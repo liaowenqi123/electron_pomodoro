@@ -23,7 +23,16 @@ function createWindow() {
   win.loadFile('src/index.html')
   
   // 启动音乐播放器进程
-  const musicExePath = path.join(__dirname, 'music-player', 'music.exe')
+  // 开发环境: __dirname/music-player/music.exe
+  // 打包后: resources/music-player/music.exe (extraResource会复制到resources目录)
+  let musicExePath
+  if (app.isPackaged) {
+    // 打包后：extraResource会把music-player放到resources目录下
+    musicExePath = path.join(process.resourcesPath, 'music-player', 'music.exe')
+  } else {
+    // 开发环境
+    musicExePath = path.join(__dirname, 'music-player', 'music.exe')
+  }
   musicProcess.start(musicExePath)
   
   // 设置音乐进程回调，转发到渲染进程
