@@ -28,6 +28,11 @@ import threading
 import time
 import random
 
+# 设置UTF-8编码
+sys.stdin.reconfigure(encoding='utf-8')
+sys.stdout.reconfigure(encoding='utf-8')
+sys.stderr.reconfigure(encoding='utf-8')
+
 class MockMusicPlayer:
     def __init__(self):
         self.playing = False

@@ -32,15 +32,16 @@ class MusicProcess {
     try {
       this.process = spawn(fullPath, [], {
         stdio: ['pipe', 'pipe', 'pipe'],
-        cwd: path.dirname(fullPath)
+        cwd: path.dirname(fullPath),
+        env: { ...process.env, PYTHONIOENCODING: 'utf-8' }
       })
 
       this.isRunning = true
       console.log('[MusicProcess] 进程已启动:', fullPath)
 
-      // 创建readline接口处理stdout
+      // 创建readline接口处理stdout，指定UTF-8编码
       const rl = readline.createInterface({
-        input: this.process.stdout,
+        input: this.process.stdout.setEncoding('utf8'),
         crlfDelay: Infinity
       })
 
@@ -138,7 +139,7 @@ class MusicProcess {
 
     try {
       const commandStr = JSON.stringify(command) + '\n'
-      this.process.stdin.write(commandStr)
+      this.process.stdin.write(commandStr, 'utf8')
       console.log('[MusicProcess] 发送命令:', command)
       return true
     } catch (err) {
