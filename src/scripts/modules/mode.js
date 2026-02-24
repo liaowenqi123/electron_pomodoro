@@ -22,6 +22,12 @@
     
     elements.container.classList.toggle('break-mode', mode === MODE.BREAK)
     
+    // 同时给 window-frame 添加模式类（用于教程弹窗样式）
+    const windowFrame = document.querySelector('.window-frame')
+    if (windowFrame) {
+      windowFrame.classList.toggle('break-mode', mode === MODE.BREAK)
+    }
+    
     if (callbacks.onModeChange) {
       callbacks.onModeChange(mode)
     }

@@ -5,10 +5,13 @@
 ## ✨ 功能特性
 
 - ⏱️ **番茄计时** - 工作/休息模式切换
+- 📋 **时间预设管理** - 自定义时间预设，支持添加和删除
 - 🎚️ **滚筒式时间选择器** - 直观的时间设置
 - 🎵 **音乐播放器** - 边工作边听音乐
-- 📊 **统计数据** - 记录今日完成数和累计专注时间
+- 📊 **统计数据** - 记录今日完成数和累计专注时间（自动持久化存储）
 - 🔔 **系统通知** - 计时完成提醒
+- 📖 **使用教程** - 内置应用使用说明
+- ➖ **窗口最小化** - 支持最小化到任务栏
 
 ## 🚀 快速开始
 
@@ -51,6 +54,8 @@ electron_pomodoro/
 │   │       ├── wheelPicker.js  # 滚筒选择器
 │   │       ├── stats.js        # 统计模块
 │   │       ├── mode.js         # 模式切换
+│   │       ├── presets.js      # 预设管理
+│   │       ├── dataStore.js    # 数据存储
 │   │       └── musicPlayer.js  # 音乐播放器
 │   └── modules/
 │       └── musicProcess.js # 音乐进程管理
@@ -103,7 +108,8 @@ electron_pomodoro/
 | HTML5 | - | 页面结构 |
 | CSS3 | - | 样式和动画 |
 | JavaScript (ES6+) | - | 业务逻辑 |
-| localStorage | - | 本地数据存储 |
+| localStorage | - | ~~本地数据存储~~ (已废弃) |
+| JSON 文件 | - | 本地数据持久化存储 |
 | Python | 3.x | 音乐播放器 |
 
 ---
@@ -307,6 +313,32 @@ Timer.init(elements, {
 | `increment(minutes)` | 分钟数 | 增加统计数据 |
 | `getTodayCount()` | - | 获取今日完成数 |
 | `getTotalMinutes()` | - | 获取累计专注分钟数 |
+
+#### dataStore.js - 数据存储模块
+
+**导出接口**:
+| 方法 | 参数 | 说明 |
+|------|------|------|
+| `load()` | - | 加载数据（异步） |
+| `save()` | - | 保存数据（异步，带防抖） |
+| `getStats()` | - | 获取统计数据 |
+| `updateStats(stats)` | 统计对象 | 更新统计数据 |
+| `getPresets()` | - | 获取预设数据 |
+| `updatePresets(presets)` | 预设对象 | 更新预设数据 |
+
+#### presets.js - 预设管理模块
+
+**导出接口**:
+| 方法 | 参数 | 说明 |
+|------|------|------|
+| `init(els, cbs)` | DOM元素对象, 回调对象 | 初始化预设 |
+| `render()` | - | 重新渲染预设列表 |
+| `selectPreset(minutes)` | 分钟数 | 选择预设 |
+| `addPreset(minutes)` | 分钟数 | 添加预设 |
+| `deletePreset(minutes)` | 分钟数 | 删除预设 |
+| `setMode(mode)` | 'work' \| 'break' | 切换模式 |
+| `setEnabled(enabled)` | boolean | 设置启用/禁用 |
+| `getActivePreset()` | - | 获取当前选中的预设 |
 
 #### mode.js - 模式切换模块
 
@@ -540,9 +572,11 @@ npm run build
 
 | 文件 | 修改场景 |
 |------|----------|
-| `main.js` | 添加系统级功能（文件操作、系统API） |
+| `main.js` | 添加系统级功能（文件操作、系统API、IPC接口） |
 | `preload.js` | 暴露新的 IPC 接口 |
 | `src/scripts/modules/*.js` | 添加新功能模块 |
+| `src/scripts/modules/dataStore.js` | 数据存储相关修改 |
+| `src/scripts/modules/presets.js` | 预设管理相关修改 |
 | `src/scripts/renderer.js` | 协调模块、初始化 |
 | `src/index.html` | 添加 UI 元素、引入脚本 |
 | `src/styles/main.css` | 添加样式 |

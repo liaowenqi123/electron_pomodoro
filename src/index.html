@@ -11,90 +11,137 @@
     <div class="container">
       <div class="draggable"></div>
       <button class="btn-close">×</button>
+      <button class="btn-minimize">−</button>
       
-      <h1 class="title">🍅 番茄钟</h1>
-      
-      <div class="mode-switch">
-        <div class="mode-btn active" data-mode="work">
-          <span class="mode-icon">💼</span>
-          <span class="mode-text">工作</span>
+      <!-- 左侧边栏 -->
+      <div class="sidebar">
+        <h2 class="sidebar-title">时间预设</h2>
+        
+        <!-- 预设列表 -->
+        <div class="preset-list" id="presetList">
+          <!-- 由 JS 动态生成 -->
         </div>
-        <div class="mode-btn" data-mode="break">
-          <span class="mode-icon">☕</span>
-          <span class="mode-text">休息</span>
-        </div>
-      </div>
-      
-      <div class="time-settings" id="timeSettings">
-        <button class="preset-btn">15分钟</button>
-        <button class="preset-btn active">25分钟</button>
-        <button class="preset-btn">45分钟</button>
-        <div class="wheel-picker-container">
-          <span>自定义:</span>
-          <div class="wheel-picker" id="wheelPicker">
-            <div class="wheel-picker-column" id="wheelColumn"></div>
+        
+        <!-- 添加预设 -->
+        <div class="add-preset-section">
+          <div class="wheel-picker-container">
+            <div class="wheel-picker" id="wheelPicker">
+              <div class="wheel-picker-column" id="wheelColumn"></div>
+            </div>
+            <span>分钟</span>
+            <button class="btn-add-preset" id="addPresetBtn">+</button>
           </div>
-          <span>分钟</span>
         </div>
-      </div>
-      
-      <div class="timer-container">
-        <svg class="progress-ring" viewBox="0 0 240 240">
-          <circle class="bg" cx="120" cy="120" r="116"></circle>
-          <circle class="progress" cx="120" cy="120" r="116" id="progressCircle"></circle>
-        </svg>
-        <div class="timer-inner">
-          <div class="time-display" id="timeDisplay">25:00</div>
-        </div>
-      </div>
-      
-      <div class="buttons">
-        <button class="btn btn-start" id="startBtn">开始</button>
-        <button class="btn btn-reset">重置</button>
-      </div>
-      
-      <p class="status" id="status">准备开始专注工作</p>
-      
-      <div class="stats">
-        <div class="stat-item">
-          <span>今日完成:</span>
-          <span class="stat-value" id="todayCount">0</span>
-          <span>个番茄</span>
-        </div>
-        <div class="stat-item">
-          <span>累计专注:</span>
-          <span class="stat-value" id="totalMinutes">0</span>
-          <span>分钟</span>
-        </div>
-      </div>
 
-      <!-- 音乐播放器 -->
-      <div class="music-player" id="musicPlayer">
-        <div class="music-info">
-          <span class="music-icon">🎵</span>
-          <span class="music-track-name" id="trackName">未播放</span>
-        </div>
-        <div class="music-progress-container">
-          <span class="music-time" id="currentTime">0:00</span>
-          <div class="music-progress-bar" id="progressBar">
-            <div class="music-progress-fill" id="progressFill"></div>
-            <div class="music-progress-handle" id="progressHandle"></div>
+        <!-- 统计信息 -->
+        <div class="sidebar-stats">
+          <div class="stat-item">
+            <span class="stat-label">今日完成</span>
+            <span class="stat-value" id="todayCount">0</span>
+            <span class="stat-unit">个</span>
           </div>
-          <span class="music-time" id="duration">0:00</span>
+          <div class="stat-item">
+            <span class="stat-label">累计专注</span>
+            <span class="stat-value" id="totalMinutes">0</span>
+            <span class="stat-unit">分钟</span>
+          </div>
         </div>
-        <div class="music-controls">
-          <button class="music-btn music-prev" id="prevBtn">⏮</button>
-          <button class="music-btn music-play" id="playBtn" data-playing="false">▶</button>
-          <button class="music-btn music-next" id="nextBtn">⏭</button>
+      </div>
+      
+      <!-- 右侧主区域 -->
+      <div class="main-content">
+        <button class="btn-tutorial" id="tutorialBtn">📖</button>
+        <h1 class="title">🍅 番茄钟</h1>
+        
+        <div class="mode-switch">
+          <div class="mode-btn active" data-mode="work">
+            <span class="mode-icon">💼</span>
+            <span class="mode-text">工作</span>
+          </div>
+          <div class="mode-btn" data-mode="break">
+            <span class="mode-icon">☕</span>
+            <span class="mode-text">休息</span>
+          </div>
+        </div>
+        
+        <div class="timer-container">
+          <svg class="progress-ring" viewBox="0 0 240 240">
+            <circle class="bg" cx="120" cy="120" r="116"></circle>
+            <circle class="progress" cx="120" cy="120" r="116" id="progressCircle"></circle>
+          </svg>
+          <div class="timer-inner">
+            <div class="time-display" id="timeDisplay">25:00</div>
+          </div>
+        </div>
+        
+        <div class="buttons">
+          <button class="btn btn-start" id="startBtn">开始</button>
+          <button class="btn btn-reset">重置</button>
+        </div>
+        
+        <p class="status" id="status">准备开始专注工作</p>
+
+        <!-- 音乐播放器 -->
+        <div class="music-player" id="musicPlayer">
+          <div class="music-info">
+            <span class="music-icon">🎵</span>
+            <span class="music-track-name" id="trackName">未播放</span>
+          </div>
+          <div class="music-progress-container">
+            <span class="music-time" id="currentTime">0:00</span>
+            <div class="music-progress-bar" id="progressBar">
+              <div class="music-progress-fill" id="progressFill"></div>
+              <div class="music-progress-handle" id="progressHandle"></div>
+            </div>
+            <span class="music-time" id="duration">0:00</span>
+          </div>
+          <div class="music-controls">
+            <button class="music-btn music-prev" id="prevBtn">⏮</button>
+            <button class="music-btn music-play" id="playBtn" data-playing="false">▶</button>
+            <button class="music-btn music-next" id="nextBtn">⏭</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 教程弹窗 -->
+    <div class="tutorial-modal" id="tutorialModal">
+      <div class="tutorial-content">
+        <button class="tutorial-close" id="tutorialClose">×</button>
+        <h2>📖 使用说明</h2>
+        <div class="tutorial-body">
+          <h3>⏱️ 计时功能</h3>
+          <p>1. 在左侧选择时间预设，点击即可设置计时时长</p>
+          <p>2. 使用滚轮选择器可以自定义时间（1-120分钟）</p>
+          <p>3. 点击 "+" 按钮将滚轮当前时间添加为新的预设</p>
+          <p>4. 点击预设右侧的 "×" 可删除该预设</p>
+          <p>5. 点击 "开始" 按钮开始计时，再次点击可暂停</p>
+          <p>6. 点击 "重置" 按钮可重置当前计时</p>
+          
+          <h3>💼☕ 模式切换</h3>
+          <p>点击 "工作" 或 "休息" 按钮切换模式，不同模式有独立的时间预设列表</p>
+          
+          <h3>🎵 音乐播放器</h3>
+          <p>底部音乐播放器可在专注时播放音乐，支持播放/暂停、上下曲切换和进度拖动</p>
+          
+          <h3>📊 统计数据</h3>
+          <p>左侧底部显示今日完成的番茄数和累计专注时间，数据会自动保存</p>
+          
+          <h3>⚙️ 窗口操作</h3>
+          <p>• 点击右上角 "−" 最小化窗口到任务栏</p>
+          <p>• 点击右上角 "×" 关闭应用</p>
+          <p>• 拖动顶部空白区域可移动窗口</p>
         </div>
       </div>
     </div>
   </div>
 
   <!-- 按依赖顺序加载模块 -->
+  <script src="scripts/modules/dataStore.js"></script>
   <script src="scripts/modules/wheelPicker.js"></script>
-  <script src="scripts/modules/timer.js"></script>
+  <script src="scripts/modules/presets.js"></script>
   <script src="scripts/modules/stats.js"></script>
+  <script src="scripts/modules/timer.js"></script>
   <script src="scripts/modules/mode.js"></script>
   <script src="scripts/modules/musicPlayer.js"></script>
   <!-- 主入口最后加载 -->

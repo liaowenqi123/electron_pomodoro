@@ -4,12 +4,80 @@
 
 const { app, BrowserWindow, ipcMain, Notification } = require('electron')
 const path = require('path')
+const fs = require('fs')
 const musicProcess = require('./src/modules/musicProcess')
+
+// 数据文件路径
+let dataFilePath = null
+
+function getDataFilePath() {
+  if (dataFilePath) return dataFilePath
+  
+  // 数据存放在用户数据目录（可读写）
+  // 开发环境和打包后都使用这个路径
+  const userDataPath = app.getPath('userData')
+  dataFilePath = path.join(userDataPath, 'data', 'data.json')
+  return dataFilePath
+}
+
+// 确保数据目录存在
+function ensureDataDir() {
+  const dataDir = path.dirname(getDataFilePath())
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true })
+  }
+}
+
+// 默认数据结构
+const defaultData = {
+  stats: {
+    date: new Date().toDateString(),
+    todayCount: 0,
+    totalMinutes: 0
+  },
+  presets: {
+    work: [15, 25, 45, 60],
+    break: [5, 10, 15]
+  }
+}
+
+// 读取数据
+function readData() {
+  ensureDataDir()
+  const filePath = getDataFilePath()
+  
+  // 如果文件不存在，创建默认数据
+  if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, JSON.stringify(defaultData, null, 2), 'utf-8')
+    return defaultData
+  }
+  
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8')
+    return JSON.parse(content)
+  } catch (e) {
+    console.error('读取数据文件失败:', e)
+    return defaultData
+  }
+}
+
+// 写入数据
+function writeData(data) {
+  ensureDataDir()
+  const filePath = getDataFilePath()
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8')
+    return true
+  } catch (e) {
+    console.error('写入数据文件失败:', e)
+    return false
+  }
+}
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 400,
-    height: 780,
+    width: 520,
+    height: 560,
     frame: false,
     transparent: true,
     resizable: false,
@@ -61,6 +129,14 @@ ipcMain.on('close-window', () => {
   }
 })
 
+// 处理最小化窗口请求
+ipcMain.on('minimize-window', () => {
+  const win = BrowserWindow.getFocusedWindow()
+  if (win) {
+    win.minimize()
+  }
+})
+
 // 处理显示通知请求
 ipcMain.on('show-notification', (event, data) => {
   if (Notification.isSupported()) {
@@ -71,6 +147,16 @@ ipcMain.on('show-notification', (event, data) => {
     })
     notification.show()
   }
+})
+
+// ============ 数据存储 IPC 处理 ============
+
+ipcMain.handle('read-data', () => {
+  return readData()
+})
+
+ipcMain.handle('write-data', (event, data) => {
+  return writeData(data)
 })
 
 // ============ 音乐播放器 IPC 处理 ============

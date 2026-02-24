@@ -1,74 +1,56 @@
 /**
- * 统计模块
+ * 统计模块 - 使用 JSON 文件存储
  */
 ;(function() {
   'use strict'
 
   let elements = {}
-  let todayCount = 0
-  let totalMinutes = 0
-
-  function load() {
-    const today = new Date().toDateString()
-    const savedStats = localStorage.getItem('pomodoroStats')
-    
-    if (savedStats) {
-      const stats = JSON.parse(savedStats)
-      if (stats.date === today) {
-        todayCount = stats.todayCount || 0
-        totalMinutes = stats.totalMinutes || 0
-      } else {
-        todayCount = 0
-        totalMinutes = stats.totalMinutes || 0
-      }
-    }
-    updateDisplay()
-  }
-
-  function save() {
-    localStorage.setItem('pomodoroStats', JSON.stringify({
-      date: new Date().toDateString(),
-      todayCount: todayCount,
-      totalMinutes: totalMinutes
-    }))
-  }
 
   function updateDisplay() {
+    const stats = DataStore.getStats()
+    
     if (elements.todayCount) {
-      elements.todayCount.textContent = todayCount
+      elements.todayCount.textContent = stats.todayCount || 0
     }
     if (elements.totalMinutes) {
-      elements.totalMinutes.textContent = totalMinutes
+      elements.totalMinutes.textContent = stats.totalMinutes || 0
     }
   }
 
-  function increment(minutes) {
-    todayCount++
-    totalMinutes += minutes
+  async function increment(minutes) {
+    const stats = DataStore.getStats()
+    
+    // 更新统计
+    const newStats = {
+      date: new Date().toDateString(),
+      todayCount: (stats.todayCount || 0) + 1,
+      totalMinutes: (stats.totalMinutes || 0) + minutes
+    }
+    
+    await DataStore.updateStats(newStats)
     updateDisplay()
-    save()
   }
 
   function getTodayCount() {
-    return todayCount
+    const stats = DataStore.getStats()
+    return stats.todayCount || 0
   }
 
   function getTotalMinutes() {
-    return totalMinutes
+    const stats = DataStore.getStats()
+    return stats.totalMinutes || 0
   }
 
   function init(els) {
     elements = els
-    load()
+    updateDisplay()
   }
 
   // 导出到全局
   window.Stats = {
     init: init,
-    load: load,
-    save: save,
-    increment: increment,
     updateDisplay: updateDisplay,
+    increment: increment,
     getTodayCount: getTodayCount,
     getTotalMinutes: getTotalMinutes
   }

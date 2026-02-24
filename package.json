@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "chcp 65001 >nul && set PYTHONIOENCODING=utf-8 && electron .",
-    "build": "npx @electron/packager . 番茄钟 --platform=win32 --arch=x64 --out=dist --overwrite --ignore=\"music-player/build|music-player/dist|music-player/.*\\.spec$\" --extra-resource=music-player"
+    "build": "npx @electron/packager . 番茄钟 --platform=win32 --arch=x64 --out=dist --overwrite --ignore=\"music-player/build|music-player/dist|music-player/.*\\.spec$|^data$\" --extra-resource=music-player --no-prune"
   },
   "keywords": [
     "pomodoro",
