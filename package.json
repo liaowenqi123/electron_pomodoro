@@ -1,0 +1,21 @@
+{
+  "name": "pomodoro-timer",
+  "version": "1.0.0",
+  "description": "一个美观的番茄钟应用",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "npx @electron/packager . 番茄钟 --platform=win32 --arch=x64 --out=dist --overwrite"
+  },
+  "keywords": [
+    "pomodoro",
+    "timer",
+    "electron"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@electron/packager": "^19.0.5",
+    "electron": "^34.0.0"
+  }
+}

@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Python build artifacts
+music-player/build/
+music-player/dist/
+music-player/__pycache__/
+music-player/*.spec
+
+# Keep only music.py and music.exe
+music-player/*
+!music-player/music.py
+!music-player/music.exe
+!music-player/music/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

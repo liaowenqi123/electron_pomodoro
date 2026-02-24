@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>番茄钟</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <div class="window-frame">
+    <div class="container">
+      <div class="draggable"></div>
+      <button class="btn-close">×</button>
+      
+      <h1 class="title">🍅 番茄钟</h1>
+      
+      <div class="mode-switch">
+        <div class="mode-btn active" data-mode="work">
+          <span class="mode-icon">💼</span>
+          <span class="mode-text">工作</span>
+        </div>
+        <div class="mode-btn" data-mode="break">
+          <span class="mode-icon">☕</span>
+          <span class="mode-text">休息</span>
+        </div>
+      </div>
+      
+      <div class="time-settings" id="timeSettings">
+        <button class="preset-btn">15分钟</button>
+        <button class="preset-btn active">25分钟</button>
+        <button class="preset-btn">45分钟</button>
+        <div class="wheel-picker-container">
+          <span>自定义:</span>
+          <div class="wheel-picker" id="wheelPicker">
+            <div class="wheel-picker-column" id="wheelColumn"></div>
+          </div>
+          <span>分钟</span>
+        </div>
+      </div>
+      
+      <div class="timer-container">
+        <svg class="progress-ring" viewBox="0 0 240 240">
+          <circle class="bg" cx="120" cy="120" r="116"></circle>
+          <circle class="progress" cx="120" cy="120" r="116" id="progressCircle"></circle>
+        </svg>
+        <div class="timer-inner">
+          <div class="time-display" id="timeDisplay">25:00</div>
+        </div>
+      </div>
+      
+      <div class="buttons">
+        <button class="btn btn-start" id="startBtn">开始</button>
+        <button class="btn btn-reset">重置</button>
+      </div>
+      
+      <p class="status" id="status">准备开始专注工作</p>
+      
+      <div class="stats">
+        <div class="stat-item">
+          <span>今日完成:</span>
+          <span class="stat-value" id="todayCount">0</span>
+          <span>个番茄</span>
+        </div>
+        <div class="stat-item">
+          <span>累计专注:</span>
+          <span class="stat-value" id="totalMinutes">0</span>
+          <span>分钟</span>
+        </div>
+      </div>
+
+      <!-- 音乐播放器 -->
+      <div class="music-player" id="musicPlayer">
+        <div class="music-info">
+          <span class="music-icon">🎵</span>
+          <span class="music-track-name" id="trackName">未播放</span>
+        </div>
+        <div class="music-progress-container">
+          <span class="music-time" id="currentTime">0:00</span>
+          <div class="music-progress-bar" id="progressBar">
+            <div class="music-progress-fill" id="progressFill"></div>
+            <div class="music-progress-handle" id="progressHandle"></div>
+          </div>
+          <span class="music-time" id="duration">0:00</span>
+        </div>
+        <div class="music-controls">
+          <button class="music-btn music-prev" id="prevBtn">⏮</button>
+          <button class="music-btn music-play" id="playBtn" data-playing="false">▶</button>
+          <button class="music-btn music-next" id="nextBtn">⏭</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 按依赖顺序加载模块 -->
+  <script src="scripts/modules/wheelPicker.js"></script>
+  <script src="scripts/modules/timer.js"></script>
+  <script src="scripts/modules/stats.js"></script>
+  <script src="scripts/modules/mode.js"></script>
+  <script src="scripts/modules/musicPlayer.js"></script>
+  <!-- 主入口最后加载 -->
+  <script src="scripts/renderer.js"></script>
+</body>
+</html>
