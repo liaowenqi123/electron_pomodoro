@@ -6,6 +6,17 @@ const { app, BrowserWindow, ipcMain, Notification } = require('electron')
 const path = require('path')
 const musicProcess = require('./src/modules/musicProcess')
 
+// Windows控制台设置UTF-8编码
+if (process.platform === 'win32') {
+  const { execSync } = require('child_process')
+  try {
+    // 设置控制台代码页为UTF-8 (65001)
+    execSync('chcp 65001', { stdio: 'inherit' })
+  } catch (e) {
+    // 忽略错误
+  }
+}
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 400,
