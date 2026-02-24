@@ -4,7 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>番茄钟</title>
-  <link rel="stylesheet" href="styles/main.css">
+  <!-- CSS 样式文件 -->
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/sidebar.css">
+  <link rel="stylesheet" href="styles/main-content.css">
+  <link rel="stylesheet" href="styles/music-player.css">
+  <link rel="stylesheet" href="styles/modal.css">
+  <link rel="stylesheet" href="styles/modes.css">
 </head>
 <body>
   <div class="window-frame">
@@ -13,23 +19,53 @@
       <button class="btn-close">×</button>
       <button class="btn-minimize">−</button>
       
+      <!-- 模式切换滑块 -->
+      <div class="mode-slider-container">
+        <div class="mode-slider" id="modeSlider">
+          <div class="mode-slider-thumb" id="modeSliderThumb"></div>
+        </div>
+        <div class="mode-slider-labels">
+          <span class="mode-label active" data-mode="single">单次</span>
+          <span class="mode-label" data-mode="plan">计划</span>
+        </div>
+      </div>
+      
       <!-- 左侧边栏 -->
       <div class="sidebar">
-        <h2 class="sidebar-title">时间预设</h2>
-        
-        <!-- 预设列表 -->
-        <div class="preset-list" id="presetList">
-          <!-- 由 JS 动态生成 -->
+        <!-- 单次模式：时间预设 -->
+        <div class="single-mode-content" id="singleModeContent">
+          <h2 class="sidebar-title">时间预设</h2>
+          
+          <!-- 预设列表 -->
+          <div class="preset-list" id="presetList">
+            <!-- 由 JS 动态生成 -->
+          </div>
         </div>
         
-        <!-- 添加预设 -->
+        <!-- 计划模式：任务列表 -->
+        <div class="plan-mode-content" id="planModeContent" style="display: none;">
+          <h2 class="sidebar-title">番茄计划</h2>
+          
+          <!-- 计划列表 -->
+          <div class="plan-list" id="planList">
+            <!-- 由 JS 动态生成 -->
+          </div>
+        </div>
+        
+        <!-- 添加预设/计划 -->
         <div class="add-preset-section">
           <div class="wheel-picker-container">
             <div class="wheel-picker" id="wheelPicker">
               <div class="wheel-picker-column" id="wheelColumn"></div>
             </div>
             <span>分钟</span>
+            <!-- 单次模式：一个加号 -->
             <button class="btn-add-preset" id="addPresetBtn">+</button>
+          </div>
+          <!-- 计划模式：两个加号在下方 -->
+          <div class="plan-add-buttons" id="planAddButtons" style="display: none;">
+            <button class="btn-add-plan btn-add-work" id="addWorkBtn" title="添加工作时间">+ 工作</button>
+            <button class="btn-add-plan btn-add-break" id="addBreakBtn" title="添加休息时间">+ 休息</button>
           </div>
         </div>
 
@@ -110,16 +146,25 @@
         <button class="tutorial-close" id="tutorialClose">×</button>
         <h2>📖 使用说明</h2>
         <div class="tutorial-body">
-          <h3>⏱️ 计时功能</h3>
+          <h3>🔄 模式切换</h3>
+          <p>顶部滑块可切换 <b>单次模式</b> 和 <b>计划模式</b>：</p>
+          <p>• <b>单次模式</b>：传统番茄钟，手动设置时间计时</p>
+          <p>• <b>计划模式</b>：创建任务列表，自动依次执行</p>
+          
+          <h3>⏱️ 单次模式</h3>
           <p>1. 在左侧选择时间预设，点击即可设置计时时长</p>
           <p>2. 使用滚轮选择器可以自定义时间（1-120分钟）</p>
           <p>3. 点击 "+" 按钮将滚轮当前时间添加为新的预设</p>
           <p>4. 点击预设右侧的 "×" 可删除该预设</p>
-          <p>5. 点击 "开始" 按钮开始计时，再次点击可暂停</p>
-          <p>6. 点击 "重置" 按钮可重置当前计时</p>
+          <p>5. 点击 "工作" 或 "休息" 按钮切换模式，不同模式有独立的时间预设列表</p>
           
-          <h3>💼☕ 模式切换</h3>
-          <p>点击 "工作" 或 "休息" 按钮切换模式，不同模式有独立的时间预设列表</p>
+          <h3>📝 计划模式</h3>
+          <p>1. 使用滚轮选择时间，点击 "+ 工作" 或 "+ 休息" 添加任务到列表</p>
+          <p>2. 拖拽列表项可调整任务顺序</p>
+          <p>3. 点击任务右侧 "×" 可删除任务</p>
+          <p>4. 点击 "开始" 按钮开始执行计划，任务将自动依次执行</p>
+          <p>5. 点击 "重置" 按钮停止计划并恢复到第一个任务</p>
+          <p>6. 工作任务显示为红色，休息任务显示为绿色</p>
           
           <h3>🎵 音乐播放器</h3>
           <p>底部音乐播放器可在专注时播放音乐，支持播放/暂停、上下曲切换和进度拖动</p>
@@ -136,15 +181,26 @@
     </div>
   </div>
 
-  <!-- 按依赖顺序加载模块 -->
+  <!-- 按依赖顺序加载 JS 模块 -->
+  <!-- 基础模块 -->
+  <script src="scripts/modules/dom.js"></script>
   <script src="scripts/modules/dataStore.js"></script>
+  <script src="scripts/modules/stats.js"></script>
+  
+  <!-- 功能模块 -->
   <script src="scripts/modules/wheelPicker.js"></script>
   <script src="scripts/modules/presets.js"></script>
-  <script src="scripts/modules/stats.js"></script>
+  <script src="scripts/modules/planMode.js"></script>
   <script src="scripts/modules/timer.js"></script>
   <script src="scripts/modules/mode.js"></script>
   <script src="scripts/modules/musicPlayer.js"></script>
-  <!-- 主入口最后加载 -->
+  
+  <!-- 应用逻辑模块 -->
+  <script src="scripts/modules/appState.js"></script>
+  <script src="scripts/modules/tutorial.js"></script>
+  <script src="scripts/modules/callbacks.js"></script>
+  
+  <!-- 主入口 -->
   <script src="scripts/renderer.js"></script>
 </body>
 </html>

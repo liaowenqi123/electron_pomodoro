@@ -31,6 +31,10 @@
     isRunning = true
     elements.startBtn.textContent = '暂停'
     
+    if (callbacks.onStart) {
+      callbacks.onStart()
+    }
+    
     if (callbacks.onStatusChange) {
       callbacks.onStatusChange('running')
     }

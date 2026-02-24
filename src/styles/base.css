@@ -1,0 +1,93 @@
+/* 番茄钟 - 基础样式 */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+body {
+  font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  background: transparent;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* 外层容器 - 用于裁剪圆角 */
+.window-frame {
+  width: 520px;
+  height: 560px;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 内层容器 - 实际背景 */
+.container {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(200, 100, 100, 0.88), rgba(180, 110, 110, 0.78));
+  display: flex;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+/* ============ 模式切换滑块 ============ */
+.mode-slider-container {
+  position: absolute;
+  left: 8px;
+  top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 50;
+  -webkit-app-region: no-drag;
+}
+
+.mode-slider {
+  width: 32px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 9px;
+  position: relative;
+  cursor: pointer;
+}
+
+.mode-slider-thumb {
+  width: 14px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  transition: left 0.3s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.mode-slider.plan-mode .mode-slider-thumb {
+  left: 16px;
+}
+
+.mode-slider-labels {
+  display: flex;
+  gap: 2px;
+}
+
+.mode-label {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.mode-label.active {
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+}

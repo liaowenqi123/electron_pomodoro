@@ -1,0 +1,70 @@
+/* 番茄钟 - 模式样式覆盖 */
+
+/* ============ 计划模式样式 ============ */
+.container.plan-mode {
+  background: transparent;
+}
+
+.container.plan-mode.break-mode {
+  background: transparent;
+}
+
+.container.plan-mode .sidebar,
+.container.plan-mode.break-mode .sidebar {
+  background: rgba(50, 60, 80, 0.75);
+  border-right-color: rgba(100, 120, 150, 0.3);
+}
+
+.container.plan-mode .main-content {
+  background: linear-gradient(135deg, rgba(200, 100, 100, 0.88), rgba(180, 110, 110, 0.78));
+  border-radius: 0 20px 20px 0;
+}
+
+.container.plan-mode.break-mode .main-content {
+  background: linear-gradient(135deg, rgba(80, 180, 120, 0.88), rgba(70, 160, 110, 0.78));
+}
+
+/* 计划模式下隐藏工作/休息模式按钮 */
+.container.plan-mode .mode-switch {
+  display: none;
+}
+
+/* ============ 休息模式样式 ============ */
+.container.break-mode {
+  background: linear-gradient(135deg, rgba(80, 180, 120, 0.88), rgba(70, 160, 110, 0.78));
+}
+
+.container.break-mode .sidebar {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.container.break-mode .title {
+  color: #fff;
+}
+
+.container.break-mode .preset-item.active {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.container.break-mode .btn-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.container.break-mode .progress-ring .progress {
+  stroke: rgba(255, 255, 255, 0.85);
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
+}
+
+.container.break-mode .timer-inner {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.container.break-mode .btn-start {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2));
+}
+
+.container.break-mode .music-player {
+  border-color: rgba(255, 255, 255, 0.2);
+}
