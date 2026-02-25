@@ -66,7 +66,9 @@
     trackNameEl: DOM.trackNameEl,
     currentTimeEl: DOM.currentTimeEl,
     durationEl: DOM.durationEl,
-    musicPlayer: DOM.musicPlayer
+    musicPlayer: DOM.musicPlayer,
+    deviceBtn: DOM.deviceBtn,
+    deviceList: DOM.deviceList
   })
 
   // ============ 事件绑定 ============

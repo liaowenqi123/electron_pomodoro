@@ -9,6 +9,7 @@
   width: 100%;
   max-width: 300px;
   -webkit-app-region: no-drag;
+  position: relative;
 }
 
 .music-info {
@@ -16,6 +17,7 @@
   align-items: center;
   gap: 6px;
   margin-bottom: 8px;
+  position: relative;
 }
 
 .music-icon {
@@ -28,7 +30,127 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 250px;
+  flex: 1;
+}
+
+.music-device-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.music-device-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.music-device-list {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 4px;
+  background: rgba(40, 40, 50, 0.98);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  min-width: 220px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.music-device-list.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.music-device-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.music-device-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.music-device-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.device-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.device-item:last-child {
+  border-bottom: none;
+}
+
+.device-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.device-item.device-current {
+  background: rgba(100, 180, 255, 0.15);
+}
+
+.device-item.device-default .device-name::after {
+  content: ' (默认)';
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 10px;
+}
+
+.device-name {
+  flex: 1;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.device-api {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-left: 6px;
+  flex-shrink: 0;
+}
+
+.device-check {
+  color: #4fc3f7;
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+.device-empty {
+  padding: 12px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+  cursor: default;
+}
+
+.device-empty:hover {
+  background: transparent;
 }
 
 .music-progress-container {

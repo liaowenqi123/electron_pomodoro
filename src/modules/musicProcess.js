@@ -11,26 +11,30 @@ class MusicProcess {
   constructor() {
     this.process = null
     this.isRunning = false
+    this.onReadyCallback = null
     this.onStatusCallback = null
     this.onTrackChangeCallback = null
     this.onPlayStateCallback = null
     this.onProgressCallback = null
+    this.onDevicesCallback = null
   }
 
   /**
    * 启动音乐播放器进程
    * @param {string} exePath - music.exe的路径
+   * @param {number} deviceId - 初始设备ID（可选）
    */
-  start(exePath) {
+  start(exePath, deviceId) {
     if (this.process) {
       console.log('[MusicProcess] 进程已在运行')
       return
     }
 
     const fullPath = exePath || path.join(__dirname, '../../music.exe')
+    const args = deviceId !== undefined && deviceId !== null ? [String(deviceId)] : []
     
     try {
-      this.process = spawn(fullPath, [], {
+      this.process = spawn(fullPath, args, {
         stdio: ['pipe', 'pipe', 'pipe'],
         cwd: path.dirname(fullPath),
         env: { ...process.env, PYTHONIOENCODING: 'utf-8' }
@@ -80,7 +84,22 @@ class MusicProcess {
    */
   stop() {
     if (this.process) {
-      this.process.kill()
+      const pid = this.process.pid
+      
+      // 在 Windows 上使用 taskkill 强制终止进程树
+      if (process.platform === 'win32' && pid) {
+        try {
+          const { execSync } = require('child_process')
+          execSync(`taskkill /pid ${pid} /T /F`, { stdio: 'ignore' })
+          console.log('[MusicProcess] 使用 taskkill 终止进程:', pid)
+        } catch (e) {
+          // 如果 taskkill 失败，尝试普通 kill
+          this.process.kill('SIGKILL')
+        }
+      } else {
+        this.process.kill('SIGKILL')
+      }
+      
       this.process = null
       this.isRunning = false
       console.log('[MusicProcess] 进程已停止')
@@ -99,6 +118,11 @@ class MusicProcess {
       console.log('[MusicProcess] 收到消息:', event, data)
 
       switch (event) {
+        case 'ready':
+          if (this.onReadyCallback) {
+            this.onReadyCallback(data)
+          }
+          break
         case 'status':
           if (this.onStatusCallback) {
             this.onStatusCallback(data)
@@ -117,6 +141,11 @@ class MusicProcess {
         case 'progress':
           if (this.onProgressCallback) {
             this.onProgressCallback(data)
+          }
+          break
+        case 'devices':
+          if (this.onDevicesCallback) {
+            this.onDevicesCallback(data)
           }
           break
         default:
@@ -194,7 +223,26 @@ class MusicProcess {
     return this.sendCommand({ command: 'get_status' })
   }
 
+  /**
+   * 获取输出设备列表
+   */
+  getDevices() {
+    return this.sendCommand({ command: 'get_devices' })
+  }
+
+  /**
+   * 设置输出设备
+   * @param {number} deviceId - 设备ID
+   */
+  setDevice(deviceId) {
+    return this.sendCommand({ command: 'set_device', device_id: deviceId })
+  }
+
   // ============ 回调设置 ============
+
+  onReady(callback) {
+    this.onReadyCallback = callback
+  }
 
   onStatus(callback) {
     this.onStatusCallback = callback
@@ -210,6 +258,10 @@ class MusicProcess {
 
   onProgress(callback) {
     this.onProgressCallback = callback
+  }
+
+  onDevices(callback) {
+    this.onDevicesCallback = callback
   }
 }
 

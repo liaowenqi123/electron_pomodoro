@@ -57,6 +57,8 @@
     currentTimeEl: document.getElementById('currentTime'),
     durationEl: document.getElementById('duration'),
     musicPlayer: document.getElementById('musicPlayer'),
+    deviceBtn: document.getElementById('deviceBtn'),
+    deviceList: document.getElementById('deviceList'),
     
     // 按钮
     btnClose: document.querySelector('.btn-close'),

@@ -38,7 +38,8 @@ const defaultData = {
   presets: {
     work: [15, 25, 45, 60],
     break: [5, 10, 15]
-  }
+  },
+  audioDevice: null  // 保存音频设备ID
 }
 
 // 读取数据
@@ -101,9 +102,18 @@ function createWindow() {
     // 开发环境
     musicExePath = path.join(__dirname, 'music-player', 'music.exe')
   }
-  musicProcess.start(musicExePath)
+  
+  // 读取保存的设备ID
+  const savedData = readData()
+  const savedDeviceId = savedData.audioDevice
+  
+  musicProcess.start(musicExePath, savedDeviceId)
   
   // 设置音乐进程回调，转发到渲染进程
+  musicProcess.onReady((data) => {
+    win.webContents.send('music-ready', data)
+  })
+  
   musicProcess.onStatus((data) => {
     win.webContents.send('music-status', data)
   })
@@ -119,12 +129,18 @@ function createWindow() {
   musicProcess.onProgress((data) => {
     win.webContents.send('music-progress', data)
   })
+  
+  musicProcess.onDevices((data) => {
+    win.webContents.send('music-devices', data)
+  })
 }
 
 // 处理关闭窗口请求
 ipcMain.on('close-window', () => {
   const win = BrowserWindow.getFocusedWindow()
   if (win) {
+    // 先停止音乐进程
+    musicProcess.stop()
     win.close()
   }
 })
@@ -183,6 +199,18 @@ ipcMain.on('music-set-volume', (event, volume) => {
 
 ipcMain.on('music-get-status', () => {
   musicProcess.getStatus()
+})
+
+ipcMain.on('music-get-devices', () => {
+  musicProcess.getDevices()
+})
+
+ipcMain.on('music-set-device', (event, deviceId) => {
+  musicProcess.setDevice(deviceId)
+  // 保存设备ID到数据文件
+  const data = readData()
+  data.audioDevice = deviceId
+  writeData(data)
 })
 
 app.whenReady().then(() => {

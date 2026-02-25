@@ -32,8 +32,13 @@ const { contextBridge, ipcRenderer } = require('electron')
   musicSeek: (position) => ipcRenderer.send('music-seek', position),
   musicSetVolume: (volume) => ipcRenderer.send('music-set-volume', volume),
   musicGetStatus: () => ipcRenderer.send('music-get-status'),
+  musicGetDevices: () => ipcRenderer.send('music-get-devices'),
+  musicSetDevice: (deviceId) => ipcRenderer.send('music-set-device', deviceId),
   
   // 音乐播放器事件监听
+  onMusicReady: (callback) => {
+    ipcRenderer.on('music-ready', (event, data) => callback(data))
+  },
   onMusicStatus: (callback) => {
     ipcRenderer.on('music-status', (event, data) => callback(data))
   },
@@ -46,12 +51,17 @@ const { contextBridge, ipcRenderer } = require('electron')
   onMusicProgress: (callback) => {
     ipcRenderer.on('music-progress', (event, data) => callback(data))
   },
+  onMusicDevices: (callback) => {
+    ipcRenderer.on('music-devices', (event, data) => callback(data))
+  },
   
   // 移除监听器
   removeMusicListeners: () => {
+    ipcRenderer.removeAllListeners('music-ready')
     ipcRenderer.removeAllListeners('music-status')
     ipcRenderer.removeAllListeners('music-track-change')
     ipcRenderer.removeAllListeners('music-play-state')
     ipcRenderer.removeAllListeners('music-progress')
+    ipcRenderer.removeAllListeners('music-devices')
   }
 })

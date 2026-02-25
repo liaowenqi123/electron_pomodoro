@@ -9,6 +9,7 @@ music-player/build/
 music-player/dist/
 music-player/__pycache__/
 music-player/*.spec
+music-player/music/
 
 # OS files
 .DS_Store

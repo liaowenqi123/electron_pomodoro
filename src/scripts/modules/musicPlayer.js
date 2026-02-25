@@ -13,11 +13,11 @@ const MusicPlayer = (function() {
     currentTime: 0,
     duration: 0,
     isDragging: false,
-    lastSyncTime: 0  // 上次同步的时间戳
+    lastSyncTime: 0,  // 上次同步的时间戳
+    devices: [],
+    currentDeviceId: null,
+    isDeviceListOpen: false
   }
-  
-  // 本地进度更新定时器
-  let progressInterval = null
 
   // ============ DOM 元素引用 ============
   let elements = {
@@ -30,7 +30,9 @@ const MusicPlayer = (function() {
     trackNameEl: null,
     currentTimeEl: null,
     durationEl: null,
-    musicPlayer: null
+    musicPlayer: null,
+    deviceBtn: null,
+    deviceList: null
   }
 
   // ============ 工具函数 ============
@@ -67,25 +69,6 @@ const MusicPlayer = (function() {
     if (elements.playBtn) {
       elements.playBtn.textContent = state.playing ? '⏸' : '▶'
       elements.playBtn.setAttribute('data-playing', state.playing)
-    }
-  }
-
-  // ============ 本地进度更新 ============
-  
-  function startLocalProgress() {
-    stopLocalProgress()
-    progressInterval = setInterval(() => {
-      if (state.playing && !state.isDragging && state.duration > 0) {
-        state.currentTime = Math.min(state.currentTime + 1, state.duration)
-        updateProgressUI()
-      }
-    }, 1000)
-  }
-  
-  function stopLocalProgress() {
-    if (progressInterval) {
-      clearInterval(progressInterval)
-      progressInterval = null
     }
   }
 
@@ -132,12 +115,75 @@ const MusicPlayer = (function() {
     window.electronAPI.musicSeek(state.currentTime)
   }
 
+  // ============ 设备选择器 ============
+  
+  function renderDeviceList() {
+    if (!elements.deviceList) return
+    
+    if (state.devices.length === 0) {
+      elements.deviceList.innerHTML = '<div class="device-item device-empty">加载中...</div>'
+      return
+    }
+    
+    const html = state.devices.map(device => {
+      const isCurrent = device.id === state.currentDeviceId
+      const isDefault = device.is_default
+      const classes = ['device-item']
+      if (isCurrent) classes.push('device-current')
+      if (isDefault) classes.push('device-default')
+      
+      return `<div class="${classes.join(' ')}" data-device-id="${device.id}">
+        <span class="device-name">${device.name}</span>
+        <span class="device-api">${device.hostapi}</span>
+        ${isCurrent ? '<span class="device-check">✓</span>' : ''}
+      </div>`
+    }).join('')
+    
+    elements.deviceList.innerHTML = html
+  }
+  
+  function toggleDeviceList() {
+    state.isDeviceListOpen = !state.isDeviceListOpen
+    if (state.isDeviceListOpen) {
+      elements.deviceList.classList.add('open')
+      // 刷新设备列表
+      window.electronAPI.musicGetDevices()
+    } else {
+      elements.deviceList.classList.remove('open')
+    }
+  }
+  
+  function handleDeviceClick(e) {
+    const deviceItem = e.target.closest('.device-item')
+    if (!deviceItem) return
+    
+    const deviceId = parseInt(deviceItem.dataset.deviceId, 10)
+    if (deviceId === state.currentDeviceId) {
+      toggleDeviceList()
+      return
+    }
+    
+    window.electronAPI.musicSetDevice(deviceId)
+    state.currentDeviceId = deviceId
+    toggleDeviceList()
+  }
+  
+  function closeDeviceListOnClickOutside(e) {
+    if (state.isDeviceListOpen && elements.deviceBtn && elements.deviceList) {
+      if (!elements.deviceBtn.contains(e.target) && !elements.deviceList.contains(e.target)) {
+        state.isDeviceListOpen = false
+        elements.deviceList.classList.remove('open')
+      }
+    }
+  }
+
   // ============ 事件监听器 ============
   
   function setupEventListeners() {
     // 播放/暂停按钮
     if (elements.playBtn) {
       elements.playBtn.addEventListener('click', () => {
+        console.log('[MusicPlayer] playBtn clicked at', Date.now())
         window.electronAPI.musicTogglePlay()
       })
     }
@@ -165,9 +211,33 @@ const MusicPlayer = (function() {
         elements.progressHandle.addEventListener('mousedown', handleProgressDragStart)
       }
     }
+    
+    // 设备选择按钮
+    if (elements.deviceBtn) {
+      elements.deviceBtn.addEventListener('click', toggleDeviceList)
+    }
+    
+    // 设备列表点击
+    if (elements.deviceList) {
+      elements.deviceList.addEventListener('click', handleDeviceClick)
+    }
+    
+    // 点击外部关闭设备列表
+    document.addEventListener('click', closeDeviceListOnClickOutside)
   }
 
   function setupIPCListeners() {
+    // 监听准备就绪事件
+    window.electronAPI.onMusicReady((data) => {
+      state.trackName = data.name
+      state.duration = data.duration
+      state.currentTime = 0
+      state.playing = false
+      updateProgressUI()
+      updatePlayButton()
+      console.log('[MusicPlayer] 收到 ready 事件:', data)
+    })
+
     // 监听状态更新
     window.electronAPI.onMusicStatus((data) => {
       state.playing = data.playing
@@ -176,11 +246,6 @@ const MusicPlayer = (function() {
       state.duration = data.duration
       updateProgressUI()
       updatePlayButton()
-      if (state.playing) {
-        startLocalProgress()
-      } else {
-        stopLocalProgress()
-      }
     })
 
     // 监听曲目切换
@@ -195,11 +260,6 @@ const MusicPlayer = (function() {
     window.electronAPI.onMusicPlayState((data) => {
       state.playing = data.playing
       updatePlayButton()
-      if (state.playing) {
-        startLocalProgress()
-      } else {
-        stopLocalProgress()
-      }
     })
 
     // 监听进度更新
@@ -209,6 +269,13 @@ const MusicPlayer = (function() {
         state.duration = data.duration
         updateProgressUI()
       }
+    })
+    
+    // 监听设备列表更新
+    window.electronAPI.onMusicDevices((data) => {
+      state.devices = data.devices || []
+      state.currentDeviceId = data.current
+      renderDeviceList()
     })
   }
 
@@ -227,6 +294,8 @@ const MusicPlayer = (function() {
       
       // 请求初始状态
       window.electronAPI.musicGetStatus()
+      // 请求设备列表
+      window.electronAPI.musicGetDevices()
       
       console.log('[MusicPlayer] 已初始化')
     },
