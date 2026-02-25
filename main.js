@@ -93,11 +93,11 @@ function createWindow() {
   
   // 启动音乐播放器进程
   // 开发环境: __dirname/music-player/music.exe
-  // 打包后: resources/music-player/music.exe (extraResource会复制到resources目录)
+  // 打包后: resources/music.exe (extraResource会复制到resources目录)
   let musicExePath
   if (app.isPackaged) {
-    // 打包后：extraResource会把music-player放到resources目录下
-    musicExePath = path.join(process.resourcesPath, 'music-player', 'music.exe')
+    // 打包后：extraResource会把 music.exe 和 music 文件夹放到 resources 目录下
+    musicExePath = path.join(process.resourcesPath, 'music.exe')
   } else {
     // 开发环境
     musicExePath = path.join(__dirname, 'music-player', 'music.exe')
