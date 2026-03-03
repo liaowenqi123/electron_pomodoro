@@ -54,6 +54,9 @@ const { contextBridge, ipcRenderer } = require('electron')
   onMusicDevices: (callback) => {
     ipcRenderer.on('music-devices', (event, data) => callback(data))
   },
+  onMusicNoMusic: (callback) => {
+    ipcRenderer.on('music-no-music', (event, data) => callback(data))
+  },
   
   // 移除监听器
   removeMusicListeners: () => {
@@ -63,5 +66,6 @@ const { contextBridge, ipcRenderer } = require('electron')
     ipcRenderer.removeAllListeners('music-play-state')
     ipcRenderer.removeAllListeners('music-progress')
     ipcRenderer.removeAllListeners('music-devices')
+    ipcRenderer.removeAllListeners('music-no-music')
   }
 })

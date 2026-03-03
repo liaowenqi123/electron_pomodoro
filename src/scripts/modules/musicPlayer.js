@@ -16,7 +16,8 @@ const MusicPlayer = (function() {
     lastSyncTime: 0,  // 上次同步的时间戳
     devices: [],
     currentDeviceId: null,
-    isDeviceListOpen: false
+    isDeviceListOpen: false,
+    hasMusic: true  // 是否有音乐文件
   }
 
   // ============ DOM 元素引用 ============
@@ -44,6 +45,26 @@ const MusicPlayer = (function() {
   }
 
   function updateProgressUI() {
+    // 没有音乐时显示提示
+    if (!state.hasMusic) {
+      if (elements.trackNameEl) {
+        elements.trackNameEl.textContent = '无音乐'
+      }
+      if (elements.currentTimeEl) {
+        elements.currentTimeEl.textContent = '--:--'
+      }
+      if (elements.durationEl) {
+        elements.durationEl.textContent = '--:--'
+      }
+      if (elements.progressFill) {
+        elements.progressFill.style.width = '0%'
+      }
+      if (elements.progressHandle) {
+        elements.progressHandle.style.left = '0%'
+      }
+      return
+    }
+    
     if (state.duration <= 0) return
     
     const progress = (state.currentTime / state.duration) * 100
@@ -276,6 +297,18 @@ const MusicPlayer = (function() {
       state.devices = data.devices || []
       state.currentDeviceId = data.current
       renderDeviceList()
+    })
+    
+    // 监听无音乐事件
+    window.electronAPI.onMusicNoMusic((data) => {
+      state.hasMusic = false
+      state.playing = false
+      state.trackName = ''
+      state.currentTime = 0
+      state.duration = 0
+      updateProgressUI()
+      updatePlayButton()
+      console.log('[MusicPlayer] 收到 no_music 事件:', data)
     })
   }
 

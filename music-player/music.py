@@ -565,7 +565,23 @@ if __name__ == "__main__":
     stdin_thread.start()
     
     # 初始化播放列表
-    init_shuffled_playlist()
+    has_music = init_shuffled_playlist()
+    
+    # 检查是否有音乐文件
+    if not has_music:
+        print("没有找到音乐文件", file=sys.stderr)
+        # 发送无音乐事件
+        state.send_event("no_music", {"message": "music文件夹中没有音乐文件"})
+        # 进入等待循环，等待退出命令
+        while True:
+            with state.lock:
+                if state.exit_program:
+                    break
+            time.sleep(0.1)
+        if listener:
+            listener.stop()
+        print("程序已退出", file=sys.stderr)
+        sys.exit(0)
     
     # 预加载第一首歌的基本信息（不加载音频数据，不阻塞）
     current_song = preload_first_song()

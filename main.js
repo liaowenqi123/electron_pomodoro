@@ -133,6 +133,10 @@ function createWindow() {
   musicProcess.onDevices((data) => {
     win.webContents.send('music-devices', data)
   })
+  
+  musicProcess.onNoMusic((data) => {
+    win.webContents.send('music-no-music', data)
+  })
 }
 
 // 处理关闭窗口请求
