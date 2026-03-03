@@ -81,7 +81,8 @@ electron_pomodoro/
 │       └── musicProcess.js     # 音乐进程管理
 └── music-player/           # Python 音乐播放器
     ├── music.py            # 播放器源码
-    └── music.exe           # 打包好的播放器 (⚠️ 当前为测试版本)
+    ├── music.exe           # 打包好的播放器
+    └── 打包复制.bat         # 打包脚本（需Python环境）
 ```
 
 ## 🎵 音乐播放器
@@ -95,10 +96,11 @@ electron_pomodoro/
 - 🔀 随机播放（启动时自动随机排序）
 - 🎚️ 进度条拖动跳转
 - 🔊 音量调节（快捷键：Ctrl+↑/↓）
-- 🎧 输出设备切换（点击设备按钮选择）
+- 🎧 输出设备切换（点击设备按钮选择，⚠️ 除非明确知道在做什么，请勿更改）
 - 📊 实时进度同步（由 Python 端精确控制）
 - ⚡ 后台预加载（首次播放无卡顿）
 - 🔄 自动连播（歌曲结束自动播放下一首）
+- ⚠️ 错误处理（播放失败/超时/进程异常时显示提示）
 
 ### 快捷键
 
@@ -115,6 +117,18 @@ electron_pomodoro/
 将音乐文件放入 `music-player/music/` 文件夹即可。
 
 支持格式：`.wav`、`.mp3`、`.flac`、`.ogg`、`.m4a`
+
+### 错误提示
+
+当出现以下情况时，音乐播放器会显示错误提示：
+
+| 错误信息 | 原因 | 解决方案 |
+|----------|------|----------|
+| 无音乐 | `music/` 文件夹为空 | 添加音频文件后重启 |
+| 播放失败，请切换输出设备后重启番茄钟 | 音频设备不可用 | 切换输出设备后重启 |
+| 输出设备异常，请切换输出设备后重试 | 设备响应异常 | 切换输出设备 |
+| 播放无响应，请检查输出设备或重启番茄钟 | 3秒内无响应 | 检查设备或重启 |
+| 播放进程未运行，请重启番茄钟 | Python进程已退出 | 重启番茄钟 |
 
 ---
 
@@ -438,7 +452,7 @@ Timer.init(elements, {
 **导出接口**:
 | 方法 | 参数 | 说明 |
 |------|------|------|
-| `start(exePath)` | exe文件路径 | 启动音乐播放器进程 |
+| `start(exePath, deviceId)` | exe路径, 设备ID | 启动音乐播放器进程 |
 | `stop()` | - | 停止进程 |
 | `togglePlay()` | - | 切换播放/暂停 |
 | `next()` | - | 下一首 |
@@ -446,10 +460,16 @@ Timer.init(elements, {
 | `seek(position)` | 秒数 | 跳转进度 |
 | `setVolume(volume)` | 0-1 | 设置音量 |
 | `getStatus()` | - | 获取当前状态 |
+| `getDevices()` | - | 获取输出设备列表 |
+| `setDevice(deviceId)` | 设备ID | 设置输出设备 |
+| `onReady(callback)` | 回调函数 | 准备就绪回调 |
 | `onStatus(callback)` | 回调函数 | 状态变化回调 |
 | `onTrackChange(callback)` | 回调函数 | 曲目切换回调 |
 | `onPlayState(callback)` | 回调函数 | 播放状态回调 |
 | `onProgress(callback)` | 回调函数 | 进度更新回调 |
+| `onDevices(callback)` | 回调函数 | 设备列表回调 |
+| `onNoMusic(callback)` | 回调函数 | 无音乐回调 |
+| `onPlayError(callback)` | 回调函数 | 播放错误回调 |
 
 ---
 
