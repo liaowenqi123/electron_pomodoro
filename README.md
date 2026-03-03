@@ -25,8 +25,11 @@
 ### 安装与运行
 
 ```bash
-# 1. 克隆仓库
+# 1. 克隆仓库（首次）
 git clone https://github.com/liaowenqi123/electron_pomodoro.git
+
+# 或更新仓库（已克隆过）
+git pull
 
 # 2. 进入项目目录
 cd electron_pomodoro
@@ -34,7 +37,12 @@ cd electron_pomodoro
 # 3. 安装依赖
 npm install
 
-# 4. 启动应用
+# 4. 添加音乐文件（建议）
+# 在 music-player 文件夹下创建 music 文件夹，并放入音频文件
+# 支持 .wav, .mp3, .flac, .ogg, .m4a 格式
+# 不添加音乐文件则音乐播放器功能不完整
+
+# 5. 启动应用
 npm start
 ```
 
