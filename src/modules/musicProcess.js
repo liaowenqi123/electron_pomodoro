@@ -18,6 +18,7 @@ class MusicProcess {
     this.onProgressCallback = null
     this.onDevicesCallback = null
     this.onNoMusicCallback = null
+    this.onPlayErrorCallback = null
   }
 
   /**
@@ -154,6 +155,11 @@ class MusicProcess {
             this.onNoMusicCallback(data)
           }
           break
+        case 'play_error':
+          if (this.onPlayErrorCallback) {
+            this.onPlayErrorCallback(data)
+          }
+          break
         default:
           console.log('[MusicProcess] 未知事件:', event)
       }
@@ -272,6 +278,10 @@ class MusicProcess {
 
   onNoMusic(callback) {
     this.onNoMusicCallback = callback
+  }
+
+  onPlayError(callback) {
+    this.onPlayErrorCallback = callback
   }
 }
 

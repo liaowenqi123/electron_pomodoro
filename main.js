@@ -137,6 +137,10 @@ function createWindow() {
   musicProcess.onNoMusic((data) => {
     win.webContents.send('music-no-music', data)
   })
+  
+  musicProcess.onPlayError((data) => {
+    win.webContents.send('music-play-error', data)
+  })
 }
 
 // 处理关闭窗口请求

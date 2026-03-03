@@ -17,7 +17,8 @@ const MusicPlayer = (function() {
     devices: [],
     currentDeviceId: null,
     isDeviceListOpen: false,
-    hasMusic: true  // 是否有音乐文件
+    hasMusic: true,  // 是否有音乐文件
+    playError: null  // 播放错误信息
   }
 
   // ============ DOM 元素引用 ============
@@ -45,10 +46,11 @@ const MusicPlayer = (function() {
   }
 
   function updateProgressUI() {
-    // 没有音乐时显示提示
-    if (!state.hasMusic) {
+    // 显示播放错误
+    if (state.playError) {
       if (elements.trackNameEl) {
-        elements.trackNameEl.textContent = '无音乐'
+        elements.trackNameEl.textContent = state.playError
+        elements.trackNameEl.style.color = 'rgba(255, 150, 100, 0.95)'
       }
       if (elements.currentTimeEl) {
         elements.currentTimeEl.textContent = '--:--'
@@ -63,6 +65,32 @@ const MusicPlayer = (function() {
         elements.progressHandle.style.left = '0%'
       }
       return
+    }
+    
+    // 没有音乐时显示提示
+    if (!state.hasMusic) {
+      if (elements.trackNameEl) {
+        elements.trackNameEl.textContent = '无音乐'
+        elements.trackNameEl.style.color = ''
+      }
+      if (elements.currentTimeEl) {
+        elements.currentTimeEl.textContent = '--:--'
+      }
+      if (elements.durationEl) {
+        elements.durationEl.textContent = '--:--'
+      }
+      if (elements.progressFill) {
+        elements.progressFill.style.width = '0%'
+      }
+      if (elements.progressHandle) {
+        elements.progressHandle.style.left = '0%'
+      }
+      return
+    }
+    
+    // 恢复正常颜色
+    if (elements.trackNameEl) {
+      elements.trackNameEl.style.color = ''
     }
     
     if (state.duration <= 0) return
@@ -146,6 +174,8 @@ const MusicPlayer = (function() {
       return
     }
     
+    const warningHtml = '<div class="device-warning">⚠️ 除非你真的知道你在做什么，请不要更改此设置</div>'
+    
     const html = state.devices.map(device => {
       const isCurrent = device.id === state.currentDeviceId
       const isDefault = device.is_default
@@ -160,7 +190,7 @@ const MusicPlayer = (function() {
       </div>`
     }).join('')
     
-    elements.deviceList.innerHTML = html
+    elements.deviceList.innerHTML = warningHtml + html
   }
   
   function toggleDeviceList() {
@@ -280,6 +310,11 @@ const MusicPlayer = (function() {
     // 监听播放状态
     window.electronAPI.onMusicPlayState((data) => {
       state.playing = data.playing
+      // 成功播放时清除错误状态
+      if (data.playing && state.playError) {
+        state.playError = null
+        updateProgressUI()
+      }
       updatePlayButton()
     })
 
@@ -309,6 +344,15 @@ const MusicPlayer = (function() {
       updateProgressUI()
       updatePlayButton()
       console.log('[MusicPlayer] 收到 no_music 事件:', data)
+    })
+    
+    // 监听播放错误事件
+    window.electronAPI.onMusicPlayError((data) => {
+      state.playing = false
+      state.playError = data.message || '播放失败'
+      updateProgressUI()
+      updatePlayButton()
+      console.log('[MusicPlayer] 收到 play_error 事件:', data)
     })
   }
 

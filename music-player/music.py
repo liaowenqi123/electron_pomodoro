@@ -98,7 +98,7 @@ state = PlayerState()
 
 # ============ 输出设备管理 ============
 def get_output_devices():
-    """获取所有 WASAPI 输出设备列表"""
+    """获取所有输出设备列表"""
     devices = sd.query_devices()
     hostapis = sd.query_hostapis()
     output_devices = []
@@ -106,14 +106,13 @@ def get_output_devices():
     for i, device in enumerate(devices):
         if device['max_output_channels'] > 0:
             hostapi_name = hostapis[device['hostapi']]['name']
-            # 只返回 WASAPI 设备
-            if 'WASAPI' in hostapi_name:
-                output_devices.append({
-                    "id": i,
-                    "name": device['name'][:50],
-                    "hostapi": hostapi_name,
-                    "is_default": device.get('is_default', False)
-                })
+            # 返回所有输出设备
+            output_devices.append({
+                "id": i,
+                "name": device['name'][:50],
+                "hostapi": hostapi_name,
+                "is_default": device.get('is_default', False)
+            })
     return output_devices
 
 def set_output_device(device_id):
@@ -333,6 +332,8 @@ def play_a_song(name, start_position=0):
         current_frame = int(start_position * fs) if start_position > 0 else 0
         chunk_size = 4096
         last_progress_time = int(current_frame / fs)
+        last_progress_timestamp = time.time()
+        progress_error_count = 0  # 记录 progress 异常次数
         
         stream = sd.OutputStream(
             samplerate=fs,
@@ -350,12 +351,11 @@ def play_a_song(name, start_position=0):
                     return "exit"
                 
                 if state.device_changed:
-                    # 设备切换：保存当前位置，返回 device_change 状态
+                    # 设备切换：关闭流，返回重新加载（不再保存位置，避免设备兼容问题）
                     state.device_changed = False
-                    saved_position = current_frame / fs
                     stream.stop()
                     stream.close()
-                    return ("device_change", saved_position)
+                    return ("device_change", 0)
                 
                 if state.next_one:
                     state.next_one = False
@@ -394,11 +394,10 @@ def play_a_song(name, start_position=0):
                             stream.close()
                             return "exit"
                         if state.device_changed:
-                            # 设备切换：保存当前位置
+                            # 设备切换：关闭流，返回重新加载（不再保存位置，避免设备兼容问题）
                             state.device_changed = False
-                            saved_position = current_frame / fs
                             stream.close()
-                            return ("device_change", saved_position)
+                            return ("device_change", 0)
                         if state.next_one:
                             state.next_one = False
                             stream.close()
@@ -424,8 +423,25 @@ def play_a_song(name, start_position=0):
             
             # 更新进度（每秒发送一次）
             current_time = int(current_frame / fs)
+            current_timestamp = time.time()
+            
+            # 检测 progress 发送频率是否异常（正常应该约1秒一次）
+            # 如果小于0.3秒就发送了，说明可能设备有问题
             if current_time != last_progress_time:
+                time_diff = current_timestamp - last_progress_timestamp
+                if time_diff < 0.3:
+                    progress_error_count += 1
+                    print(f"progress 频率异常: {time_diff:.3f}s, 计数: {progress_error_count}", file=sys.stderr)
+                    if progress_error_count >= 3:
+                        # 连续3次异常，判定为设备问题
+                        stream.stop()
+                        stream.close()
+                        return "device_error"
+                else:
+                    progress_error_count = 0  # 正常则重置计数
+                
                 last_progress_time = current_time
+                last_progress_timestamp = current_timestamp
                 with state.lock:
                     state.current_time = current_time
                     state.send_event("progress", {
@@ -634,8 +650,13 @@ if __name__ == "__main__":
             current_song = get_prev_song()
             current_position = 0
         elif isinstance(result, tuple) and result[0] == "device_change":
-            # 设备切换：保持当前歌曲，从保存的位置继续
-            current_position = result[1]
+            # 设备切换：重新加载当前歌曲
+            current_position = 0
+            # 发送曲目重新加载事件
+            state.send_event("track_change", {
+                "name": current_song,
+                "duration": state.duration
+            })
         elif result == "done":
             # 歌曲播放完毕，播放下一首
             current_song = get_next_song()
@@ -644,11 +665,19 @@ if __name__ == "__main__":
             with state.lock:
                 state.playing = True
         elif result == "error":
-            # 出错时跳到下一首
-            current_song = get_next_song()
-            current_position = 0
+            # 播放失败，发送错误事件并停止播放
             with state.lock:
-                state.playing = True
+                state.playing = False
+                state.should_play = False
+            state.send_event("play_error", {"message": "播放失败，请切换输出设备后重启番茄钟"})
+            print("播放失败，已停止", file=sys.stderr)
+        elif result == "device_error":
+            # 设备异常（progress频率异常），发送错误并停止
+            with state.lock:
+                state.playing = False
+                state.should_play = False
+            state.send_event("play_error", {"message": "输出设备异常，请切换输出设备后重试"})
+            print("设备异常，已停止", file=sys.stderr)
     
     if listener:
         listener.stop()
