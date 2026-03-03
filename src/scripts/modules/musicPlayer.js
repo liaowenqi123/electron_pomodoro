@@ -18,8 +18,12 @@ const MusicPlayer = (function() {
     currentDeviceId: null,
     isDeviceListOpen: false,
     hasMusic: true,  // 是否有音乐文件
-    playError: null  // 播放错误信息
+    playError: null,  // 播放错误信息
+    playTimeout: null  // 播放超时计时器
   }
+  
+  // 播放超时时间（毫秒）
+  const PLAY_TIMEOUT_MS = 3000
 
   // ============ DOM 元素引用 ============
   let elements = {
@@ -43,6 +47,43 @@ const MusicPlayer = (function() {
     const mins = Math.floor(seconds / 60)
     const secs = Math.floor(seconds % 60)
     return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
+
+  // ============ 播放超时检测 ============
+  
+  /**
+   * 启动播放超时计时器
+   * 如果 Python 端在指定时间内没有响应，自动进入错误状态
+   */
+  function startPlayTimeout() {
+    clearPlayTimeout()
+    state.playTimeout = setTimeout(() => {
+      // 超时，进入错误状态
+      state.playError = '播放无响应，请检查输出设备或重启番茄钟'
+      state.playing = false
+      updateProgressUI()
+      updatePlayButton()
+      console.log('[MusicPlayer] 播放超时，Python 端可能已死机')
+    }, PLAY_TIMEOUT_MS)
+  }
+  
+  /**
+   * 清除播放超时计时器
+   * 收到 Python 端响应时调用
+   */
+  function clearPlayTimeout() {
+    if (state.playTimeout) {
+      clearTimeout(state.playTimeout)
+      state.playTimeout = null
+    }
+  }
+  
+  /**
+   * Python 端响应处理
+   * 清除超时计时器，表示 Python 端正常工作
+   */
+  function handlePythonResponse() {
+    clearPlayTimeout()
   }
 
   function updateProgressUI() {
@@ -235,6 +276,10 @@ const MusicPlayer = (function() {
     if (elements.playBtn) {
       elements.playBtn.addEventListener('click', () => {
         console.log('[MusicPlayer] playBtn clicked at', Date.now())
+        // 如果当前没有播放（即将开始播放），启动超时检测
+        if (!state.playing && !state.playError) {
+          startPlayTimeout()
+        }
         window.electronAPI.musicTogglePlay()
       })
     }
@@ -280,6 +325,7 @@ const MusicPlayer = (function() {
   function setupIPCListeners() {
     // 监听准备就绪事件
     window.electronAPI.onMusicReady((data) => {
+      handlePythonResponse()  // Python 端响应正常
       state.trackName = data.name
       state.duration = data.duration
       state.currentTime = 0
@@ -291,6 +337,7 @@ const MusicPlayer = (function() {
 
     // 监听状态更新
     window.electronAPI.onMusicStatus((data) => {
+      handlePythonResponse()  // Python 端响应正常
       state.playing = data.playing
       state.trackName = data.name
       state.currentTime = data.current
@@ -301,6 +348,7 @@ const MusicPlayer = (function() {
 
     // 监听曲目切换
     window.electronAPI.onMusicTrackChange((data) => {
+      handlePythonResponse()  // Python 端响应正常
       state.trackName = data.name
       state.duration = data.duration
       state.currentTime = 0
@@ -309,6 +357,7 @@ const MusicPlayer = (function() {
 
     // 监听播放状态
     window.electronAPI.onMusicPlayState((data) => {
+      handlePythonResponse()  // Python 端响应正常
       state.playing = data.playing
       // 成功播放时清除错误状态
       if (data.playing && state.playError) {
@@ -320,6 +369,7 @@ const MusicPlayer = (function() {
 
     // 监听进度更新
     window.electronAPI.onMusicProgress((data) => {
+      handlePythonResponse()  // Python 端响应正常
       if (!state.isDragging) {
         state.currentTime = data.current
         state.duration = data.duration
@@ -336,6 +386,7 @@ const MusicPlayer = (function() {
     
     // 监听无音乐事件
     window.electronAPI.onMusicNoMusic((data) => {
+      handlePythonResponse()  // Python 端响应正常
       state.hasMusic = false
       state.playing = false
       state.trackName = ''
@@ -348,6 +399,7 @@ const MusicPlayer = (function() {
     
     // 监听播放错误事件
     window.electronAPI.onMusicPlayError((data) => {
+      handlePythonResponse()  // Python 端响应正常
       state.playing = false
       state.playError = data.message || '播放失败'
       updateProgressUI()

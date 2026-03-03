@@ -19,6 +19,7 @@ class MusicProcess {
     this.onDevicesCallback = null
     this.onNoMusicCallback = null
     this.onPlayErrorCallback = null
+    this.onProcessDeadCallback = null  // 进程死亡回调
   }
 
   /**
@@ -175,6 +176,10 @@ class MusicProcess {
   sendCommand(command) {
     if (!this.process || !this.process.stdin.writable) {
       console.error('[MusicProcess] 进程未运行,无法发送命令')
+      // 进程未运行时触发错误回调
+      if (this.onPlayErrorCallback) {
+        this.onPlayErrorCallback({ message: '播放进程未运行，请重启番茄钟' })
+      }
       return false
     }
 

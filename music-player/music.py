@@ -87,7 +87,10 @@ class PlayerState:
             })
             
     def send_devices(self):
-        """发送设备列表"""
+        """
+        发送设备列表
+        注意：设备列表在程序启动时初始化，设备插拔后需要重启程序才能生效
+        """
         devices = get_output_devices()
         self.send_event("devices", {
             "devices": devices,
@@ -97,8 +100,25 @@ class PlayerState:
 state = PlayerState()
 
 # ============ 输出设备管理 ============
+
+# 设备过滤配置
+# Windows 音频 API 说明：
+#   - WASAPI: Windows Audio Session API，Windows Vista+ 推荐，兼容性好
+#   - DirectSound: DirectX 音频 API，Windows 95+ 支持，兼容性尚可
+#   - WDM-KS: Windows Driver Model Kernel Streaming，底层驱动接口，兼容性差，已排除
+#   - MME: Multimedia Extensions，Windows 3.1+ 支持，老旧但兼容性好
+EXCLUDED_HOST_APIS = [
+    'WDM-KS',  # 排除：兼容性较差，容易导致播放问题
+    'DirectSound',  # 可选排除：取消注释此行可排除 DirectSound
+    # 'MME',  # 可选排除：取消注释此行可排除 MME
+]
+
 def get_output_devices():
-    """获取所有输出设备列表"""
+    """
+    获取所有输出设备列表（排除兼容性较差的API）
+    
+    返回格式: [{"id": 0, "name": "设备名", "hostapi": "API名", "is_default": True}, ...]
+    """
     devices = sd.query_devices()
     hostapis = sd.query_hostapis()
     output_devices = []
@@ -106,13 +126,24 @@ def get_output_devices():
     for i, device in enumerate(devices):
         if device['max_output_channels'] > 0:
             hostapi_name = hostapis[device['hostapi']]['name']
-            # 返回所有输出设备
+            
+            # 检查是否在排除列表中
+            is_excluded = False
+            for excluded_api in EXCLUDED_HOST_APIS:
+                if excluded_api in hostapi_name:
+                    is_excluded = True
+                    break
+            
+            if is_excluded:
+                continue
+            
             output_devices.append({
                 "id": i,
                 "name": device['name'][:50],
                 "hostapi": hostapi_name,
                 "is_default": device.get('is_default', False)
             })
+    
     return output_devices
 
 def set_output_device(device_id):
