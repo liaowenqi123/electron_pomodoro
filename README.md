@@ -720,6 +720,302 @@ Timer.init(elements, {
 
 ---
 
+## 🆕 何时需要新建 HTML 页面
+
+> **重要提示**：当前 `index.html` 已经承载了大量功能，继续往里添加内容会让代码越来越难维护。在开发新功能前，请先阅读本章节，判断是否需要新建 HTML 页面。
+
+### 为什么需要考虑这个问题？
+
+当前 `index.html` 已经包含：
+- 主计时器界面
+- 音乐播放器
+- 教程弹窗
+- 侧边栏（预设列表 + 计划列表）
+- 各种模式切换逻辑
+
+**如果继续往里塞内容**：
+1. HTML 文件会越来越长，难以阅读
+2. CSS 样式冲突风险增加
+3. JavaScript 模块间耦合度升高
+4. 后期维护成本指数级增长
+
+---
+
+### 两种扩展方式对比
+
+| 方式 | 优点 | 缺点 | 适用场景 |
+|------|------|------|----------|
+| **新建 HTML 页面** | 完全独立、易维护、可复用、代码分离清晰 | 需要处理窗口间通信、数据共享稍复杂 | 设置页、独立功能模块、数据可视化页面 |
+| **当前页面弹窗** | 实现简单、共享状态方便、无需额外通信 | HTML 会越来越臃肿、样式容易冲突 | 简单提示、确认对话框、小型输入框 |
+
+---
+
+### 根据待办功能的具体建议
+
+| 功能 | 推荐方式 | 原因 |
+|------|----------|------|
+| **惩罚奖励机制** | ✅ 新建 HTML | 独立的功能模块，需要展示奖励/惩罚结果，界面复杂 |
+| **备注功能** | ❌ 当前页面弹窗 | 只是一个简单的输入框，不需要独立页面 |
+| **深色模式** | ❌ 不需要新页面 | 纯 CSS 变量切换，在当前页面实现即可 |
+| **AI 规划助手** | ⚠️ 可选 | 如果是侧边面板可在当前页面，如果是独立对话框建议新建 |
+| **数据可视化** | ✅ 新建 HTML | 统计图表页面，功能独立，需要大量图表库代码 |
+| **成就系统** | ✅ 新建 HTML | 成就展示页面，可以做成独立的成就墙 |
+| **周报/月报** | ✅ 新建 HTML | 报告生成和展示，功能独立 |
+| **专注锁屏** | ✅ 新建 HTML | 全屏锁屏界面，必须独立 |
+
+---
+
+### 如何新建 HTML 页面
+
+#### 第一步：创建 HTML 文件
+
+在 `src/` 目录下创建新的 HTML 文件，例如 `src/settings.html`：
+
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>设置</title>
+  <link rel="stylesheet" href="styles/settings.css">
+</head>
+<body>
+  <div class="settings-container">
+    <!-- 你的内容 -->
+  </div>
+  <script src="scripts/modules/settingsModule.js"></script>
+</body>
+</html>
+```
+
+#### 第二步：在主进程创建窗口
+
+编辑 `main.js`，添加创建新窗口的逻辑：
+
+```javascript
+// 存储设置窗口的引用
+let settingsWindow = null
+
+// 创建设置窗口
+function createSettingsWindow() {
+  // 如果窗口已存在，聚焦它
+  if (settingsWindow) {
+    settingsWindow.focus()
+    return
+  }
+
+  settingsWindow = new BrowserWindow({
+    width: 400,
+    height: 500,
+    parent: BrowserWindow.getFocusedWindow(), // 设置父窗口
+    modal: true, // 模态窗口（可选，会阻止操作父窗口）
+    frame: false, // 无边框（与主窗口风格一致）
+    transparent: true,
+    resizable: false,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js') // 复用同一个 preload
+    }
+  })
+
+  settingsWindow.loadFile('src/settings.html')
+
+  // 窗口关闭时清理引用
+  settingsWindow.on('closed', () => {
+    settingsWindow = null
+  })
+}
+
+// 监听打开设置窗口的请求
+ipcMain.on('open-settings', () => {
+  createSettingsWindow()
+})
+
+// 监听关闭设置窗口的请求
+ipcMain.on('close-settings', () => {
+  if (settingsWindow) {
+    settingsWindow.close()
+  }
+})
+```
+
+#### 第三步：在 preload.js 暴露 API
+
+```javascript
+contextBridge.exposeInMainWorld('electronAPI', {
+  // 原有的 API...
+  
+  // 新增窗口相关 API
+  openSettings: () => ipcRenderer.send('open-settings'),
+  closeSettings: () => ipcRenderer.send('close-settings'),
+})
+```
+
+#### 第四步：在主窗口添加入口按钮
+
+在 `src/index.html` 中添加打开新页面的按钮：
+
+```html
+<button id="openSettingsBtn">⚙️ 设置</button>
+```
+
+在 `src/scripts/renderer.js` 中添加事件：
+
+```javascript
+document.getElementById('openSettingsBtn').addEventListener('click', () => {
+  window.electronAPI.openSettings()
+})
+```
+
+---
+
+### 窗口间数据共享
+
+新窗口和主窗口之间的数据共享有以下几种方式：
+
+#### 方式一：通过 JSON 文件（推荐）
+
+两个窗口都通过 `DataStore` 读写同一个 JSON 文件，数据自动同步。
+
+```javascript
+// 新窗口中读取数据
+const data = await window.electronAPI.readData()
+
+// 新窗口中保存数据
+await window.electronAPI.writeData(newData)
+```
+
+**优点**：简单可靠，数据持久化
+**缺点**：需要手动刷新数据
+
+#### 方式二：通过 IPC 消息传递
+
+主窗口和新窗口通过主进程中转消息。
+
+```javascript
+// 主进程 - 转发消息
+ipcMain.on('sync-data', (event, data) => {
+  // 转发给所有窗口
+  BrowserWindow.getAllWindows().forEach(win => {
+    win.webContents.send('data-updated', data)
+  })
+})
+
+// 渲染进程 - 发送消息
+window.electronAPI.syncData(data)
+
+// 渲染进程 - 接收消息
+window.electronAPI.onDataUpdated((data) => {
+  // 更新界面
+})
+```
+
+**优点**：实时同步
+**缺点**：代码稍复杂
+
+---
+
+### 新建页面的完整示例
+
+以「惩罚奖励机制」为例：
+
+```
+新增文件：
+├── src/
+│   ├── reward.html          # 惩罚奖励页面
+│   ├── styles/
+│   │   └── reward.css       # 惩罚奖励样式
+│   └── scripts/
+│       └── modules/
+│           └── reward.js    # 惩罚奖励逻辑
+
+修改文件：
+├── main.js                  # 添加创建窗口逻辑
+└── preload.js               # 暴露新窗口 API
+```
+
+**reward.html 结构示例**：
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>奖励</title>
+  <link rel="stylesheet" href="styles/reward.css">
+</head>
+<body>
+  <div class="reward-container">
+    <div class="reward-header">
+      <h1>🎉 恭喜完成！</h1>
+      <button class="btn-close" id="closeBtn">×</button>
+    </div>
+    <div class="reward-content">
+      <div class="reward-icon">🏆</div>
+      <p class="reward-text">你获得了一个奖励！</p>
+      <p class="reward-detail">累计专注 100 分钟</p>
+    </div>
+    <button class="btn-primary" id="claimBtn">领取奖励</button>
+  </div>
+  <script src="scripts/modules/reward.js"></script>
+</body>
+</html>
+```
+
+**reward.js 逻辑示例**：
+```javascript
+;(function() {
+  'use strict'
+
+  // 关闭按钮
+  document.getElementById('closeBtn').addEventListener('click', () => {
+    window.electronAPI.closeReward()
+  })
+
+  // 领取奖励按钮
+  document.getElementById('claimBtn').addEventListener('click', async () => {
+    // 保存奖励数据
+    const data = await window.electronAPI.readData()
+    data.rewards = data.rewards || []
+    data.rewards.push({
+      type: 'completion',
+      time: new Date().toISOString()
+    })
+    await window.electronAPI.writeData(data)
+    
+    // 关闭窗口
+    window.electronAPI.closeReward()
+  })
+})()
+```
+
+---
+
+### 总结：决策流程图
+
+```
+开始开发新功能
+      │
+      ▼
+是否需要大量 UI 元素？
+      │
+      ├──── 否 ────▶ 是否是简单的输入/确认？
+      │                    │
+      │                    ├──── 是 ────▶ 使用当前页面弹窗
+      │                    │
+      │                    └──── 否 ────▶ 考虑新建 HTML
+      │
+      └──── 是 ────▶ 是否与主界面功能独立？
+                           │
+                           ├──── 是 ────▶ ✅ 新建 HTML 页面
+                           │
+                           └──── 否 ────▶ 评估后决定
+```
+
+**记住**：当你犹豫不决时，新建页面通常是更安全的选择。代码分离总比臃肿好！
+
+---
+
 ## 常见问题
 
 ### Q1: 为什么渲染进程不能直接使用 Node.js？
