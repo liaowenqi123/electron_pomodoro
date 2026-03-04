@@ -37,7 +37,7 @@
           <h2 class="sidebar-title">时间预设</h2>
           
           <!-- 预设列表 -->
-          <div class="preset-list" id="presetList">
+          <div class="preset-list scrollable" id="presetList">
             <!-- 由 JS 动态生成 -->
           </div>
         </div>
@@ -47,7 +47,7 @@
           <h2 class="sidebar-title">番茄计划</h2>
           
           <!-- 计划列表 -->
-          <div class="plan-list" id="planList">
+          <div class="plan-list scrollable" id="planList">
             <!-- 由 JS 动态生成 -->
           </div>
         </div>
@@ -191,6 +191,7 @@
 
   <!-- 按依赖顺序加载 JS 模块 -->
   <!-- 基础模块 -->
+  <script src="scripts/modules/utils.js"></script>
   <script src="scripts/modules/dom.js"></script>
   <script src="scripts/modules/dataStore.js"></script>
   <script src="scripts/modules/stats.js"></script>

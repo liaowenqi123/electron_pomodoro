@@ -25,30 +25,16 @@
 .preset-list {
   flex: 0 1 auto;
   max-height: 280px;
-  overflow-y: overlay;
-  overflow-y: auto;
   margin-bottom: 10px;
   -webkit-app-region: no-drag;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
-  scrollbar-gutter: stable;
 }
 
-.preset-list::-webkit-scrollbar {
-  width: 5px;
-}
-
-.preset-list::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 3px;
-}
-
-.preset-list::-webkit-scrollbar-thumb {
+/* 预设列表使用公共滚动条样式 */
+.preset-list.scrollable::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.25);
-  border-radius: 3px;
 }
 
-.preset-list::-webkit-scrollbar-thumb:hover {
+.preset-list.scrollable::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.4);
 }
 
@@ -113,30 +99,16 @@
 .plan-list {
   flex: 0 1 auto;
   max-height: 280px;
-  overflow-y: overlay;
-  overflow-y: auto;
   margin-bottom: 10px;
   -webkit-app-region: no-drag;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(100, 120, 150, 0.3) transparent;
-  scrollbar-gutter: stable;
 }
 
-.plan-list::-webkit-scrollbar {
-  width: 5px;
-}
-
-.plan-list::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 3px;
-}
-
-.plan-list::-webkit-scrollbar-thumb {
+/* 计划列表使用公共滚动条样式（略带蓝色调） */
+.plan-list.scrollable::-webkit-scrollbar-thumb {
   background: rgba(100, 120, 150, 0.3);
-  border-radius: 3px;
 }
 
-.plan-list::-webkit-scrollbar-thumb:hover {
+.plan-list.scrollable::-webkit-scrollbar-thumb:hover {
   background: rgba(100, 120, 150, 0.5);
 }
 

@@ -163,11 +163,7 @@
 
   // 保存计划到数据存储
   async function savePlan() {
-    const data = DataStore.getData()
-    data.planList = planList
-    await DataStore.updatePresets(data.presets)
-    // 直接写入完整数据
-    await window.electronAPI.writeData(data)
+    await DataStore.updatePlanList(planList)
   }
 
   // 加载计划

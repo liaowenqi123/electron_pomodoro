@@ -8,19 +8,8 @@
   let cachedData = null
   let saveTimeout = null
 
-  // 默认数据结构
-  const defaultData = {
-    stats: {
-      date: new Date().toDateString(),
-      todayCount: 0,
-      totalMinutes: 0
-    },
-    presets: {
-      work: [15, 25, 45, 60],
-      break: [5, 10, 15]
-    },
-    planList: []
-  }
+  // 使用统一的默认数据结构
+  const defaultData = Utils.createDefaultData()
 
   // 加载数据
   async function load() {
@@ -104,6 +93,18 @@
     return cachedData || defaultData
   }
 
+  // 获取计划列表
+  function getPlanList() {
+    return cachedData ? (cachedData.planList || []) : []
+  }
+
+  // 更新计划列表
+  async function updatePlanList(planList) {
+    if (!cachedData) return false
+    cachedData.planList = planList
+    return await saveImmediate()
+  }
+
   // 导出到全局
   window.DataStore = {
     load: load,
@@ -113,6 +114,8 @@
     updateStats: updateStats,
     getPresets: getPresets,
     updatePresets: updatePresets,
-    getData: getData
+    getData: getData,
+    getPlanList: getPlanList,
+    updatePlanList: updatePlanList
   }
 })()

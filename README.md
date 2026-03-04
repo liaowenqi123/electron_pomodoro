@@ -163,7 +163,7 @@ electron_pomodoro/
 ├── src/
 │   ├── index.html          # 页面入口
 │   ├── styles/
-│   │   ├── base.css            # 基础样式
+│   │   ├── base.css            # 基础样式 + 公共滚动条样式
 │   │   ├── sidebar.css         # 侧边栏样式
 │   │   ├── main-content.css    # 主内容区样式
 │   │   ├── music-player.css    # 音乐播放器样式
@@ -172,16 +172,17 @@ electron_pomodoro/
 │   ├── scripts/
 │   │   ├── renderer.js         # 渲染进程入口
 │   │   └── modules/            # 功能模块
-│   │       ├── timer.js            # 计时器
-│   │       ├── wheelPicker.js      # 滚筒选择器
+│   │       ├── utils.js            # 公共工具函数 (formatTime, 默认数据)
+│   │       ├── dom.js              # DOM 元素引用
+│   │       ├── dataStore.js        # 数据存储
 │   │       ├── stats.js            # 统计模块
+│   │       ├── wheelPicker.js      # 滚筒选择器
+│   │       ├── timer.js            # 计时器
 │   │       ├── mode.js             # 模式切换（工作/休息）
 │   │       ├── presets.js          # 预设管理
-│   │       ├── dataStore.js        # 数据存储
-│   │       ├── musicPlayer.js      # 音乐播放器
 │   │       ├── planMode.js         # 番茄计划模式
 │   │       ├── appState.js         # 应用状态管理
-│   │       ├── dom.js              # DOM 元素引用
+│   │       ├── musicPlayer.js      # 音乐播放器
 │   │       ├── callbacks.js        # 回调函数定义
 │   │       └── tutorial.js         # 教程弹窗
 │   └── modules/
@@ -478,6 +479,8 @@ Timer.init(elements, {
 | `updateStats(stats)` | 统计对象 | 更新统计数据 |
 | `getPresets()` | - | 获取预设数据 |
 | `updatePresets(presets)` | 预设对象 | 更新预设数据 |
+| `getPlanList()` | - | 获取计划列表 |
+| `updatePlanList(planList)` | 计划数组 | 更新计划列表 |
 
 #### presets.js - 预设管理模块
 
@@ -530,6 +533,15 @@ Timer.init(elements, {
 | `defaultBreakTime` | 默认休息时间 |
 | `switchAppMode(mode)` | 切换应用模式 |
 | `updateContainerColor(isBreak)` | 更新界面颜色 |
+
+#### utils.js - 公共工具函数模块
+
+**导出接口**:
+| 方法/属性 | 说明 |
+|------|------|
+| `formatTime(seconds, showLeadingZero)` | 格式化秒数为 MM:SS 格式 |
+| `DEFAULT_PRESETS` | 默认预设常量 `{work: [15,25,45,60], break: [5,10,15]}` |
+| `createDefaultData()` | 创建默认数据结构对象 |
 
 #### dom.js - DOM 元素引用模块
 

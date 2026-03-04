@@ -28,24 +28,28 @@ function ensureDataDir() {
   }
 }
 
-// 默认数据结构
-const defaultData = {
-  stats: {
-    date: new Date().toDateString(),
-    todayCount: 0,
-    totalMinutes: 0
-  },
-  presets: {
-    work: [15, 25, 45, 60],
-    break: [5, 10, 15]
-  },
-  audioDevice: null  // 保存音频设备ID
+// 创建默认数据结构（与渲染进程 utils.js 保持一致）
+function createDefaultData() {
+  return {
+    stats: {
+      date: new Date().toDateString(),
+      todayCount: 0,
+      totalMinutes: 0
+    },
+    presets: {
+      work: [15, 25, 45, 60],
+      break: [5, 10, 15]
+    },
+    planList: [],
+    audioDevice: null
+  }
 }
 
 // 读取数据
 function readData() {
   ensureDataDir()
   const filePath = getDataFilePath()
+  const defaultData = createDefaultData()
   
   // 如果文件不存在，创建默认数据
   if (!fs.existsSync(filePath)) {

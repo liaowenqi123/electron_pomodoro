@@ -43,11 +43,8 @@ const MusicPlayer = (function() {
 
   // ============ 工具函数 ============
   
-  function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60)
-    const secs = Math.floor(seconds % 60)
-    return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
+  // 使用统一的格式化函数（不显示分钟前导零）
+  const formatTime = (seconds) => Utils.formatTime(seconds, false)
 
   // ============ 播放超时检测 ============
   

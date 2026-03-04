@@ -14,11 +14,8 @@
   const radius = 116
   const circumference = 2 * Math.PI * radius
 
-  function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
-  }
+  // 使用统一的格式化函数
+  const formatTime = Utils.formatTime
 
   function updateDisplay() {
     elements.timeDisplay.textContent = formatTime(timeLeft)

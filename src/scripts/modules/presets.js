@@ -11,11 +11,8 @@
   let activePreset = null
   let isEnabled = true
 
-  // 默认预设（首次加载时使用）
-  const defaultPresets = {
-    work: [15, 25, 45, 60],
-    break: [5, 10, 15]
-  }
+  // 使用统一的默认预设
+  const defaultPresets = Utils.DEFAULT_PRESETS
 
   // 渲染预设列表
   function render() {
