@@ -238,6 +238,48 @@ electron_pomodoro/
 | 播放无响应，请检查输出设备或重启番茄钟 | 3秒内无响应 | 检查设备或重启 |
 | 播放进程未运行，请重启番茄钟 | Python进程已退出 | 重启番茄钟 |
 
+## 📥 B站音乐下载工具
+
+`music-player/youget_download.py` 是一个用于从B站下载纯音乐视频并提取音频的工具。
+
+### 功能特性
+
+- 🔗 支持 B站视频链接
+- 🎬 自动解析视频格式，可选择画质
+- 🎵 自动提取音频并转换为 MP3 格式
+- 🧹 自动清理下载的临时文件
+- ⚠️ 启动时检查 `you-get` 和 `ffmpeg` 依赖
+
+### 环境要求
+
+- **Python** 3.x
+- **you-get** - 视频下载工具
+  ```bash
+  pip install you-get
+  ```
+- **ffmpeg** - 音频转换工具
+  - Windows: 从 [ffmpeg.org](https://ffmpeg.org/download.html) 下载并添加到系统 PATH
+
+### 使用方法
+
+```bash
+# 进入工具目录
+cd music-player
+
+# 运行脚本
+python youget_download.py
+
+# 按提示输入B站视频链接即可
+```
+
+下载的 MP3 文件会自动保存到 `music-player/music/` 目录。
+
+### 注意事项
+
+- 仅支持有音频的视频，不支持纯无声视频
+- 部分视频可能因版权限制无法下载
+- 建议下载纯音乐/BGM类视频以获得最佳体验
+
 ---
 
 # 📖 开发人员手册
