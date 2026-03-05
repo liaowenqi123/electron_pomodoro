@@ -190,6 +190,7 @@ electron_pomodoro/
 └── music-player/           # Python 音乐播放器
     ├── music.py            # 播放器源码
     ├── music.exe           # 打包好的播放器
+    ├── youget_download.py  # B站音乐下载工具
     └── 打包复制.bat         # 打包脚本（需Python环境）
 ```
 
