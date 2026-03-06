@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>菜园子</title>
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/garden.css">
+</head>
+<body>
+  <div class="garden-frame">
+    <!-- 顶部栏 -->
+    <div class="garden-header">
+      <div class="garden-draggable"></div>
+      <div class="garden-info">
+        <span class="garden-title">🌱 我的菜园</span>
+        <div class="garden-coins">
+          <span class="coin-icon">💰</span>
+          <span id="coinCount">0</span>
+        </div>
+      </div>
+      <button class="garden-btn-close" id="gardenCloseBtn">×</button>
+    </div>
+    
+    <!-- 菜园网格 -->
+    <div class="garden-content">
+      <div class="garden-grid" id="gardenGrid">
+        <!-- 格子由 JS 动态生成 -->
+      </div>
+    </div>
+    
+    <!-- 种子背包 -->
+    <div class="garden-seed-bag">
+      <h3>🎒 种子背包</h3>
+      <div class="seed-list" id="seedList">
+        <!-- 种子由 JS 动态生成 -->
+      </div>
+    </div>
+    
+    <!-- 提示信息 -->
+    <div class="garden-tip" id="gardenTip">
+      点击种子，然后点击空格子种植
+    </div>
+  </div>
+
+  <!-- 引入依赖 -->
+  <script src="scripts/modules/utils.js"></script>
+  <script src="scripts/modules/garden.js"></script>
+</body>
+</html>

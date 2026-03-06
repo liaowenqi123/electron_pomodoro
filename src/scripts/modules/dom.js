@@ -43,6 +43,7 @@
     
     // 教程弹窗
     tutorialBtn: document.getElementById('tutorialBtn'),
+    gardenBtn: document.getElementById('gardenBtn'),
     tutorialModal: document.getElementById('tutorialModal'),
     tutorialClose: document.getElementById('tutorialClose'),
     

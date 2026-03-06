@@ -151,6 +151,13 @@
     window.electronAPI.closeWindow()
   })
 
+  // 菜园子按钮事件
+  if (DOM.gardenBtn) {
+    DOM.gardenBtn.addEventListener('click', () => {
+      window.electronAPI.openGarden()
+    })
+  }
+
   // 最小化窗口按钮
   DOM.btnMinimize.addEventListener('click', () => {
     window.electronAPI.minimizeWindow()

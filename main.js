@@ -167,6 +167,39 @@ function createWindow() {
   })
 }
 
+// 存储菜园子窗口引用
+let gardenWindow = null
+
+// 创建菜园子窗口
+function createGardenWindow() {
+  // 如果窗口已存在，聚焦它
+  if (gardenWindow) {
+    gardenWindow.focus()
+    return
+  }
+
+  gardenWindow = new BrowserWindow({
+    width: 400,
+    height: 520,
+    frame: false,
+    transparent: true,
+    resizable: false,
+    parent: BrowserWindow.getFocusedWindow(),
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js')
+    }
+  })
+
+  gardenWindow.loadFile('src/garden.html')
+
+  // 窗口关闭时清理引用
+  gardenWindow.on('closed', () => {
+    gardenWindow = null
+  })
+}
+
 // 处理关闭窗口请求
 ipcMain.on('close-window', () => {
   const win = BrowserWindow.getFocusedWindow()
@@ -194,6 +227,20 @@ ipcMain.on('show-notification', (event, data) => {
       silent: false
     })
     notification.show()
+  }
+})
+
+// ============ 菜园子窗口 IPC 处理 ============
+
+// 打开菜园子窗口
+ipcMain.on('open-garden', () => {
+  createGardenWindow()
+})
+
+// 关闭菜园子窗口
+ipcMain.on('close-garden', () => {
+  if (gardenWindow) {
+    gardenWindow.close()
   }
 })
 

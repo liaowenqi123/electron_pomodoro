@@ -71,5 +71,13 @@ const { contextBridge, ipcRenderer } = require('electron')
     ipcRenderer.removeAllListeners('music-devices')
     ipcRenderer.removeAllListeners('music-no-music')
     ipcRenderer.removeAllListeners('music-play-error')
-  }
+  },
+
+  // ============ 菜园子窗口 API ============
+  
+  // 打开菜园子窗口
+  openGarden: () => ipcRenderer.send('open-garden'),
+  
+  // 关闭菜园子窗口
+  closeGarden: () => ipcRenderer.send('close-garden')
 })
