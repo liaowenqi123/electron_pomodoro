@@ -80,9 +80,9 @@
 ##### 界面修改
 | 位置 | 修改内容 |
 |------|----------|
-| 计时器旁边 | 添加「专注模式」拨杆开关 |
-| 教程按钮右侧 | 添加「菜园子」按钮，点击打开菜园子页面 |
-| 新建 `garden.html` | 菜园子独立页面（网格布局） |
+| 计时器下方 | 添加「专注模式」拨杆开关 |
+| 教程按钮左侧（header-buttons 容器） | 添加「菜园子」按钮，点击打开菜园子页面 |
+| 新建 `src/garden.html` | 菜园子独立页面（3x4 网格布局） |
 
 ##### 规则说明
 
@@ -277,17 +277,19 @@ electron_pomodoro/
 ├── package.json            # 项目配置
 ├── src/
 │   ├── index.html          # 页面入口
+│   ├── garden.html         # 菜园子页面
 │   ├── styles/
 │   │   ├── base.css            # 基础样式 + 公共滚动条样式
 │   │   ├── sidebar.css         # 侧边栏样式
 │   │   ├── main-content.css    # 主内容区样式
 │   │   ├── music-player.css    # 音乐播放器样式
 │   │   ├── modal.css           # 弹窗样式
-│   │   └── modes.css           # 模式样式
+│   │   ├── modes.css           # 模式样式
+│   │   └── garden.css          # 菜园子样式
 │   ├── scripts/
 │   │   ├── renderer.js         # 渲染进程入口
 │   │   └── modules/            # 功能模块
-│   │       ├── utils.js            # 公共工具函数 (formatTime, 默认数据)
+│   │       ├── utils.js            # 公共工具函数 (formatTime, 默认数据, 作物配置)
 │   │       ├── dom.js              # DOM 元素引用
 │   │       ├── dataStore.js        # 数据存储
 │   │       ├── stats.js            # 统计模块
@@ -296,7 +298,8 @@ electron_pomodoro/
 │   │       ├── mode.js             # 模式切换（工作/休息）
 │   │       ├── presets.js          # 预设管理
 │   │       ├── planMode.js         # 番茄计划模式
-│   │       ├── appState.js         # 应用状态管理
+│   │       ├── appState.js         # 应用状态管理（含专注模式开关）
+│   │       ├── garden.js           # 菜园子模块
 │   │       ├── musicPlayer.js      # 音乐播放器
 │   │       ├── callbacks.js        # 回调函数定义
 │   │       └── tutorial.js         # 教程弹窗
