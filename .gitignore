@@ -15,7 +15,7 @@ foreground_inspection/build/
 foreground_inspection/dist/
 foreground_inspection/__pycache__/
 foreground_inspection/*.spec
-foreground_inspection/config.json
+foreground_inspection/api_config.json
 
 
 # OS files
