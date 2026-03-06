@@ -11,6 +11,12 @@ music-player/__pycache__/
 music-player/*.spec
 music-player/music/
 
+foreground_inspection/build/
+foreground_inspection/dist/
+foreground_inspection/__pycache__/
+foreground_inspection/*.spec
+
+
 # OS files
 .DS_Store
 Thumbs.db
