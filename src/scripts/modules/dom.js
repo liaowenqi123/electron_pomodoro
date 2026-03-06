@@ -46,6 +46,10 @@
     tutorialModal: document.getElementById('tutorialModal'),
     tutorialClose: document.getElementById('tutorialClose'),
     
+    // 专注模式开关
+    focusModeSwitch: document.getElementById('focusModeSwitch'),
+    focusModeStatus: document.getElementById('focusModeStatus'),
+    
     // 音乐播放器
     playBtn: document.getElementById('playBtn'),
     nextBtn: document.getElementById('nextBtn'),

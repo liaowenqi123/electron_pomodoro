@@ -28,6 +28,17 @@
   }
 
   /**
+   * 作物配置
+   */
+  const CROP_CONFIG = {
+    carrot: { name: '胡萝卜', growTime: 25, icon: '🥕', rarity: 'common', value: 10 },
+    tomato: { name: '番茄', growTime: 50, icon: '🍅', rarity: 'common', value: 20 },
+    sunflower: { name: '向日葵', growTime: 90, icon: '🌻', rarity: 'rare', value: 50 },
+    rose: { name: '玫瑰', growTime: 120, icon: '🌹', rarity: 'rare', value: 80 },
+    osmanthus: { name: '金桂树', growTime: 180, icon: '🌳', rarity: 'legend', value: 150 }
+  }
+
+  /**
    * 创建默认数据结构
    * @returns {Object} 默认数据对象
    */
@@ -40,7 +51,27 @@
       },
       presets: { ...DEFAULT_PRESETS },
       planList: [],
-      audioDevice: null
+      audioDevice: null,
+      // 菜园子系统
+      garden: {
+        coins: 0,
+        seeds: { carrot: 5, tomato: 2, sunflower: 0, rose: 0, osmanthus: 0 },
+        plots: [
+          { id: 0, crop: null, progress: 0, plantedAt: null },
+          { id: 1, crop: null, progress: 0, plantedAt: null },
+          { id: 2, crop: null, progress: 0, plantedAt: null },
+          { id: 3, crop: null, progress: 0, plantedAt: null },
+          { id: 4, crop: null, progress: 0, plantedAt: null },
+          { id: 5, crop: null, progress: 0, plantedAt: null },
+          { id: 6, crop: null, progress: 0, plantedAt: null, locked: true },
+          { id: 7, crop: null, progress: 0, plantedAt: null, locked: true },
+          { id: 8, crop: null, progress: 0, plantedAt: null, locked: true },
+          { id: 9, crop: null, progress: 0, plantedAt: null, locked: true },
+          { id: 10, crop: null, progress: 0, plantedAt: null, locked: true },
+          { id: 11, crop: null, progress: 0, plantedAt: null, locked: true }
+        ],
+        warehouse: []
+      }
     }
   }
 
@@ -48,6 +79,7 @@
   window.Utils = {
     formatTime: formatTime,
     DEFAULT_PRESETS: DEFAULT_PRESETS,
-    createDefaultData: createDefaultData
+    createDefaultData: createDefaultData,
+    CROP_CONFIG: CROP_CONFIG
   }
 })()

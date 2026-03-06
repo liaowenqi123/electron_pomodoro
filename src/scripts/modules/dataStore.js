@@ -105,6 +105,18 @@
     return await saveImmediate()
   }
 
+  // 获取菜园数据
+  function getGarden() {
+    return cachedData ? cachedData.garden : Utils.createDefaultData().garden
+  }
+
+  // 更新菜园数据
+  async function updateGarden(garden) {
+    if (!cachedData) return false
+    cachedData.garden = { ...cachedData.garden, ...garden }
+    return await saveImmediate()
+  }
+
   // 导出到全局
   window.DataStore = {
     load: load,
@@ -116,6 +128,8 @@
     updatePresets: updatePresets,
     getData: getData,
     getPlanList: getPlanList,
-    updatePlanList: updatePlanList
+    updatePlanList: updatePlanList,
+    getGarden: getGarden,
+    updateGarden: updateGarden
   }
 })()

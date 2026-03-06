@@ -41,7 +41,27 @@ function createDefaultData() {
       break: [5, 10, 15]
     },
     planList: [],
-    audioDevice: null
+    audioDevice: null,
+    // 菜园子系统
+    garden: {
+      coins: 0,
+      seeds: { carrot: 5, tomato: 2, sunflower: 0, rose: 0, osmanthus: 0 },
+      plots: [
+        { id: 0, crop: null, progress: 0, plantedAt: null },
+        { id: 1, crop: null, progress: 0, plantedAt: null },
+        { id: 2, crop: null, progress: 0, plantedAt: null },
+        { id: 3, crop: null, progress: 0, plantedAt: null },
+        { id: 4, crop: null, progress: 0, plantedAt: null },
+        { id: 5, crop: null, progress: 0, plantedAt: null },
+        { id: 6, crop: null, progress: 0, plantedAt: null, locked: true },
+        { id: 7, crop: null, progress: 0, plantedAt: null, locked: true },
+        { id: 8, crop: null, progress: 0, plantedAt: null, locked: true },
+        { id: 9, crop: null, progress: 0, plantedAt: null, locked: true },
+        { id: 10, crop: null, progress: 0, plantedAt: null, locked: true },
+        { id: 11, crop: null, progress: 0, plantedAt: null, locked: true }
+      ],
+      warehouse: []
+    }
   }
 }
 

@@ -78,6 +78,18 @@
     // 滚轮值变化时的处理
   })
 
+  // 专注模式开关事件
+  if (DOM.focusModeSwitch) {
+    DOM.focusModeSwitch.addEventListener('click', () => {
+      const enabled = AppState.toggleFocusMode()
+      // 更新状态文字
+      if (DOM.focusModeStatus) {
+        DOM.focusModeStatus.textContent = enabled ? '开启' : '关闭'
+        DOM.focusModeStatus.classList.toggle('active', enabled)
+      }
+    })
+  }
+
   // 添加预设按钮
   DOM.addPresetBtn.addEventListener('click', async () => {
     if (AppState.appMode === 'single') {

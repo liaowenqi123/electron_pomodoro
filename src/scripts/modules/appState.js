@@ -9,7 +9,8 @@
   const state = {
     defaultWorkTime: 25,
     defaultBreakTime: 5,
-    appMode: 'single'  // 'single' | 'plan'
+    appMode: 'single',  // 'single' | 'plan'
+    focusModeEnabled: false  // 专注模式开关
   }
 
   // ============ 状态管理 API ============
@@ -24,6 +25,51 @@
 
   function getDefaultBreakTime() {
     return state.defaultBreakTime
+  }
+
+  /**
+   * 获取专注模式状态
+   */
+  function isFocusModeEnabled() {
+    return state.focusModeEnabled
+  }
+
+  /**
+   * 切换专注模式
+   */
+  function toggleFocusMode() {
+    state.focusModeEnabled = !state.focusModeEnabled
+    // 更新 UI 显示
+    updateFocusModeUI()
+    return state.focusModeEnabled
+  }
+
+  /**
+   * 设置专注模式
+   */
+  function setFocusMode(enabled) {
+    state.focusModeEnabled = enabled
+    updateFocusModeUI()
+  }
+
+  /**
+   * 更新专注模式 UI
+   */
+  function updateFocusModeUI() {
+    if (DOM.focusModeSwitch) {
+      if (state.focusModeEnabled) {
+        DOM.focusModeSwitch.classList.add('active')
+      } else {
+        DOM.focusModeSwitch.classList.remove('active')
+      }
+    }
+    if (DOM.container) {
+      if (state.focusModeEnabled) {
+        DOM.container.classList.add('focus-mode')
+      } else {
+        DOM.container.classList.remove('focus-mode')
+      }
+    }
   }
 
   // ============ 模式切换逻辑 ============
@@ -133,10 +179,15 @@
     get appMode() { return state.appMode },
     get defaultWorkTime() { return state.defaultWorkTime },
     get defaultBreakTime() { return state.defaultBreakTime },
+    get focusModeEnabled() { return state.focusModeEnabled },
     getAppMode,
     getDefaultWorkTime,
     getDefaultBreakTime,
     switchAppMode,
-    updateContainerColor
+    updateContainerColor,
+    isFocusModeEnabled,
+    toggleFocusMode,
+    setFocusMode,
+    updateFocusModeUI
   }
 })()
