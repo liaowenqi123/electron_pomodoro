@@ -257,29 +257,102 @@ foreground_inspection/
                                         结果存入历史记录
 ```
 
-##### 配置文件示例 (config.json)
+##### 配置文件说明
+
+配置文件分为三个，位于 `foreground_inspection/` 目录下：
+
+| 文件名 | 说明 | 是否上传 Git |
+|--------|------|--------------|
+| `api_config.json` | API 密钥配置（**敏感信息**） | ❌ 不上传 |
+| `model_config.json` | 模型配置（API 地址、模型名称） | ✅ 上传 |
+| `list_config.json` | 黑白名单、历史记录 | ✅ 上传 |
+
+---
+
+**1. api_config.json（需手动创建）**
+
+此文件包含 API 密钥，**不会上传到 Git**，需要手动创建。
+
+首次运行程序时会自动生成模板，或手动创建：
 
 ```json
 {
-  "api_key": "your-deepseek-api-key",
-  "whitelist": [
-    "Visual Studio Code",
-    "Notion",
-    "Typora"
-  ],
-  "blacklist": [
-    "游戏",
-    "Steam",
-    "bilibili",
-    "抖音"
-  ],
-  "history": {
-    "微信": "不是",
-    "QQ音乐": "是",
-    "Steam": "是"
-  }
+    "api_key": "your-api-key-here"
 }
 ```
+
+**如何获取 API Key：**
+
+1. 访问 [DeepSeek 开放平台](https://platform.deepseek.com/)
+2. 注册/登录账号
+3. 进入「API Keys」页面，点击「创建 API Key」
+4. 复制生成的密钥，填入 `api_config.json`
+
+**其他兼容 API：**
+
+程序支持 OpenAI 兼容的 API，可在 `model_config.json` 中修改 `base_url`：
+
+| API 提供商 | base_url | model 示例 |
+|------------|----------|------------|
+| DeepSeek | `https://api.deepseek.com` | `deepseek-chat` |
+| OpenAI | `https://api.openai.com/v1` | `gpt-4o-mini` |
+| 智谱 AI | `https://open.bigmodel.cn/api/paas/v4` | `glm-4-flash` |
+| 本地 Ollama | `http://localhost:11434/v1` | `llama3` |
+
+---
+
+**2. model_config.json（自动生成）**
+
+```json
+{
+    "base_url": "https://api.deepseek.com",
+    "model": "deepseek-chat"
+}
+```
+
+| 字段 | 说明 | 示例值 |
+|------|------|--------|
+| `base_url` | API 服务地址 | `https://api.deepseek.com` |
+| `model` | 使用的模型名称 | `deepseek-chat` |
+
+---
+
+**3. list_config.json（自动生成）**
+
+```json
+{
+    "whitelist": [
+        "Visual Studio Code",
+        "Notion",
+        "Typora"
+    ],
+    "blacklist": [
+        "游戏",
+        "Steam",
+        "bilibili",
+        "抖音"
+    ],
+    "history": {
+        "微信": "不是",
+        "QQ音乐": "是"
+    }
+}
+```
+
+| 字段 | 说明 |
+|------|------|
+| `whitelist` | 白名单关键字列表，匹配到的窗口直接判定为「非娱乐」 |
+| `blacklist` | 黑名单关键字列表，匹配到的窗口直接判定为「娱乐」 |
+| `history` | AI 判断过的窗口历史记录，避免重复调用 API |
+
+---
+
+**首次使用步骤：**
+
+1. 确保 `foreground_inspection/` 目录存在
+2. 在该目录下创建 `api_config.json`，填入你的 API Key
+3. 运行 `foreground_inspection.exe` 或 `python foreground_inspection.py`
+4. 程序会自动生成 `model_config.json` 和 `list_config.json`（如不存在）
 
 ### ✅ 已完成
 
@@ -431,7 +504,9 @@ electron_pomodoro/
 └── foreground_inspection/  # Python 前台检测程序
     ├── foreground_inspection.py   # 前台检测源码
     ├── foreground_inspection.exe  # 打包好的检测程序
-    ├── config.json                # 黑名单/白名单/历史记录配置
+    ├── api_config.json            # API 密钥配置（不上传 Git）
+    ├── model_config.json          # 模型配置（API 地址、模型名）
+    ├── list_config.json           # 黑白名单、历史记录
     └── 打包复制.bat                # 打包脚本（需Python环境）
 ```
 

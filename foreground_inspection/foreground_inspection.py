@@ -27,14 +27,18 @@ def get_base_path():
 
 BASE_PATH = get_base_path()
 API_CONFIG_FILE = os.path.join(BASE_PATH, "api_config.json")
+MODEL_CONFIG_FILE = os.path.join(BASE_PATH, "model_config.json")
 LIST_CONFIG_FILE = os.path.join(BASE_PATH, "list_config.json")
 
 
 # ============ 默认配置 ============
 
 DEFAULT_API_CONFIG = {
+    "api_key": "<your api key>"
+}
+
+DEFAULT_MODEL_CONFIG = {
     "base_url": "https://api.deepseek.com",
-    "api_key": "<your api key>",
     "model": "deepseek-chat"
 }
 
@@ -79,8 +83,13 @@ def save_json_file(file_path, config):
 
 
 def load_api_config():
-    """加载 API 配置"""
+    """加载 API 密钥配置"""
     return load_json_file(API_CONFIG_FILE, DEFAULT_API_CONFIG)
+
+
+def load_model_config():
+    """加载模型配置（base_url, model）"""
+    return load_json_file(MODEL_CONFIG_FILE, DEFAULT_MODEL_CONFIG)
 
 
 def load_list_config():
@@ -118,7 +127,7 @@ def check_list(window_title, keyword_list):
     return False
 
 
-def check_is_entertainment(window_title, api_config, list_config):
+def check_is_entertainment(window_title, api_config, model_config, list_config):
     """
     检查窗口是否为娱乐类应用
     优先级：白名单 -> 黑名单 -> 历史记录 -> AI API
@@ -141,10 +150,10 @@ def check_is_entertainment(window_title, api_config, list_config):
     # 4. 调用 AI API
     client = OpenAI(
         api_key=api_config.get("api_key", "<your api key>"),
-        base_url=api_config.get("base_url", "https://api.deepseek.com"),
+        base_url=model_config.get("base_url", "https://api.deepseek.com"),
     )
     
-    model = api_config.get("model", "deepseek-chat")
+    model = model_config.get("model", "deepseek-chat")
     
     system_prompt = """你是一个窗口分类助手。根据用户提供的窗口名称，判断该应用是否属于娱乐类（如游戏、视频、音乐、直播、社交媒体等）。
 
@@ -183,10 +192,11 @@ def check_is_entertainment(window_title, api_config, list_config):
 def main():
     # 加载配置
     api_config = load_api_config()
+    model_config = load_model_config()
     list_config = load_list_config()
     
     print("开始监听前台窗口变化... (按 Ctrl+C 退出)")
-    print(f"API 配置: {api_config.get('base_url')} | 模型: {api_config.get('model')}")
+    print(f"API 地址: {model_config.get('base_url')} | 模型: {model_config.get('model')}")
     print("-" * 70)
     
     last_title = None
@@ -199,7 +209,7 @@ def main():
             if current_title is not None and current_title != last_title:
                 if current_title:  # 非空标题才查询
                     is_entertainment, list_config = check_is_entertainment(
-                        current_title, api_config, list_config
+                        current_title, api_config, model_config, list_config
                     )
                     
                     timestamp = time.strftime("%H:%M:%S", time.localtime())
