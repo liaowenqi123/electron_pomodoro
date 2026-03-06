@@ -8,13 +8,24 @@ import ctypes
 import time
 import json
 import os
+import sys
 from openai import OpenAI
 
 # Windows API 函数
 user32 = ctypes.windll.user32
 
-# 配置文件路径
-CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+# 配置文件路径（兼容 PyInstaller 打包）
+def get_config_path():
+    """获取配置文件路径，兼容打包和开发环境"""
+    if getattr(sys, 'frozen', False):
+        # 打包后：使用 exe 所在目录
+        base_path = os.path.dirname(sys.executable)
+    else:
+        # 开发环境：使用脚本所在目录
+        base_path = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base_path, "config.json")
+
+CONFIG_FILE = get_config_path()
 
 def load_config():
     """加载配置文件"""
