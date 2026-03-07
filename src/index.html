@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="styles/music-player.css">
   <link rel="stylesheet" href="styles/modal.css">
   <link rel="stylesheet" href="styles/modes.css">
+  <link rel="stylesheet" href="styles/ai-helper.css">
 </head>
 <body>
   <div class="window-frame">
@@ -89,6 +90,7 @@
         <div class="header-buttons">
           <button class="btn-tutorial" id="themeToggleBtn" title="切换深色模式">🌙</button>
           <button class="btn-tutorial" id="tutorialBtn">📖</button>
+          <button class="btn-ai" id="aiBtn" title="AI规划助手">🤖</button>
           <button class="btn-garden" id="gardenBtn" title="菜园子">🌱</button>
         </div>
         <h1 class="title">🍅 番茄钟</h1>
@@ -161,6 +163,13 @@
         <button class="tutorial-close" id="tutorialClose">×</button>
         <h2>📖 使用说明</h2>
         <div class="tutorial-body">
+          <h3>🤖 AI规划助手</h3>
+          <p>点击右上角 🤖 按钮打开AI助手，用自然语言描述您的需求：</p>
+          <p>• 例如："我要准备考试，需要学习3小时"</p>
+          <p>• 例如："写代码2小时，每25分钟休息5分钟"</p>
+          <p>• AI会自动为您生成合理的番茄钟计划</p>
+          <p>• 点击"应用计划"即可自动添加到计划列表</p>
+          
           <h3>🔄 模式切换</h3>
           <p>顶部滑块可切换 <b>单次模式</b> 和 <b>计划模式</b>：</p>
           <p>• <b>单次模式</b>：传统番茄钟，手动设置时间计时</p>
@@ -200,6 +209,32 @@
         </div>
       </div>
     </div>
+
+    <!-- AI助手弹窗 -->
+    <div class="ai-modal" id="aiModal">
+      <div class="ai-modal-content">
+        <button class="ai-modal-close" id="aiModalClose">×</button>
+        <h2>🤖 AI规划助手</h2>
+        
+        <div class="ai-input-section">
+          <label class="ai-input-label">告诉AI您的工作或学习需求：</label>
+          <textarea 
+            class="ai-input" 
+            id="aiInput" 
+            placeholder="例如：我要准备考试，需要学习3小时，每学习45分钟休息10分钟"
+          ></textarea>
+          <div class="ai-input-hint">💡 提示：描述您的任务内容、时长需求，AI会为您规划合理的番茄钟计划</div>
+        </div>
+        
+        <button class="ai-generate-btn" id="aiGenerateBtn">✨ 生成计划</button>
+        
+        <div class="ai-result-section" id="aiResult">
+          <!-- AI生成的结果将显示在这里 -->
+        </div>
+        
+        <button class="ai-apply-btn" id="aiApplyBtn">✅ 应用计划</button>
+      </div>
+    </div>
   </div>
 
   <!-- 按依赖顺序加载 JS 模块 -->
@@ -222,6 +257,7 @@
   <script src="scripts/modules/tutorial.js"></script>
   <script src="scripts/modules/callbacks.js"></script>
   <script src="scripts/modules/theme.js"></script>
+  <script src="scripts/modules/aiHelper.js"></script>
   
   <!-- 主入口 -->
   <script src="scripts/renderer.js"></script>
