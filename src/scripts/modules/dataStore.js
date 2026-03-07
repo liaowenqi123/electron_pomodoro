@@ -130,6 +130,12 @@
     getPlanList: getPlanList,
     updatePlanList: updatePlanList,
     getGarden: getGarden,
-    updateGarden: updateGarden
+    updateGarden: updateGarden,
+    getTheme: () => cachedData ? (cachedData.theme || 'light') : 'light',
+    updateTheme: (theme) => {
+      if (!cachedData) return false;
+      cachedData.theme = theme;
+      return saveImmediate();
+}
   }
 })()
