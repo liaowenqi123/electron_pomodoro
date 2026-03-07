@@ -71,7 +71,8 @@
           { id: 11, crop: null, progress: 0, plantedAt: null, locked: true }
         ],
         warehouse: []
-      }
+      },
+      theme: 'light'  
     }
   }
 
