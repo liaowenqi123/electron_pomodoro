@@ -21,7 +21,7 @@
 }
 
 .container.plan-mode.break-mode .main-content {
-  background: linear-gradient(135deg, rgba(80, 180, 120, 0.88), rgba(70, 160, 110, 0.78));
+  background: linear-gradient(135deg, var(--break-gradient-start), var(--break-gradient-end));
 }
 
 /* 计划模式下隐藏工作/休息模式按钮 */
@@ -31,9 +31,8 @@
 
 /* ============ 休息模式样式 ============ */
 .container.break-mode {
-  background: linear-gradient(135deg, rgba(80, 180, 120, 0.88), rgba(70, 160, 110, 0.78));
+  background: linear-gradient(135deg, var(--break-gradient-start), var(--break-gradient-end));
 }
-
 .container.break-mode .sidebar {
   background: rgba(0, 0, 0, 0.1);
 }
