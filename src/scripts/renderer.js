@@ -16,7 +16,13 @@
 
   // ============ 初始化滚轮选择器 ============
   WheelPicker.init(DOM.wheelPickerEl, DOM.wheelColumn, null)
-
+  
+  // ============初始化主题模块============
+  if (window.Theme) {
+    Theme.init({
+      themeToggleBtn: document.getElementById('themeToggleBtn')
+    });
+  }
   // ============ 初始化预设模块 ============
   await Presets.init(
     {
