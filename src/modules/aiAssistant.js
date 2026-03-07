@@ -8,7 +8,7 @@ const axios = require('axios')
 class AIAssistant {
   constructor() {
     // DeepSeek API配置
-    this.apiKey = 'sk-你的实际api' // 开发者在这里填入API密钥
+    this.apiKey = 'sk-你的实际API' // 开发者在这里填入API密钥
     this.apiUrl = 'https://api.deepseek.com/v1/chat/completions'
     this.model = 'deepseek-chat'
   }
@@ -105,4 +105,5 @@ class AIAssistant {
 }
 
 module.exports = new AIAssistant()
+
 
