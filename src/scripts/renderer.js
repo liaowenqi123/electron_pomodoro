@@ -61,6 +61,17 @@
   // ============ 初始化教程弹窗 ============
   Tutorial.init()
 
+  // ============ 初始化AI助手 ============
+  AIHelper.init({
+    aiBtn: DOM.aiBtn,
+    aiModal: DOM.aiModal,
+    aiModalClose: DOM.aiModalClose,
+    aiInput: DOM.aiInput,
+    aiGenerateBtn: DOM.aiGenerateBtn,
+    aiResult: DOM.aiResult,
+    aiApplyBtn: DOM.aiApplyBtn
+  })
+
   // ============ 初始化音乐播放器 ============
   MusicPlayer.init({
     playBtn: DOM.playBtn,
