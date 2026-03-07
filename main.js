@@ -115,7 +115,55 @@ function createWindow() {
     }
   })
 
-  win.loadFile('src/index.html')
+  // 先显示加载页面
+  win.loadFile('src/loading.html')
+  
+  // 追踪两个 Python 进程的启动状态
+  let musicReady = false
+  let foregroundReady = false
+  let mainPageLoaded = false  // 主页面是否已加载
+  
+  // 缓存需要在主页面加载后发送的事件
+  const pendingEvents = []
+  
+  // 发送事件到渲染进程（主页面加载后立即发送，否则缓存）
+  function sendToRenderer(channel, data) {
+    if (mainPageLoaded) {
+      win.webContents.send(channel, data)
+    } else {
+      pendingEvents.push({ channel, data })
+    }
+  }
+  
+  // 主页面加载完成后发送缓存的事件
+  win.webContents.on('did-finish-load', () => {
+    // 检查当前加载的是否是主页面
+    const url = win.webContents.getURL()
+    if (url.includes('index.html')) {
+      mainPageLoaded = true
+      // 发送缓存的事件
+      pendingEvents.forEach(event => {
+        win.webContents.send(event.channel, event.data)
+      })
+      pendingEvents.length = 0
+    }
+  })
+  
+  // 更新加载进度
+  function updateLoadingProgress() {
+    const progress = ((musicReady ? 50 : 0) + (foregroundReady ? 50 : 0))
+    win.webContents.executeJavaScript(`
+      document.getElementById('progressBar').style.width = '${progress}%';
+      document.getElementById('status').textContent = '${musicReady && foregroundReady ? '启动完成' : '正在启动...'}';
+    `)
+    
+    // 两个进程都 ready 后，加载主页面
+    if (musicReady && foregroundReady) {
+      setTimeout(() => {
+        win.loadFile('src/index.html')
+      }, 300)
+    }
+  }
   
   // 启动音乐播放器进程
   // 开发环境: __dirname/music-player/music.exe
@@ -137,6 +185,8 @@ function createWindow() {
   
   // 设置音乐进程回调，转发到渲染进程
   musicProcess.onReady((data) => {
+    musicReady = true
+    updateLoadingProgress()
     win.webContents.send('music-ready', data)
   })
   
@@ -184,15 +234,17 @@ function createWindow() {
   
   // 设置前台检测回调，转发到渲染进程
   foregroundInspection.onReady((data) => {
+    foregroundReady = true
+    updateLoadingProgress()
     win.webContents.send('foreground-ready', data)
   })
   
   foregroundInspection.onApiKeyInvalid((data) => {
-    win.webContents.send('foreground-api-key-invalid', data)
+    sendToRenderer('foreground-api-key-invalid', data)
   })
   
   foregroundInspection.onEntertainmentDetected((data) => {
-    win.webContents.send('foreground-entertainment-detected', data)
+    sendToRenderer('foreground-entertainment-detected', data)
   })
   
   foregroundInspection.onStatus((data) => {
