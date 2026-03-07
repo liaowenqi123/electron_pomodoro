@@ -12,6 +12,8 @@
   --btn-hover: #d0d0d0;
   --container-gradient-start: rgba(200, 100, 100, 0.88);
   --container-gradient-end: rgba(180, 110, 110, 0.78);
+  --break-gradient-start: rgba(80, 180, 120, 0.88);
+  --break-gradient-end: rgba(70, 160, 110, 0.78);
 }
 
 /* 深色模式变量 */
@@ -25,9 +27,12 @@ body.dark-theme {
   --border-color: #444444;
   --btn-bg: #3a3a3a;
   --btn-hover: #4a4a4a;
-  --container-gradient-start: rgba(40, 20, 20, 0.95);
-  --container-gradient-end: rgba(20, 10, 10, 0.9);
+  --container-gradient-start: rgba(80, 40, 40, 0.85);
+  --container-gradient-end: rgba(60, 30, 30, 0.8);
+  --break-gradient-start: rgba(30, 60, 30, 0.95);
+  --break-gradient-end: rgba(20, 40, 20, 0.85);
 }
+
 * {
   margin: 0;
   padding: 0;
