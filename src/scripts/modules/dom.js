@@ -47,6 +47,15 @@
     tutorialModal: document.getElementById('tutorialModal'),
     tutorialClose: document.getElementById('tutorialClose'),
     
+    // AI助手
+    aiBtn: document.getElementById('aiBtn'),
+    aiModal: document.getElementById('aiModal'),
+    aiModalClose: document.getElementById('aiModalClose'),
+    aiInput: document.getElementById('aiInput'),
+    aiGenerateBtn: document.getElementById('aiGenerateBtn'),
+    aiResult: document.getElementById('aiResult'),
+    aiApplyBtn: document.getElementById('aiApplyBtn'),
+    
     // 专注模式开关
     focusModeSwitch: document.getElementById('focusModeSwitch'),
     focusModeStatus: document.getElementById('focusModeStatus'),
