@@ -245,6 +245,13 @@ ipcMain.on('close-garden', () => {
   }
 })
 
+// 刷新菜园子窗口
+ipcMain.on('refresh-garden', () => {
+  if (gardenWindow && !gardenWindow.isDestroyed()) {
+    gardenWindow.webContents.send('refresh-garden')
+  }
+})
+
 // ============ 数据存储 IPC 处理 ============
 
 ipcMain.handle('read-data', () => {

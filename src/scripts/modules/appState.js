@@ -70,6 +70,16 @@
         DOM.container.classList.remove('focus-mode')
       }
     }
+    // 专注模式拨杆在番茄钟运行时不允许拨动（通过禁用点击事件实现）
+    if (DOM.focusModeSwitch) {
+      if (state.focusModeEnabled && Timer.getIsRunning()) {
+        DOM.focusModeSwitch.style.pointerEvents = 'none'
+        DOM.focusModeSwitch.style.opacity = '0.6'
+      } else {
+        DOM.focusModeSwitch.style.pointerEvents = 'auto'
+        DOM.focusModeSwitch.style.opacity = '1'
+      }
+    }
   }
 
   // ============ 模式切换逻辑 ============

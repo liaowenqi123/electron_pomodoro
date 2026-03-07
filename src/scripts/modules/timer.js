@@ -10,6 +10,7 @@
   let timeLeft = totalTime
   let timerId = null
   let isRunning = false
+  let minuteCounter = 0  // 用于跟踪分钟数
 
   const radius = 116
   const circumference = 2 * Math.PI * radius
@@ -26,6 +27,7 @@
   function start() {
     if (timeLeft === 0) timeLeft = totalTime
     isRunning = true
+    minuteCounter = 0  // 重置分钟计数器
     elements.startBtn.textContent = '暂停'
     
     if (callbacks.onStart) {
@@ -42,11 +44,19 @@
     
     timerId = setInterval(() => {
       timeLeft--
+      minuteCounter++
       updateDisplay()
+      
+      // 每过1分钟，通知菜园子更新作物进度
+      if (minuteCounter >= 60 && window.Garden) {
+        window.Garden.updateProgress()
+        minuteCounter = 0  // 重置计数器
+      }
       
       if (timeLeft === 0) {
         clearInterval(timerId)
         isRunning = false
+        minuteCounter = 0  // 重置分钟计数器
         elements.startBtn.textContent = '开始'
         
         if (callbacks.onComplete) {
@@ -84,6 +94,10 @@
   }
 
   function toggle() {
+    // 专注模式下禁止暂停，只能通过重置按钮中断
+    if (isRunning && AppState && AppState.focusModeEnabled) {
+      return // 专注模式下运行中时点击无效
+    }
     isRunning ? pause() : start()
   }
 

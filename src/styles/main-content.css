@@ -215,6 +215,17 @@
   transform: translateY(0);
 }
 
+/* 专注模式下暂停按钮禁用样式 */
+.btn-start.focus-mode-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-start.focus-mode-disabled:hover {
+  transform: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
 .btn-reset {
   background: rgba(255, 255, 255, 0.15);
   color: #fff;

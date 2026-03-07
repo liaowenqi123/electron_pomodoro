@@ -80,6 +80,14 @@ const { contextBridge, ipcRenderer } = require('electron')
   
   // 关闭菜园子窗口
   closeGarden: () => ipcRenderer.send('close-garden'),
+  
+  // 刷新菜园子窗口
+  refreshGarden: () => ipcRenderer.send('refresh-garden'),
+  
+  // 监听菜园子刷新事件
+  onGardenRefresh: (callback) => {
+    ipcRenderer.on('refresh-garden', () => callback())
+  },
 
   // ============ AI助手 API ============
   

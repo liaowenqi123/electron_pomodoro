@@ -51,6 +51,33 @@
           DOM.addWorkBtn.disabled = !enabled
           DOM.addBreakBtn.disabled = !enabled
         }
+        // 专注模式下，计时器运行时禁用开始按钮（显示"暂停"时）
+        // 计时器停止时（enabled=true），按钮显示"开始"，不禁用
+        if (AppState.focusModeEnabled) {
+          if (!enabled) {
+            // 计时器运行中，显示"暂停"，添加禁用样式
+            DOM.startBtn.classList.add('focus-mode-disabled')
+          } else {
+            // 计时器停止，显示"开始"，移除禁用样式
+            DOM.startBtn.classList.remove('focus-mode-disabled')
+          }
+        }
+        // 专注模式下番茄钟运行时，禁用菜园子按钮
+        if (AppState.focusModeEnabled && !enabled) {
+          if (DOM.gardenBtn) {
+            DOM.gardenBtn.disabled = true
+            DOM.gardenBtn.style.opacity = '0.5'
+            DOM.gardenBtn.style.cursor = 'not-allowed'
+            DOM.gardenBtn.title = '专注模式下番茄钟运行中，无法使用菜园'
+          }
+        } else {
+          if (DOM.gardenBtn) {
+            DOM.gardenBtn.disabled = false
+            DOM.gardenBtn.style.opacity = '1'
+            DOM.gardenBtn.style.cursor = 'pointer'
+            DOM.gardenBtn.title = ''
+          }
+        }
       },
       
       onComplete: () => {

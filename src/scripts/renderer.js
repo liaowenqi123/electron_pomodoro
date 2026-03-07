@@ -98,13 +98,40 @@
   // 专注模式开关事件
   if (DOM.focusModeSwitch) {
     DOM.focusModeSwitch.addEventListener('click', () => {
-      const enabled = AppState.toggleFocusMode()
+      // 番茄钟运行时不允许切换专注模式（已在appState.js中通过pointer-events禁用）
+      if (Timer.getIsRunning()) {
+        return
+      }
+      
+      AppState.toggleFocusMode()
+      
       // 更新状态文字
       if (DOM.focusModeStatus) {
-        DOM.focusModeStatus.textContent = enabled ? '开启' : '关闭'
-        DOM.focusModeStatus.classList.toggle('active', enabled)
+        DOM.focusModeStatus.textContent = AppState.focusModeEnabled ? '开启' : '关闭'
+        DOM.focusModeStatus.classList.toggle('active', AppState.focusModeEnabled)
       }
+      
+      // 更新菜园子按钮状态
+      updateGardenButtonState()
     })
+  }
+
+  // 更新菜园子按钮状态（专注模式下番茄钟运行时禁用）
+  function updateGardenButtonState() {
+    if (DOM.gardenBtn) {
+      // 专注模式开启且番茄钟运行时，禁用菜园子按钮
+      if (AppState.focusModeEnabled && Timer.getIsRunning()) {
+        DOM.gardenBtn.disabled = true
+        DOM.gardenBtn.style.opacity = '0.5'
+        DOM.gardenBtn.style.cursor = 'not-allowed'
+        DOM.gardenBtn.title = '专注模式下番茄钟运行中，无法使用菜园'
+      } else {
+        DOM.gardenBtn.disabled = false
+        DOM.gardenBtn.style.opacity = '1'
+        DOM.gardenBtn.style.cursor = 'pointer'
+        DOM.gardenBtn.title = ''
+      }
+    }
   }
 
   // 添加预设按钮
@@ -145,6 +172,23 @@
 
   // 重置按钮
   DOM.btnReset.addEventListener('click', () => {
+    // 先保存当前计时器运行状态（在重置之前）
+    const wasRunning = Timer.getIsRunning()
+    
+    // 专注模式下，如果计时器正在运行，弹出确认框
+    if (AppState.focusModeEnabled && wasRunning) {
+      const confirmed = confirm('确定要中断专注吗？所有正在生长的作物将会枯萎！')
+      if (!confirmed) {
+        return // 用户取消，不执行重置
+      }
+      // 显示惩罚提示
+      DOM.statusEl.textContent = '⚠️ 专注中断！作物已枯萎'
+      // 触发惩罚：所有正在生长的作物枯萎
+      if (window.Garden) {
+        window.Garden.handleResetPunishment()
+      }
+    }
+    
     // 先停止计时器
     Timer.reset()
     

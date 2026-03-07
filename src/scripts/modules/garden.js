@@ -33,11 +33,31 @@
       window.electronAPI.closeGarden()
     })
 
+    // 监听刷新事件（当主页面更新作物数据时）
+    if (window.electronAPI && window.electronAPI.onGardenRefresh) {
+      window.electronAPI.onGardenRefresh(async () => {
+        // 重新从数据库加载数据
+        await loadGardenData()
+        // 重新渲染界面
+        render()
+      })
+    }
+
     // 加载数据
     await loadGardenData()
     
     // 渲染界面
     render()
+  }
+
+  /**
+   * 确保菜园数据已加载（供外部调用）
+   */
+  async function ensureGardenDataLoaded() {
+    if (!gardenData) {
+      await loadGardenData()
+    }
+    return gardenData
   }
 
   /**
@@ -291,18 +311,82 @@
 
   /**
    * 更新成长进度（由外部调用）
+   * 在番茄钟运行期间，每分钟被调用一次
    */
   async function updateProgress() {
-    // 这个方法会在计时器运行时被调用
-    // 目前先不实现，第四阶段再做
+    // 每次都重新从数据库加载数据，确保获取最新状态
+    await loadGardenData()
+    
+    const plots = gardenData.plots || []
+    let hasChanges = false
+    
+    for (let i = 0; i < plots.length; i++) {
+      const plot = plots[i]
+      // 只有未锁定且有作物的格子才生长
+      if (!plot.locked && plot.crop && plot.progress !== null) {
+        const cropConfig = CROP_CONFIG[plot.crop]
+        if (cropConfig) {
+          // 成长进度+1分钟
+          plot.progress += 1
+          hasChanges = true
+        }
+      }
+    }
+    
+    if (hasChanges) {
+      await saveGardenData()
+      // 通知菜园子页面刷新（如果页面已打开）
+      if (window.electronAPI && window.electronAPI.refreshGarden) {
+        window.electronAPI.refreshGarden()
+      }
+    }
   }
 
   /**
    * 处理重置惩罚（由外部调用）
+   * 专注模式下重置计时器时，所有正在生长的作物枯萎死亡
    */
   async function handleResetPunishment() {
-    // 这个方法会在重置计时器时被调用
-    // 目前先不实现，第四阶段再做
+    // 每次都重新从数据库加载数据，确保获取最新状态
+    await loadGardenData()
+    
+    const plots = gardenData.plots || []
+    let hasDeadCrops = false
+    
+    for (let i = 0; i < plots.length; i++) {
+      const plot = plots[i]
+      // 未锁定且有未成熟作物的格子，作物枯萎
+      if (!plot.locked && plot.crop && plot.progress !== null) {
+        const cropConfig = CROP_CONFIG[plot.crop]
+        if (cropConfig) {
+          const progress = plot.progress
+          const totalTime = cropConfig.growTime
+          // 如果未成熟，作物枯萎
+          if (progress < totalTime) {
+            // 清空格子，作物死亡
+            gardenData.plots[i] = {
+              id: i,
+              crop: null,
+              progress: 0,
+              plantedAt: null
+            }
+            hasDeadCrops = true
+          }
+        }
+      }
+    }
+    
+    if (hasDeadCrops) {
+      await saveGardenData()
+      // 只在花园页面打开时显示提示（检查元素是否存在）
+      if (elements.gardenTip) {
+        updateTip('⚠️ 专注模式中断！所有正在生长的作物已枯萎')
+      }
+      // 通知菜园子页面刷新（如果页面已打开）
+      if (window.electronAPI && window.electronAPI.refreshGarden) {
+        window.electronAPI.refreshGarden()
+      }
+    }
   }
 
   /**
