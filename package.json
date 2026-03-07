@@ -17,5 +17,8 @@
   "devDependencies": {
     "@electron/packager": "^19.0.5",
     "electron": "^34.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.13.6"
   }
 }
