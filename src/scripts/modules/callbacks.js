@@ -17,6 +17,10 @@
             PlanMode.startPlan()
           }
         }
+        // 专注模式开启且计时器开始时，启动前台检测
+        if (AppState.focusModeEnabled && window.ForegroundDetection) {
+          window.ForegroundDetection.startDetection()
+        }
       },
       
       onStatusChange: (status) => {
@@ -26,6 +30,10 @@
             DOM.statusEl.textContent = mode === 'work' ? '专注中...' : '休息中...'
           } else if (status === 'paused') {
             DOM.statusEl.textContent = '已暂停'
+            // 专注模式下暂停时，停止前台检测
+            if (AppState.focusModeEnabled && window.ForegroundDetection) {
+              window.ForegroundDetection.stopDetection()
+            }
           } else if (status === 'ready') {
             DOM.statusEl.textContent = mode === 'work' ? '准备开始专注工作' : '准备休息一下'
           }
@@ -37,6 +45,10 @@
             }
           } else if (status === 'paused') {
             DOM.statusEl.textContent = '已暂停'
+            // 专注模式下暂停时，停止前台检测
+            if (AppState.focusModeEnabled && window.ForegroundDetection) {
+              window.ForegroundDetection.stopDetection()
+            }
           } else if (status === 'ready') {
             DOM.statusEl.textContent = '准备开始计划'
           }

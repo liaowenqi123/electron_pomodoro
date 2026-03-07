@@ -92,5 +92,51 @@ const { contextBridge, ipcRenderer } = require('electron')
   // ============ AI助手 API ============
   
   // 生成AI计划
-  aiGeneratePlan: (userInput) => ipcRenderer.invoke('ai-generate-plan', userInput)
+  aiGeneratePlan: (userInput) => ipcRenderer.invoke('ai-generate-plan', userInput),
+  
+  // ============ 前台检测 API ============
+  
+  // 前台检测控制命令
+  foregroundStart: () => ipcRenderer.send('foreground-start'),
+  foregroundStop: () => ipcRenderer.send('foreground-stop'),
+  foregroundGetStatus: () => ipcRenderer.send('foreground-get-status'),
+  foregroundAddWhitelist: (keyword) => ipcRenderer.send('foreground-add-whitelist', keyword),
+  foregroundAddBlacklist: (keyword) => ipcRenderer.send('foreground-add-blacklist', keyword),
+  foregroundMarkHistoryNot: (windowTitle) => ipcRenderer.send('foreground-mark-history-not', windowTitle),
+  foregroundMoveBlacklistToWhitelist: (keyword) => ipcRenderer.send('foreground-move-blacklist-to-whitelist', keyword),
+  
+  // 前台检测事件监听
+  onForegroundReady: (callback) => {
+    ipcRenderer.on('foreground-ready', (event, data) => callback(data))
+  },
+  onForegroundApiKeyInvalid: (callback) => {
+    ipcRenderer.on('foreground-api-key-invalid', (event, data) => callback(data))
+  },
+  onForegroundEntertainmentDetected: (callback) => {
+    ipcRenderer.on('foreground-entertainment-detected', (event, data) => callback(data))
+  },
+  onForegroundStatus: (callback) => {
+    ipcRenderer.on('foreground-status', (event, data) => callback(data))
+  },
+  onForegroundError: (callback) => {
+    ipcRenderer.on('foreground-error', (event, data) => callback(data))
+  },
+  
+  // 移除前台检测监听器
+  removeForegroundListeners: () => {
+    ipcRenderer.removeAllListeners('foreground-ready')
+    ipcRenderer.removeAllListeners('foreground-entertainment-detected')
+    ipcRenderer.removeAllListeners('foreground-status')
+    ipcRenderer.removeAllListeners('foreground-error')
+  },
+  
+  // ============ 窗口置顶 API ============
+  
+  setAlwaysOnTop: (onTop) => ipcRenderer.send('set-always-on-top', onTop),
+  
+  // 窗口抢占前台
+  bringToFront: () => ipcRenderer.send('bring-to-front'),
+  
+  // 取消置顶
+  cancelAlwaysOnTop: () => ipcRenderer.send('cancel-always-on-top')
 })

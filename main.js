@@ -7,6 +7,7 @@ const path = require('path')
 const fs = require('fs')
 const musicProcess = require('./src/modules/musicProcess')
 const aiAssistant = require('./src/modules/aiAssistant')
+const foregroundInspection = require('./src/modules/foregroundInspection')
 
 // 数据文件路径
 let dataFilePath = null
@@ -166,6 +167,37 @@ function createWindow() {
   musicProcess.onPlayError((data) => {
     win.webContents.send('music-play-error', data)
   })
+  
+  // 启动前台检测进程
+  let foregroundExePath
+  if (app.isPackaged) {
+    foregroundExePath = path.join(process.resourcesPath, 'foreground_inspection.exe')
+  } else {
+    foregroundExePath = path.join(__dirname, 'foreground_inspection', 'foreground_inspection.exe')
+  }
+  
+  foregroundInspection.start(foregroundExePath)
+  
+  // 设置前台检测回调，转发到渲染进程
+  foregroundInspection.onReady((data) => {
+    win.webContents.send('foreground-ready', data)
+  })
+  
+  foregroundInspection.onApiKeyInvalid((data) => {
+    win.webContents.send('foreground-api-key-invalid', data)
+  })
+  
+  foregroundInspection.onEntertainmentDetected((data) => {
+    win.webContents.send('foreground-entertainment-detected', data)
+  })
+  
+  foregroundInspection.onStatus((data) => {
+    win.webContents.send('foreground-status', data)
+  })
+  
+  foregroundInspection.onError((data) => {
+    win.webContents.send('foreground-error', data)
+  })
 }
 
 // 存储菜园子窗口引用
@@ -306,6 +338,75 @@ ipcMain.handle('ai-generate-plan', async (event, userInput) => {
   return await aiAssistant.generatePlan(userInput)
 })
 
+// ============ 前台检测 IPC 处理 ============
+
+ipcMain.on('foreground-start', () => {
+  foregroundInspection.startDetection()
+})
+
+ipcMain.on('foreground-stop', () => {
+  foregroundInspection.stopDetection()
+})
+
+ipcMain.on('foreground-get-status', () => {
+  foregroundInspection.getStatus()
+})
+
+ipcMain.on('foreground-add-whitelist', (event, keyword) => {
+  foregroundInspection.addWhitelist(keyword)
+})
+
+ipcMain.on('foreground-add-blacklist', (event, keyword) => {
+  foregroundInspection.addBlacklist(keyword)
+})
+
+ipcMain.on('foreground-mark-history-not', (event, windowTitle) => {
+  foregroundInspection.markHistoryNot(windowTitle)
+})
+
+ipcMain.on('foreground-move-blacklist-to-whitelist', (event, keyword) => {
+  foregroundInspection.moveBlacklistToWhitelist(keyword)
+})
+
+// ============ 窗口置顶 IPC 处理 ============
+
+ipcMain.on('set-always-on-top', (event, onTop) => {
+  const win = BrowserWindow.getFocusedWindow()
+  if (win) {
+    win.setAlwaysOnTop(onTop)
+  }
+})
+
+// ============ 窗口抢占前台 IPC 处理 ============
+
+ipcMain.on('bring-to-front', (event) => {
+  // 获取主窗口（番茄钟窗口）
+  const windows = BrowserWindow.getAllWindows()
+  const mainWindow = windows.find(w => !w.isDestroyed())
+  
+  if (mainWindow) {
+    // 先设置置顶，确保能抢占前台
+    mainWindow.setAlwaysOnTop(true)
+    // 显示窗口（如果被最小化）
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore()
+    }
+    // 抢占前台焦点
+    mainWindow.focus()
+    // 移动到最上层
+    mainWindow.moveTop()
+  }
+})
+
+ipcMain.on('cancel-always-on-top', (event) => {
+  const windows = BrowserWindow.getAllWindows()
+  const mainWindow = windows.find(w => !w.isDestroyed())
+  
+  if (mainWindow) {
+    mainWindow.setAlwaysOnTop(false)
+  }
+})
+
 app.whenReady().then(() => {
   createWindow()
 
@@ -319,6 +420,8 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   // 停止音乐播放器进程
   musicProcess.stop()
+  // 停止前台检测进程
+  foregroundInspection.stop()
   
   if (process.platform !== 'darwin') {
     app.quit()
@@ -328,4 +431,6 @@ app.on('window-all-closed', () => {
 app.on('before-quit', () => {
   // 确保在退出前停止音乐播放器进程
   musicProcess.stop()
+  // 确保在退出前停止前台检测进程
+  foregroundInspection.stop()
 })

@@ -7,11 +7,11 @@
         "演示文稿"
     ],
     "blacklist": [
-        "bilibili",
         "抖音",
         "快手",
         "斗鱼",
-        "虎牙"
+        "虎牙",
+        "bilibili"
     ],
     "history": {
         "C:\\WINDOWS\\py.exe": "不是",
@@ -74,6 +74,12 @@
         "glm5 Model by Z-ai | NVIDIA NIM 和另外 37 个页面 - 用户1 - Microsoft​ Edge": "不是",
         "NVIDIA 和另外 37 个页面 - 用户1 - Microsoft​ Edge": "不是",
         "IEEE Xplore Full-Text PDF: 和另外 37 个页面 - 用户1 - Microsoft​ Edge": "不是",
-        "Terminal": "不是"
+        "Terminal": "不是",
+        "C:\\WINDOWS\\system32\\cmd.exe ": "不是",
+        "npm": "不是",
+        "微信音视频通话 ": "不是",
+        "对话SHIT主编：你发过论文吗？": "不是",
+        "Commits · liaowenqi123/electron_pomodoro 和另外 40 个页面 - 用户1 - Microsoft​ Edge": "不是",
+        "男子点外卖仅退款称餐漏了，商家上门“平台会退我，但骑手会被扣钱，我们家不惯毛病！”": "不是"
     }
 }

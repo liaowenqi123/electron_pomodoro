@@ -88,6 +88,11 @@
     deviceList: DOM.deviceList
   })
 
+  // ============ 初始化前台检测模块 ============
+  if (window.ForegroundDetection) {
+    window.ForegroundDetection.init()
+  }
+
   // ============ 事件绑定 ============
   
   // 滚轮选择器回调
@@ -113,6 +118,11 @@
       
       // 更新菜园子按钮状态
       updateGardenButtonState()
+      
+      // 专注模式关闭时，停止前台检测
+      if (!AppState.focusModeEnabled && window.ForegroundDetection) {
+        window.ForegroundDetection.stopDetection()
+      }
     })
   }
 
@@ -174,6 +184,11 @@
   DOM.btnReset.addEventListener('click', () => {
     // 先保存当前计时器运行状态（在重置之前）
     const wasRunning = Timer.getIsRunning()
+    
+    // 停止前台检测
+    if (window.ForegroundDetection) {
+      window.ForegroundDetection.stopDetection()
+    }
     
     // 专注模式下，如果计时器正在运行，弹出确认框
     if (AppState.focusModeEnabled && wasRunning) {

@@ -235,6 +235,38 @@
         <button class="ai-apply-btn" id="aiApplyBtn">✅ 应用计划</button>
       </div>
     </div>
+
+    <!-- 前台检测警告弹窗 -->
+    <div class="warning-modal" id="warningModal">
+      <div class="warning-modal-content">
+        <div class="warning-icon">⚠️</div>
+        <h3 class="warning-title">检测到娱乐前台</h3>
+        <p class="warning-window-title" id="warningWindowTitle"></p>
+        <p class="warning-count" id="warningCount">警告次数：1/3</p>
+        <div class="warning-buttons">
+          <button class="warning-btn warning-btn-whitelist" id="btnNotEntertainment">不是娱乐</button>
+          <button class="warning-btn warning-btn-dismiss" id="btnDismissWarning">知道了</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Key 错误弹窗 -->
+    <div class="api-key-error-modal" id="apiKeyErrorModal">
+      <div class="api-key-error-content">
+        <div class="api-key-error-header">
+          <span class="api-key-error-icon">🔑</span>
+          <h3>前台检测 API Key 配置错误</h3>
+        </div>
+        <div class="api-key-error-body">
+          <p class="api-key-error-message" id="apiKeyErrorMessage">API key 未配置或无效</p>
+          <p class="api-key-error-path" id="apiKeyErrorPath"></p>
+          <p class="api-key-error-hint">请手动配置 API key，等待后续优化支持界面配置</p>
+        </div>
+        <div class="api-key-error-buttons">
+          <button class="btn-api-key-error" id="btnApiKeyErrorOk">知道了</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- 按依赖顺序加载 JS 模块 -->
@@ -259,6 +291,7 @@
   <script src="scripts/modules/theme.js"></script>
   <script src="scripts/modules/aiHelper.js"></script>
   <script src="scripts/modules/garden.js"></script>
+  <script src="scripts/modules/foregroundDetection.js"></script>
   
   <!-- 主入口 -->
   <script src="scripts/renderer.js"></script>
