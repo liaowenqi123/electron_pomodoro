@@ -622,6 +622,7 @@ electron_pomodoro/
 │   │       ├── callbacks.js        # 回调函数定义
 │   │       └── tutorial.js         # 教程弹窗
 │   │       └── aiHelper.js         # 显示AI生成计划
+│   │       └── theme.js            # 明暗切换          
 │   └── modules/
 │       └── musicProcess.js     # 音乐进程管理
 │       └── aiAssistant.js     # AI助手进程管理
