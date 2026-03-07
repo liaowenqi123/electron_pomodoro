@@ -234,6 +234,15 @@
     return planList.length > 0
   }
 
+  // 清空所有计划
+  async function clearAll() {
+    planList = []
+    currentIndex = -1
+    isRunning = false
+    await savePlan()
+    render()
+  }
+
   // 初始化
   function init(els, cbs) {
     elements = els
@@ -255,6 +264,7 @@
     getFirstItem: getFirstItem,
     getPlanStatus: getPlanStatus,
     hasPlan: hasPlan,
-    loadPlan: loadPlan
+    loadPlan: loadPlan,
+    clearAll: clearAll
   }
 })()
