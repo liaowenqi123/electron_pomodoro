@@ -6,6 +6,7 @@ const { app, BrowserWindow, ipcMain, Notification } = require('electron')
 const path = require('path')
 const fs = require('fs')
 const musicProcess = require('./src/modules/musicProcess')
+const aiAssistant = require('./src/modules/aiAssistant')
 
 // 数据文件路径
 let dataFilePath = null
@@ -290,6 +291,12 @@ ipcMain.on('music-set-device', (event, deviceId) => {
   const data = readData()
   data.audioDevice = deviceId
   writeData(data)
+})
+
+// ============ AI助手 IPC 处理 ============
+
+ipcMain.handle('ai-generate-plan', async (event, userInput) => {
+  return await aiAssistant.generatePlan(userInput)
 })
 
 app.whenReady().then(() => {
