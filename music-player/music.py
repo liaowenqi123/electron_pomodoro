@@ -2,6 +2,11 @@
 音乐播放器 - 带通讯功能
 支持stdin/stdout与Electron通信，同时保留快捷键控制
 
+状态模型（简化）：
+- playing: 用户是否在播放会话中（True = 正在播放或暂停，False = 未开始）
+- pause_program: 是否暂停（True = 暂停，False = 播放中）
+- 准备阶段 = playing=True + pause_program=True（在歌曲开头暂停）
+
 通信协议:
 - Electron -> Python: JSON格式字符串，以换行符结束
   - {"command": "toggle"} - 暂停/播放切换
@@ -45,9 +50,8 @@ sys.stderr.reconfigure(encoding='utf-8')
 # ============ 全局状态 ============
 class PlayerState:
     def __init__(self):
-        self.playing = False
-        self.should_play = False  # 用户请求播放（用于启动播放）
-        self.pause_program = False
+        self.playing = False          # 是否在播放会话中
+        self.pause_program = True     # 是否暂停（初始为暂停状态）
         self.next_one = False
         self.prev_one = False
         self.exit_program = False
@@ -55,20 +59,23 @@ class PlayerState:
         self.current_time = 0
         self.duration = 0
         self.track_name = ""
-        self.seek_position = None  # 用于seek功能
-        self.play_history = []  # 已播放的歌曲索引历史
-        self.shuffled_playlist = []  # 随机排序后的播放列表
-        self.playlist_index = -1  # 当前播放歌曲在shuffled_playlist中的索引
+        self.seek_position = None
+        self.play_history = []
+        self.shuffled_playlist = []
+        self.playlist_index = -1
         self.file_list = []
         self.directory_path = "music/"
-        self.current_device_id = None  # 当前设备ID
-        self.device_changed = False  # 设备切换标志，用于不切歌继续播放
+        self.current_device_id = None
+        self.device_changed = False
         self.lock = threading.Lock()
         
         # 预加载的音频数据
         self.preloaded_data = None
         self.preloaded_fs = None
         self.preloaded_song = None
+        
+        # 初始化完成标志（用于避免在 ready 后发送初始化事件）
+        self.initialized = False
         
     def send_event(self, event_type, data):
         """向stdout发送事件（给Electron）"""
@@ -80,17 +87,15 @@ class PlayerState:
         """发送当前状态"""
         with self.lock:
             self.send_event("status", {
-                "playing": self.playing,
+                "playing": self.playing and not self.pause_program,
                 "name": self.track_name,
                 "current": self.current_time,
-                "duration": self.duration
+                "duration": self.duration,
+                "has_prev": len(self.play_history) > 1
             })
             
     def send_devices(self):
-        """
-        发送设备列表
-        注意：设备列表在程序启动时初始化，设备插拔后需要重启程序才能生效
-        """
+        """发送设备列表"""
         devices = get_output_devices()
         self.send_event("devices", {
             "devices": devices,
@@ -100,25 +105,13 @@ class PlayerState:
 state = PlayerState()
 
 # ============ 输出设备管理 ============
-
-# 设备过滤配置
-# Windows 音频 API 说明：
-#   - WASAPI: Windows Audio Session API，Windows Vista+ 推荐，兼容性好
-#   - DirectSound: DirectX 音频 API，Windows 95+ 支持，兼容性尚可
-#   - WDM-KS: Windows Driver Model Kernel Streaming，底层驱动接口，兼容性差，已排除
-#   - MME: Multimedia Extensions，Windows 3.1+ 支持，老旧但兼容性好
 EXCLUDED_HOST_APIS = [
-    'WDM-KS',  # 排除：兼容性较差，容易导致播放问题
-    'DirectSound',  # 可选排除：取消注释此行可排除 DirectSound
-    # 'MME',  # 可选排除：取消注释此行可排除 MME
+    'WDM-KS',
+    'DirectSound',
 ]
 
 def get_output_devices():
-    """
-    获取所有输出设备列表（排除兼容性较差的API）
-    
-    返回格式: [{"id": 0, "name": "设备名", "hostapi": "API名", "is_default": True}, ...]
-    """
+    """获取所有输出设备列表"""
     devices = sd.query_devices()
     hostapis = sd.query_hostapis()
     output_devices = []
@@ -126,28 +119,19 @@ def get_output_devices():
     for i, device in enumerate(devices):
         if device['max_output_channels'] > 0:
             hostapi_name = hostapis[device['hostapi']]['name']
-            
-            # 检查是否在排除列表中
-            is_excluded = False
-            for excluded_api in EXCLUDED_HOST_APIS:
-                if excluded_api in hostapi_name:
-                    is_excluded = True
-                    break
-            
-            if is_excluded:
-                continue
-            
-            output_devices.append({
-                "id": i,
-                "name": device['name'][:50],
-                "hostapi": hostapi_name,
-                "is_default": device.get('is_default', False)
-            })
+            is_excluded = any(excluded in hostapi_name for excluded in EXCLUDED_HOST_APIS)
+            if not is_excluded:
+                output_devices.append({
+                    "id": i,
+                    "name": device['name'][:50],
+                    "hostapi": hostapi_name,
+                    "is_default": device.get('is_default', False)
+                })
     
     return output_devices
 
 def set_output_device(device_id):
-    """设置输出设备，切换后从当前位置继续播放"""
+    """设置输出设备"""
     try:
         devices = sd.query_devices()
         if 0 <= device_id < len(devices):
@@ -155,7 +139,6 @@ def set_output_device(device_id):
                 sd.default.device = device_id
                 state.current_device_id = device_id
                 print(f"已切换到设备: {devices[device_id]['name']}", file=sys.stderr)
-                # 设置设备切换标志，让播放函数重新打开流继续播放
                 with state.lock:
                     state.device_changed = True
                 return True
@@ -165,10 +148,9 @@ def set_output_device(device_id):
         return False
 
 def select_output_device(initial_device_id=None):
-    """选择输出设备，支持初始化设备ID"""
+    """选择输出设备"""
     devices = sd.query_devices()
     
-    # 如果有指定的初始设备ID，尝试使用它
     if initial_device_id is not None:
         try:
             if 0 <= initial_device_id < len(devices):
@@ -180,7 +162,6 @@ def select_output_device(initial_device_id=None):
         except Exception as e:
             print(f"指定设备失败: {e}", file=sys.stderr)
     
-    # 自动选择默认输出设备
     default_device = sd.query_devices(kind='output')
     state.current_device_id = default_device['index'] if 'index' in default_device else None
     print(f"使用默认输出设备: {default_device['name']}", file=sys.stderr)
@@ -190,7 +171,6 @@ select_output_device()
 
 # ============ 快捷键定义 ============
 pause_key = {keyboard.Key.ctrl_r, keyboard.Key.shift_r}
-exit_key = {keyboard.Key.ctrl_r, keyboard.KeyCode.from_char('q')}
 next_key = {keyboard.Key.ctrl_r, keyboard.Key.right}
 prev_key = {keyboard.Key.ctrl_r, keyboard.Key.left}
 voice_up = {keyboard.Key.ctrl_r, keyboard.Key.up}
@@ -219,13 +199,6 @@ def keys_pressed(required_keys):
 def on_key_press(key):
     current_keys.add(key)
     
-    # 禁用 Ctrl+Q 快捷键退出功能（由 Electron 控制生命周期）
-    # if keys_pressed(exit_key):
-    #     print("退出程序（快捷键）", file=sys.stderr)
-    #     with state.lock:
-    #         state.exit_program = True
-    #     return False
-    
     if keys_pressed(pause_key):
         with state.lock:
             state.pause_program = not state.pause_program
@@ -243,27 +216,18 @@ def on_key_press(key):
     
     if keys_pressed(voice_up):
         with state.lock:
-            if state.volume + 0.1 >= 1.0:
-                state.volume = 1.0
-            else:
-                state.volume = round(state.volume + 0.1, 2)
+            state.volume = min(1.0, round(state.volume + 0.1, 2))
             print(f"音量: {state.volume:.2f}", file=sys.stderr)
             state.send_event("volume_change", {"volume": state.volume})
     
     if keys_pressed(voice_down):
         with state.lock:
-            if state.volume - 0.1 <= 0:
-                state.volume = 0
-            else:
-                state.volume = round(state.volume - 0.1, 2)
+            state.volume = max(0, round(state.volume - 0.1, 2))
             print(f"音量: {state.volume:.2f}", file=sys.stderr)
             state.send_event("volume_change", {"volume": state.volume})
 
 def on_key_release(key):
-    try:
-        current_keys.discard(key)
-    except KeyError:
-        pass
+    current_keys.discard(key)
 
 def start_keyboard_listener():
     global listener
@@ -278,7 +242,6 @@ def list_files_in_directory(directory_path):
     if os.path.exists(directory_path) and os.path.isdir(directory_path):
         for filename in os.listdir(directory_path):
             if os.path.isfile(os.path.join(directory_path, filename)):
-                # 只添加音频文件
                 if filename.lower().endswith(('.wav', '.mp3', '.flac', '.ogg', '.m4a')):
                     file_names.append(filename)
     return file_names
@@ -289,7 +252,6 @@ def init_shuffled_playlist():
     if not state.file_list:
         state.shuffled_playlist = []
         return False
-    # 创建随机播放顺序
     state.shuffled_playlist = state.file_list.copy()
     random.shuffle(state.shuffled_playlist)
     state.playlist_index = -1
@@ -302,7 +264,6 @@ def get_next_song():
         if not init_shuffled_playlist():
             return None
     state.playlist_index += 1
-    # 如果播放完所有歌曲，重新随机
     if state.playlist_index >= len(state.shuffled_playlist):
         random.shuffle(state.shuffled_playlist)
         state.playlist_index = 0
@@ -314,14 +275,14 @@ def get_prev_song():
     if not state.shuffled_playlist:
         if not init_shuffled_playlist():
             return None
-    # 如果有历史记录，回退到上一首
     if len(state.play_history) > 1:
-        state.play_history.pop()  # 移除当前歌曲
-        state.playlist_index = state.play_history[-1]  # 获取上一首的索引
+        state.play_history.pop()
+        state.playlist_index = state.play_history[-1]
     return state.shuffled_playlist[state.playlist_index]
 
 # ============ 播放函数 ============
 def play_a_song(name, start_position=0):
+    """播放一首歌，处理所有状态（暂停、切歌等）"""
     if name is None:
         return "error"
     
@@ -330,18 +291,15 @@ def play_a_song(name, start_position=0):
         if state.preloaded_song == name and state.preloaded_data is not None:
             data = state.preloaded_data
             fs = state.preloaded_fs
-            # 清除预加载的数据（只用一次）
             state.preloaded_data = None
             state.preloaded_song = None
             state.preloaded_fs = None
         else:
-            # 读取音频文件
             file_path = state.directory_path + name
             with sf.SoundFile(file_path) as f:
                 fs = f.samplerate
                 data = f.read(always_2d=True).astype('float32')
         
-        # 确保数据是二维的
         if len(data.shape) == 1:
             data = data.reshape(-1, 1)
         
@@ -352,52 +310,54 @@ def play_a_song(name, start_position=0):
         with state.lock:
             state.track_name = name
             state.duration = int(duration)
-            state.playing = True
             if start_position == 0:
                 state.current_time = 0
-                state.send_event("track_change", {
-                    "name": name,
-                    "duration": state.duration
-                })
+                # 只有在已初始化后才发送 track_change（避免在 ready 后发送初始化事件）
+                if state.initialized:
+                    state.send_event("track_change", {
+                        "name": name,
+                        "duration": state.duration,
+                        "has_prev": len(state.play_history) > 1
+                    })
         
         current_frame = int(start_position * fs) if start_position > 0 else 0
         chunk_size = 4096
         last_progress_time = int(current_frame / fs)
         last_progress_timestamp = time.time()
-        progress_error_count = 0  # 记录 progress 异常次数
+        progress_error_count = 0
         
-        stream = sd.OutputStream(
-            samplerate=fs,
-            channels=channels,
-            dtype='float32'
-        )
-        stream.start()
+        # ========== 主播放循环（包含暂停处理）==========
+        # 注意：stream 在需要时才创建，暂停状态下不创建
+        stream = None
         
         while current_frame < total_frames:
-            # 检查退出
+            # 检查控制命令
             with state.lock:
                 if state.exit_program:
-                    stream.stop()
-                    stream.close()
+                    if stream:
+                        stream.stop()
+                        stream.close()
                     return "exit"
                 
                 if state.device_changed:
-                    # 设备切换：关闭流，返回重新加载（不再保存位置，避免设备兼容问题）
                     state.device_changed = False
-                    stream.stop()
-                    stream.close()
-                    return ("device_change", 0)
+                    if stream:
+                        stream.stop()
+                        stream.close()
+                    return ("device_change", current_frame / fs)
                 
                 if state.next_one:
                     state.next_one = False
-                    stream.stop()
-                    stream.close()
+                    if stream:
+                        stream.stop()
+                        stream.close()
                     return "next"
                 
                 if state.prev_one:
                     state.prev_one = False
-                    stream.stop()
-                    stream.close()
+                    if stream:
+                        stream.stop()
+                        stream.close()
                     return "prev"
                 
                 # 检查seek
@@ -407,44 +367,70 @@ def play_a_song(name, start_position=0):
                     state.seek_position = None
                     state.current_time = int(current_frame / fs)
             
-            # 检查暂停
+            # ========== 检查暂停 ==========
             pause_local = False
             with state.lock:
                 pause_local = state.pause_program
-                if pause_local:
-                    state.playing = False
-                    state.send_event("play_state", {"playing": False})
             
             if pause_local:
-                stream.stop()
+                # 暂停状态：关闭stream，进入暂停循环
+                if stream:
+                    stream.stop()
+                    stream.close()
+                    stream = None
+                
+                # 第一次进入暂停时，标记初始化完成
+                # 这样后续的用户操作会正常发送事件
+                if not state.initialized:
+                    state.initialized = True
+                
+                # 只有在非初始化暂停时才发送 play_state
+                # 初始化暂停（current_frame == 0）不发送事件，前端通过 musicGetStatus 获取初始状态
+                is_initial_pause = (current_frame == 0)
+                if state.initialized and not is_initial_pause:
+                    with state.lock:
+                        state.send_event("play_state", {"playing": False})
                 print("已暂停", file=sys.stderr, flush=True)
                 
+                # 暂停循环：等待恢复或其他命令
                 while True:
                     with state.lock:
                         if state.exit_program:
-                            stream.close()
                             return "exit"
                         if state.device_changed:
-                            # 设备切换：关闭流，返回重新加载（不再保存位置，避免设备兼容问题）
                             state.device_changed = False
-                            stream.close()
-                            return ("device_change", 0)
+                            return ("device_change", current_frame / fs)
                         if state.next_one:
                             state.next_one = False
-                            stream.close()
                             return "next"
                         if state.prev_one:
                             state.prev_one = False
-                            stream.close()
                             return "prev"
                         if not state.pause_program:
-                            state.playing = True
-                            state.send_event("play_state", {"playing": True})
+                            # 恢复播放
+                            if state.initialized:
+                                state.send_event("play_state", {"playing": True})
                             break
                     time.sleep(0.05)
                 
-                stream.start()
                 print("继续播放", file=sys.stderr)
+                # 恢复播放后，会在下面的写入数据部分重新创建stream
+            else:
+                # 播放状态：发送play_state（如果是刚从暂停恢复）
+                with state.lock:
+                    if stream is None:
+                        # 刚进入播放状态，发送事件
+                        state.send_event("play_state", {"playing": True})
+            
+            # ========== 写入音频数据 ==========
+            # 如果stream不存在，创建它
+            if stream is None:
+                stream = sd.OutputStream(
+                    samplerate=fs,
+                    channels=channels,
+                    dtype='float32'
+                )
+                stream.start()
             
             # 写入数据
             end_frame = min(current_frame + chunk_size, total_frames)
@@ -456,20 +442,17 @@ def play_a_song(name, start_position=0):
             current_time = int(current_frame / fs)
             current_timestamp = time.time()
             
-            # 检测 progress 发送频率是否异常（正常应该约1秒一次）
-            # 如果小于0.3秒就发送了，说明可能设备有问题
             if current_time != last_progress_time:
                 time_diff = current_timestamp - last_progress_timestamp
                 if time_diff < 0.3:
                     progress_error_count += 1
-                    print(f"progress 频率异常: {time_diff:.3f}s, 计数: {progress_error_count}", file=sys.stderr)
                     if progress_error_count >= 3:
-                        # 连续3次异常，判定为设备问题
-                        stream.stop()
-                        stream.close()
+                        if stream:
+                            stream.stop()
+                            stream.close()
                         return "device_error"
                 else:
-                    progress_error_count = 0  # 正常则重置计数
+                    progress_error_count = 0
                 
                 last_progress_time = current_time
                 last_progress_timestamp = current_timestamp
@@ -480,9 +463,9 @@ def play_a_song(name, start_position=0):
                         "duration": int(duration)
                     })
         
-        stream.close()
-        with state.lock:
-            state.playing = False
+        # 播放完毕
+        if stream:
+            stream.close()
         return "done"
             
     except Exception as e:
@@ -496,19 +479,12 @@ def process_command(command_obj):
     
     if command == "toggle":
         with state.lock:
-            if not state.should_play:
-                # 还没开始播放，请求开始
-                state.should_play = True
+            if state.pause_program:
+                # 当前暂停，恢复播放
                 state.pause_program = False
-                state.playing = True
-                state.send_event("play_state", {"playing": True})
-                print("toggle: 请求开始播放", file=sys.stderr)
-            elif state.pause_program:
-                # 当前是暂停状态，恢复播放
-                state.pause_program = False
-                print("toggle: 继续播放", file=sys.stderr)
+                print("toggle: 恢复播放", file=sys.stderr)
             else:
-                # 当前正在播放，暂停
+                # 当前播放中，暂停
                 state.pause_program = True
                 print("toggle: 暂停", file=sys.stderr)
     
@@ -533,8 +509,6 @@ def process_command(command_obj):
         print(f"set_volume命令: {volume}", file=sys.stderr)
         with state.lock:
             state.volume = max(0, min(volume, 1))
-            # 不发送 volume_change 事件，因为前端已经知道音量了
-            # 只有快捷键调整音量时才需要通知前端
     
     elif command == "get_status":
         state.send_status()
@@ -545,12 +519,11 @@ def process_command(command_obj):
     elif command == "set_device":
         device_id = command_obj.get("device_id")
         if device_id is not None:
-            success = set_output_device(device_id)
-            if success:
+            if set_output_device(device_id):
                 state.send_devices()
 
 def stdin_reader():
-    """读取来自Electron的命令（后台线程）"""
+    """读取来自Electron的命令"""
     for line in sys.stdin:
         line = line.strip()
         if not line:
@@ -562,7 +535,7 @@ def stdin_reader():
             print(f"JSON解析错误: {e}", file=sys.stderr)
 
 def get_song_duration(name):
-    """获取歌曲时长（不加载全部数据）"""
+    """获取歌曲时长"""
     try:
         info = sf.info(state.directory_path + name)
         return int(info.duration)
@@ -570,20 +543,20 @@ def get_song_duration(name):
         print(f"获取歌曲信息失败: {e}", file=sys.stderr)
         return 0
 
-def preload_first_song():
-    """预加载第一首歌的信息（不播放）- 仅获取基本信息"""
+def init_first_song():
+    """初始化第一首歌（准备状态）"""
     song = get_next_song()
     if song:
         state.track_name = song
         state.duration = get_song_duration(song)
         state.current_time = 0
-        state.playing = False
-        state.should_play = False
+        state.playing = True      # 进入播放会话
+        state.pause_program = True  # 但处于暂停状态
         return song
     return None
 
 def preload_audio_data(song):
-    """在后台预加载音频数据到内存"""
+    """预加载音频数据"""
     if song:
         try:
             file_path = state.directory_path + song
@@ -605,7 +578,6 @@ if __name__ == "__main__":
         except ValueError:
             pass
     
-    # 选择输出设备
     select_output_device(initial_device_id)
     
     # 启动stdin读取线程
@@ -615,12 +587,9 @@ if __name__ == "__main__":
     # 初始化播放列表
     has_music = init_shuffled_playlist()
     
-    # 检查是否有音乐文件
     if not has_music:
         print("没有找到音乐文件", file=sys.stderr)
-        # 发送无音乐事件
         state.send_event("no_music", {"message": "music文件夹中没有音乐文件"})
-        # 进入等待循环，等待退出命令
         while True:
             with state.lock:
                 if state.exit_program:
@@ -631,37 +600,35 @@ if __name__ == "__main__":
         print("程序已退出", file=sys.stderr)
         sys.exit(0)
     
-    # 预加载第一首歌的基本信息（不加载音频数据，不阻塞）
-    current_song = preload_first_song()
+    # 初始化第一首歌（准备状态 = 暂停状态）
+    current_song = init_first_song()
     current_position = 0
     
-    # 先发送初始状态给JS（让UI能正确显示）
-    state.send_status()
-    
-    # 发送准备就绪事件
+    # 发送 ready 事件（触发 Electron 加载主页面）
     state.send_event("ready", {
         "name": state.track_name, 
-        "duration": state.duration
+        "duration": state.duration,
+        "has_prev": len(state.play_history) > 1
     })
     
-    # 在后台线程预加载音频数据（不阻塞主线程）
+    # 预加载音频数据
     if current_song:
         preload_thread = threading.Thread(target=preload_audio_data, args=(current_song,), daemon=True)
         preload_thread.start()
     
-    # 主循环
+    # ========== 主循环（简化）==========
     while True:
         with state.lock:
             if state.exit_program:
                 break
         
-        # 检查是否需要播放
+        # 主循环只需要检查 playing 状态
+        # play_a_song 内部会处理暂停
         playing_local = False
         with state.lock:
-            playing_local = state.playing and not state.pause_program
+            playing_local = state.playing
         
         if not playing_local:
-            # 等待播放命令
             time.sleep(0.05)
             continue
         
@@ -670,7 +637,7 @@ if __name__ == "__main__":
             time.sleep(1)
             continue
         
-        # 开始播放当前歌曲
+        # 播放当前歌曲
         result = play_a_song(current_song, current_position)
         
         if result == "exit":
@@ -682,32 +649,23 @@ if __name__ == "__main__":
             current_song = get_prev_song()
             current_position = 0
         elif isinstance(result, tuple) and result[0] == "device_change":
-            # 设备切换：重新加载当前歌曲
-            current_position = 0
-            # 发送曲目重新加载事件
+            current_position = result[1]
             state.send_event("track_change", {
                 "name": current_song,
-                "duration": state.duration
+                "duration": state.duration,
+                "has_prev": len(state.play_history) > 1
             })
         elif result == "done":
-            # 歌曲播放完毕，播放下一首
             current_song = get_next_song()
             current_position = 0
-            # 保持播放状态，继续播放下一首
-            with state.lock:
-                state.playing = True
         elif result == "error":
-            # 播放失败，发送错误事件并停止播放
             with state.lock:
                 state.playing = False
-                state.should_play = False
             state.send_event("play_error", {"message": "播放失败，请切换输出设备后重启番茄钟"})
             print("播放失败，已停止", file=sys.stderr)
         elif result == "device_error":
-            # 设备异常（progress频率异常），发送错误并停止
             with state.lock:
                 state.playing = False
-                state.should_play = False
             state.send_event("play_error", {"message": "输出设备异常，请切换输出设备后重试"})
             print("设备异常，已停止", file=sys.stderr)
     

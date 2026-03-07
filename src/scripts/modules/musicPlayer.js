@@ -18,6 +18,7 @@ const MusicPlayer = (function() {
     currentDeviceId: null,
     isDeviceListOpen: false,
     hasMusic: true,  // 是否有音乐文件
+    hasPrev: false,  // 是否有上一首歌
     playError: null,  // 播放错误信息
     playTimeout: null,  // 播放超时计时器
     volume: 1.0,  // 音量 0-1
@@ -162,6 +163,18 @@ const MusicPlayer = (function() {
     if (elements.playBtn) {
       elements.playBtn.textContent = state.playing ? '⏸' : '▶'
       elements.playBtn.setAttribute('data-playing', state.playing)
+    }
+  }
+
+  function updatePrevButton() {
+    if (elements.prevBtn) {
+      if (state.hasPrev) {
+        elements.prevBtn.classList.remove('disabled')
+        elements.prevBtn.disabled = false
+      } else {
+        elements.prevBtn.classList.add('disabled')
+        elements.prevBtn.disabled = true
+      }
     }
   }
 
@@ -412,8 +425,10 @@ const MusicPlayer = (function() {
       state.duration = data.duration
       state.currentTime = 0
       state.playing = false
+      state.hasPrev = data.has_prev || false
       updateProgressUI()
       updatePlayButton()
+      updatePrevButton()
       console.log('[MusicPlayer] 收到 ready 事件:', data)
     })
 
@@ -424,8 +439,12 @@ const MusicPlayer = (function() {
       state.trackName = data.name
       state.currentTime = data.current
       state.duration = data.duration
+      if (data.has_prev !== undefined) {
+        state.hasPrev = data.has_prev
+      }
       updateProgressUI()
       updatePlayButton()
+      updatePrevButton()
     })
 
     // 监听曲目切换
@@ -434,7 +453,11 @@ const MusicPlayer = (function() {
       state.trackName = data.name
       state.duration = data.duration
       state.currentTime = 0
+      if (data.has_prev !== undefined) {
+        state.hasPrev = data.has_prev
+      }
       updateProgressUI()
+      updatePrevButton()
     })
 
     // 监听播放状态
