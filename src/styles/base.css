@@ -1,5 +1,33 @@
 /* 番茄钟 - 基础样式 */
+/* 亮色模式变量（默认） */
+:root {
+  --bg-color: #f5f5f5;
+  --text-color: #333333;
+  --primary-color: #ff6b6b;
+  --secondary-color: #4ecdc4;
+  --card-bg: #ffffff;
+  --sidebar-bg: #fafafa;
+  --border-color: #dddddd;
+  --btn-bg: #e0e0e0;
+  --btn-hover: #d0d0d0;
+  --container-gradient-start: rgba(200, 100, 100, 0.88);
+  --container-gradient-end: rgba(180, 110, 110, 0.78);
+}
 
+/* 深色模式变量 */
+body.dark-theme {
+  --bg-color: #1e1e1e;
+  --text-color: #f0f0f0;
+  --primary-color: #ff8a8a;
+  --secondary-color: #6dd5d5;
+  --card-bg: #2d2d2d;
+  --sidebar-bg: #252525;
+  --border-color: #444444;
+  --btn-bg: #3a3a3a;
+  --btn-hover: #4a4a4a;
+  --container-gradient-start: rgba(40, 20, 20, 0.95);
+  --container-gradient-end: rgba(20, 10, 10, 0.9);
+}
 * {
   margin: 0;
   padding: 0;
@@ -30,7 +58,7 @@ body {
 .container {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(200, 100, 100, 0.88), rgba(180, 110, 110, 0.78));
+  background: linear-gradient(135deg, var(--container-gradient-start), var(--container-gradient-end));
   display: flex;
   position: relative;
   border: 1px solid rgba(255, 255, 255, 0.4);
