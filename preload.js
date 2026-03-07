@@ -60,6 +60,9 @@ const { contextBridge, ipcRenderer } = require('electron')
   onMusicPlayError: (callback) => {
     ipcRenderer.on('music-play-error', (event, data) => callback(data))
   },
+  onMusicVolumeChange: (callback) => {
+    ipcRenderer.on('music-volume-change', (event, data) => callback(data))
+  },
   
   // 移除监听器
   removeMusicListeners: () => {
@@ -71,6 +74,7 @@ const { contextBridge, ipcRenderer } = require('electron')
     ipcRenderer.removeAllListeners('music-devices')
     ipcRenderer.removeAllListeners('music-no-music')
     ipcRenderer.removeAllListeners('music-play-error')
+    ipcRenderer.removeAllListeners('music-volume-change')
   },
 
   // ============ 菜园子窗口 API ============

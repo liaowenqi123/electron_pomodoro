@@ -246,8 +246,8 @@ def on_key_press(key):
             if state.volume + 0.1 >= 1.0:
                 state.volume = 1.0
             else:
-                state.volume += 0.1
-            print(f"音量: {state.volume:.1f}", file=sys.stderr)
+                state.volume = round(state.volume + 0.1, 2)
+            print(f"音量: {state.volume:.2f}", file=sys.stderr)
             state.send_event("volume_change", {"volume": state.volume})
     
     if keys_pressed(voice_down):
@@ -255,8 +255,8 @@ def on_key_press(key):
             if state.volume - 0.1 <= 0:
                 state.volume = 0
             else:
-                state.volume -= 0.1
-            print(f"音量: {state.volume:.1f}", file=sys.stderr)
+                state.volume = round(state.volume - 0.1, 2)
+            print(f"音量: {state.volume:.2f}", file=sys.stderr)
             state.send_event("volume_change", {"volume": state.volume})
 
 def on_key_release(key):
@@ -533,7 +533,8 @@ def process_command(command_obj):
         print(f"set_volume命令: {volume}", file=sys.stderr)
         with state.lock:
             state.volume = max(0, min(volume, 1))
-            state.send_event("volume_change", {"volume": state.volume})
+            # 不发送 volume_change 事件，因为前端已经知道音量了
+            # 只有快捷键调整音量时才需要通知前端
     
     elif command == "get_status":
         state.send_status()

@@ -85,7 +85,10 @@
     durationEl: DOM.durationEl,
     musicPlayer: DOM.musicPlayer,
     deviceBtn: DOM.deviceBtn,
-    deviceList: DOM.deviceList
+    deviceList: DOM.deviceList,
+    volumeBtn: DOM.volumeBtn,
+    volumeSlider: DOM.volumeSlider,
+    volumeRange: DOM.volumeRange
   })
 
   // ============ 初始化前台检测模块 ============

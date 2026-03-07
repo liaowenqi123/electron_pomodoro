@@ -19,7 +19,10 @@ const MusicPlayer = (function() {
     isDeviceListOpen: false,
     hasMusic: true,  // 是否有音乐文件
     playError: null,  // 播放错误信息
-    playTimeout: null  // 播放超时计时器
+    playTimeout: null,  // 播放超时计时器
+    volume: 1.0,  // 音量 0-1
+    isVolumeSliderOpen: false,  // 音量滑块是否展开
+    lastVolumeSendTime: 0  // 上次发送音量的时间戳（节流用）
   }
   
   // 播放超时时间（毫秒）
@@ -38,7 +41,10 @@ const MusicPlayer = (function() {
     durationEl: null,
     musicPlayer: null,
     deviceBtn: null,
-    deviceList: null
+    deviceList: null,
+    volumeBtn: null,
+    volumeSlider: null,
+    volumeRange: null
   }
 
   // ============ 工具函数 ============
@@ -266,6 +272,62 @@ const MusicPlayer = (function() {
     }
   }
 
+  // ============ 音量控制 ============
+  
+  function toggleVolumeSlider() {
+    state.isVolumeSliderOpen = !state.isVolumeSliderOpen
+    if (state.isVolumeSliderOpen) {
+      elements.volumeSlider.classList.add('open')
+    } else {
+      elements.volumeSlider.classList.remove('open')
+    }
+  }
+  
+  // 音量滑块变化 - 节流发送到Python（最多100ms一次）
+  function handleVolumeInput(e) {
+    const volume = parseInt(e.target.value, 10) / 100
+    state.volume = volume
+    updateVolumeIcon()
+    
+    // 节流：距离上次发送超过100ms才发送
+    const now = Date.now()
+    if (now - state.lastVolumeSendTime >= 100) {
+      window.electronAPI.musicSetVolume(volume)
+      state.lastVolumeSendTime = now
+    }
+  }
+  
+  // 从Python收到音量变化 - 更新滑块位置
+  function updateVolumeUI() {
+    if (elements.volumeRange) {
+      elements.volumeRange.value = Math.round(state.volume * 100)
+    }
+    updateVolumeIcon()
+  }
+  
+  function updateVolumeIcon() {
+    if (elements.volumeBtn) {
+      if (state.volume === 0) {
+        elements.volumeBtn.textContent = '🔇'
+      } else if (state.volume < 0.3) {
+        elements.volumeBtn.textContent = '🔈'
+      } else if (state.volume < 0.7) {
+        elements.volumeBtn.textContent = '🔉'
+      } else {
+        elements.volumeBtn.textContent = '🔊'
+      }
+    }
+  }
+  
+  function closeVolumeSliderOnClickOutside(e) {
+    if (state.isVolumeSliderOpen && elements.volumeBtn && elements.volumeSlider) {
+      if (!elements.volumeBtn.contains(e.target) && !elements.volumeSlider.contains(e.target)) {
+        state.isVolumeSliderOpen = false
+        elements.volumeSlider.classList.remove('open')
+      }
+    }
+  }
+
   // ============ 事件监听器 ============
   
   function setupEventListeners() {
@@ -315,8 +377,31 @@ const MusicPlayer = (function() {
       elements.deviceList.addEventListener('click', handleDeviceClick)
     }
     
-    // 点击外部关闭设备列表
-    document.addEventListener('click', closeDeviceListOnClickOutside)
+    // 音量按钮
+    if (elements.volumeBtn) {
+      elements.volumeBtn.addEventListener('click', toggleVolumeSlider)
+    }
+    
+    // 音量滑块
+    if (elements.volumeRange) {
+                      elements.volumeRange.addEventListener('input', handleVolumeInput)
+                      // 确保拖动结束时发送最终值
+                      elements.volumeRange.addEventListener('change', (e) => {
+                        const volume = parseInt(e.target.value, 10) / 100
+                        window.electronAPI.musicSetVolume(volume)
+                        state.lastVolumeSendTime = Date.now()
+                      })
+                      // 禁用滑块的键盘控制（方向键），避免和Python快捷键冲突
+                      elements.volumeRange.addEventListener('keydown', (e) => {
+                        if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                          e.preventDefault()
+                        }
+                      })
+                    }    // 点击外部关闭设备列表和音量滑块
+    document.addEventListener('click', (e) => {
+      closeDeviceListOnClickOutside(e)
+      closeVolumeSliderOnClickOutside(e)
+    })
   }
 
   function setupIPCListeners() {
@@ -403,6 +488,13 @@ const MusicPlayer = (function() {
       updatePlayButton()
       console.log('[MusicPlayer] 收到 play_error 事件:', data)
     })
+    
+    // 监听音量变化事件（来自Python端快捷键）
+    window.electronAPI.onMusicVolumeChange((data) => {
+      state.volume = data.volume
+      updateVolumeUI()
+    })
+    
   }
 
   // ============ 公共API ============

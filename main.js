@@ -168,6 +168,10 @@ function createWindow() {
     win.webContents.send('music-play-error', data)
   })
   
+  musicProcess.onVolumeChange((data) => {
+    win.webContents.send('music-volume-change', data)
+  })
+  
   // 启动前台检测进程
   let foregroundExePath
   if (app.isPackaged) {

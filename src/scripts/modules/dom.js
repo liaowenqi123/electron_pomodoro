@@ -73,6 +73,9 @@
     musicPlayer: document.getElementById('musicPlayer'),
     deviceBtn: document.getElementById('deviceBtn'),
     deviceList: document.getElementById('deviceList'),
+    volumeBtn: document.getElementById('volumeBtn'),
+    volumeSlider: document.getElementById('volumeSlider'),
+    volumeRange: document.getElementById('volumeRange'),
     
     // 按钮
     btnClose: document.querySelector('.btn-close'),

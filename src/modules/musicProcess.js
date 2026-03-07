@@ -20,6 +20,7 @@ class MusicProcess {
     this.onNoMusicCallback = null
     this.onPlayErrorCallback = null
     this.onProcessDeadCallback = null  // 进程死亡回调
+    this.onVolumeChangeCallback = null  // 音量变化回调
   }
 
   /**
@@ -161,6 +162,11 @@ class MusicProcess {
             this.onPlayErrorCallback(data)
           }
           break
+        case 'volume_change':
+          if (this.onVolumeChangeCallback) {
+            this.onVolumeChangeCallback(data)
+          }
+          break
         default:
           console.log('[MusicProcess] 未知事件:', event)
       }
@@ -287,6 +293,10 @@ class MusicProcess {
 
   onPlayError(callback) {
     this.onPlayErrorCallback = callback
+  }
+
+  onVolumeChange(callback) {
+    this.onVolumeChangeCallback = callback
   }
 }
 

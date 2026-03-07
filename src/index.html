@@ -140,6 +140,12 @@
           <div class="music-info">
             <span class="music-icon">🎵</span>
             <span class="music-track-name" id="trackName">未播放</span>
+            <div class="volume-control">
+              <button class="music-device-btn" id="volumeBtn" title="音量">🔊</button>
+              <div class="music-volume-slider" id="volumeSlider">
+                <input type="range" id="volumeRange" min="0" max="100" value="100" class="volume-range">
+              </div>
+            </div>
             <button class="music-device-btn" id="deviceBtn" title="选择输出设备">🎧</button>
             <div class="music-device-list" id="deviceList"></div>
           </div>

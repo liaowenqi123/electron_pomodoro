@@ -252,3 +252,80 @@
 .music-play:hover {
   background: rgba(255, 255, 255, 0.35);
 }
+
+/* ============ 音量控制 ============ */
+.volume-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.music-volume-slider {
+  position: absolute;
+  bottom: 100%;
+  right: 50%;
+  transform: translateX(50%);
+  margin-bottom: 6px;
+  background: linear-gradient(145deg, rgba(255, 120, 120, 0.5), rgba(255, 100, 100, 0.4));
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 6px;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(50%) translateY(8px);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(4px);
+}
+
+/* 休息模式 - 绿色调 */
+.break-mode .music-volume-slider {
+  background: linear-gradient(145deg, rgba(100, 200, 140, 0.5), rgba(80, 180, 120, 0.4));
+}
+
+.music-volume-slider.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(50%) translateY(0);
+}
+
+/* 竖向滑块 */
+.volume-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 4px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  writing-mode: vertical-lr;
+  direction: rtl;
+}
+
+.volume-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.15s ease;
+}
+
+.volume-range::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+.volume-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
