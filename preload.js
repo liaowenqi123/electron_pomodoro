@@ -79,5 +79,10 @@ const { contextBridge, ipcRenderer } = require('electron')
   openGarden: () => ipcRenderer.send('open-garden'),
   
   // 关闭菜园子窗口
-  closeGarden: () => ipcRenderer.send('close-garden')
+  closeGarden: () => ipcRenderer.send('close-garden'),
+
+  // ============ AI助手 API ============
+  
+  // 生成AI计划
+  aiGeneratePlan: (userInput) => ipcRenderer.invoke('ai-generate-plan', userInput)
 })
