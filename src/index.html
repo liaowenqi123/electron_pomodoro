@@ -87,11 +87,14 @@
       
       <!-- 右侧主区域 -->
       <div class="main-content">
-        <div class="header-buttons">
-          <button class="btn-tutorial" id="themeToggleBtn" title="切换深色模式">🌙</button>
-          <button class="btn-tutorial" id="tutorialBtn">📖</button>
-          <button class="btn-ai" id="aiBtn" title="AI规划助手">🤖</button>
-          <button class="btn-garden" id="gardenBtn" title="菜园子">🌱</button>
+        <div class="header-buttons" id="headerButtons">
+          <button class="btn-header" id="tutorialBtn" title="教程">📖</button>
+          <div class="header-buttons-hidden" id="hiddenButtons">
+            <button class="btn-header" id="themeToggleBtn" title="切换深色模式">🌙</button>
+            <button class="btn-header" id="aiBtn" title="AI规划助手">🤖</button>
+            <button class="btn-header" id="gardenBtn" title="菜园子">🌱</button>
+          </div>
+          <button class="btn-header btn-expand" id="expandBtn" title="展开"></button>
         </div>
         <h1 class="title">🍅 番茄钟</h1>
         
@@ -163,49 +166,32 @@
         <button class="tutorial-close" id="tutorialClose">×</button>
         <h2>📖 使用说明</h2>
         <div class="tutorial-body">
-          <h3>🤖 AI规划助手</h3>
-          <p>点击右上角 🤖 按钮打开AI助手，用自然语言描述您的需求：</p>
-          <p>• 例如："我要准备考试，需要学习3小时"</p>
-          <p>• 例如："写代码2小时，每25分钟休息5分钟"</p>
-          <p>• AI会自动为您生成合理的番茄钟计划</p>
-          <p>• 点击"应用计划"即可自动添加到计划列表</p>
-          
           <h3>🔄 模式切换</h3>
-          <p>顶部滑块可切换 <b>单次模式</b> 和 <b>计划模式</b>：</p>
-          <p>• <b>单次模式</b>：传统番茄钟，手动设置时间计时</p>
-          <p>• <b>计划模式</b>：创建任务列表，自动依次执行</p>
+          <p>顶部滑块切换 <b>单次模式</b> 和 <b>计划模式</b></p>
           
           <h3>⏱️ 单次模式</h3>
-          <p>1. 在左侧选择时间预设，点击即可设置计时时长</p>
-          <p>2. 使用滚轮选择器可以自定义时间（1-120分钟）</p>
-          <p>3. 点击 "+" 按钮将滚轮当前时间添加为新的预设</p>
-          <p>4. 点击预设右侧的 "×" 可删除该预设</p>
-          <p>5. 点击 "工作" 或 "休息" 按钮切换模式，不同模式有独立的时间预设列表</p>
+          <p>• 点击左侧预设设置时间，或用滚轮自定义（1-120分钟）p>
+          <p>• 点击 "+" 添加新预设，点击 "×" 删除预设</p>
+          <p>• "工作"/"休息" 按钮切换模式</p>
           
           <h3>📝 计划模式</h3>
-          <p>1. 使用滚轮选择时间，点击 "+ 工作" 或 "+ 休息" 添加任务到列表</p>
-          <p>2. 拖拽列表项可调整任务顺序</p>
-          <p>3. 点击任务右侧 "×" 可删除任务</p>
-          <p>4. 点击 "开始" 按钮开始执行计划，任务将自动依次执行</p>
-          <p>5. 点击 "重置" 按钮停止计划并恢复到第一个任务</p>
-          <p>6. 工作任务显示为红色，休息任务显示为绿色</p>
+          <p>• 滚轮选时间，点击 "+ 工作"/"+ 休息" 添加任务</p>
+          <p>• 拖拽调整顺序，点击 "×" 删除任务</p>
+          <p>• 点击"开始"自动依次执行计划</p>
+          
+          <h3>🌱 专注模式与菜园子</h3>
+          <p>• 开启专注模式后参与奖惩机制</p>
+          <p>• 计时运行时作物会成长</p>
+          <p>• 切换娱乐应用会收到警告，3次警告作物枯萎</p>
+          <p>• 点击 🌱 按钮打开菜园子管理作物</p>
           
           <h3>🎵 音乐播放器</h3>
-          <p>底部音乐播放器可在专注时播放音乐：</p>
-          <p>• <b>播放控制</b>：播放/暂停、上一首、下一首</p>
-          <p>• <b>进度条</b>：点击或拖动进度条跳转播放位置</p>
-          <p>• <b>音量控制</b>：快捷键 Ctrl+↑/↓ 调节音量</p>
-          <p>• <b>设备切换</b>：点击设备按钮选择音频输出设备</p>
-          <p>• <b>随机播放</b>：启动时自动随机排序播放列表</p>
-          <p>• <b>自动连播</b>：歌曲结束自动播放下一首</p>
+          <p>• 播放控制：播放/暂停、上下首</p>
+          <p>• 快捷键：Ctrl+↑/↓ 调音量</p>
           
-          <h3>📊 统计数据</h3>
-          <p>左侧底部显示今日完成的番茄数和累计专注时间，数据会自动保存</p>
-          
-          <h3>⚙️ 窗口操作</h3>
-          <p>• 点击右上角 "−" 最小化窗口到任务栏</p>
-          <p>• 点击右上角 "×" 关闭应用</p>
-          <p>• 拖动顶部空白区域可移动窗口</p>
+          <h3>🤖 AI规划助手</h3>
+          <p>• 点击 🤖 按钮，用自然语言描述需求</p>
+          <p>• AI 自动生成番茄钟计划</p>
         </div>
       </div>
     </div>

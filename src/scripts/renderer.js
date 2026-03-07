@@ -243,5 +243,28 @@
   Timer.setTime(AppState.defaultWorkTime)
   WheelPicker.setValue(AppState.defaultWorkTime)
 
+  // ============ 顶部按钮展开/收起功能 ============
+  const expandBtn = document.getElementById('expandBtn')
+  const hiddenButtons = document.getElementById('hiddenButtons')
+  let isExpanded = false
+
+  if (expandBtn && hiddenButtons) {
+    expandBtn.addEventListener('click', () => {
+      isExpanded = !isExpanded
+      
+      if (isExpanded) {
+        // 展开：箭头旋转，容器展开露出按钮
+        expandBtn.classList.add('expanded')
+        hiddenButtons.classList.add('expanded')
+        expandBtn.title = '收起'
+      } else {
+        // 收起：箭头恢复，容器收起隐藏按钮
+        expandBtn.classList.remove('expanded')
+        hiddenButtons.classList.remove('expanded')
+        expandBtn.title = '展开'
+      }
+    })
+  }
+
   console.log('[App] 初始化完成')
 })()
