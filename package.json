@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "chcp 65001 >nul && set PYTHONIOENCODING=utf-8 && electron .",
+    "supabase": "cd supabase-test && npm start",
     "build": "npx @electron/packager . 番茄钟 --platform=win32 --arch=x64 --out=dist --overwrite --ignore=\"[/\\\\\\\\]music-player$|[/\\\\\\\\]music-player[/\\\\\\\\]|[/\\\\\\\\]foreground_inspection$|[/\\\\\\\\]foreground_inspection[/\\\\\\\\]\" --extra-resource=music-player/music.exe --extra-resource=music-player/music --extra-resource=foreground_inspection/foreground_inspection.exe --extra-resource=foreground_inspection/list_config.json --extra-resource=foreground_inspection/model_config.json --no-prune"
   },
   "keywords": [
