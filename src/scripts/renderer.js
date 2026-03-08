@@ -80,13 +80,15 @@
     apiKeyCancel: document.getElementById('apiKeyCancel')
   })
 
-  // 检查并提示配置API Key
-  await APIKeyManager.checkAndPrompt()
+  // 静默检查API Key（不自动弹窗）
+  const hasApiKey = await APIKeyManager.checkAndPrompt()
+  if (!hasApiKey) {
+    console.log('未配置API Key，可通过顶部按钮配置')
+  }
 
   // 当保存API Key后，更新AI助手和前台检测
   APIKeyManager.onSave(async (apiKey) => {
-    console.log('API Key已保存，重新加载模块...')
-    // 可以在这里添加重新初始化逻辑
+    console.log('API Key已保存，功能已启用')
   })
 
   // ============ 初始化音乐播放器 ============

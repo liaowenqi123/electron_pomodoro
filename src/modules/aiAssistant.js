@@ -8,7 +8,7 @@ const axios = require('axios')
 class AIAssistant {
   constructor() {
     // DeepSeek API配置
-    this.apiKey = 'sk-你的实际API' // 开发者在这里填入API密钥
+    this.apiKey = null // 从数据存储中读取
     this.apiUrl = 'https://api.deepseek.com/v1/chat/completions'
     this.model = 'deepseek-chat'
   }
@@ -20,6 +20,14 @@ class AIAssistant {
    */
   async generatePlan(userInput) {
     try {
+      // 检查API Key
+      if (!this.apiKey) {
+        return {
+          success: false,
+          error: '请先配置 API Key'
+        }
+      }
+
       const systemPrompt = `你是一个番茄钟规划助手。用户会告诉你他们的工作或学习需求，你需要帮他们规划合理的工作和休息时间。
 
 规则：
@@ -80,24 +88,33 @@ class AIAssistant {
    */
   parseAIResponse(content) {
     try {
+      // 先尝试直接解析
+      try {
+        return JSON.parse(content)
+      } catch (e) {
+        // 如果直接解析失败，尝试提取JSON
+      }
+      
       // 尝试提取JSON（可能包含在markdown代码块中）
       const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || 
+                       content.match(/```\s*([\s\S]*?)\s*```/) ||
                        content.match(/\{[\s\S]*\}/)
       
       if (jsonMatch) {
         const jsonStr = jsonMatch[1] || jsonMatch[0]
-        return JSON.parse(jsonStr)
+        return JSON.parse(jsonStr.trim())
       }
       
       throw new Error('无法解析AI响应')
     } catch (error) {
       console.error('解析AI响应失败:', error)
+      console.error('原始内容:', content)
       throw new Error('AI响应格式错误')
     }
   }
 
   /**
-   * 设置API密钥（可选，用于动态配置）
+   * 设置API密钥
    */
   setApiKey(apiKey) {
     this.apiKey = apiKey
@@ -105,5 +122,3 @@ class AIAssistant {
 }
 
 module.exports = new AIAssistant()
-
-

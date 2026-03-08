@@ -74,6 +74,43 @@
   color: #aaa;
 }
 
+.api-key-status {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 20px;
+}
+
+.dark-mode .api-key-status {
+  background: #3d3d3d;
+}
+
+.api-key-status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 13px;
+}
+
+.api-key-status-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.dark-mode .api-key-status-label {
+  color: #aaa;
+}
+
+.api-key-status-value {
+  color: #333;
+  font-weight: 600;
+}
+
+.dark-mode .api-key-status-value {
+  color: #e0e0e0;
+}
+
 .api-key-input-group {
   margin-bottom: 16px;
 }
