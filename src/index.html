@@ -92,6 +92,7 @@
           <button class="btn-header" id="tutorialBtn" title="教程">📖</button>
           <div class="header-buttons-hidden" id="hiddenButtons">
             <button class="btn-header" id="themeToggleBtn" title="切换深色模式">🌙</button>
+            <button class="btn-header" id="apiKeyBtn" title="API Key 设置">🔑</button>
             <button class="btn-header" id="aiBtn" title="AI规划助手">🤖</button>
             <button class="btn-header" id="gardenBtn" title="菜园子">🌱</button>
           </div>
@@ -285,6 +286,20 @@
           <p class="api-key-description">
             为了使用 AI 规划助手和前台检测功能，需要配置 DeepSeek API Key。
           </p>
+          <div class="api-key-status" id="apiKeyStatus">
+            <div class="api-key-status-item">
+              <span class="api-key-status-label">当前状态：</span>
+              <span class="api-key-status-value" id="apiKeyStatusValue">未配置</span>
+            </div>
+            <div class="api-key-status-item">
+              <span class="api-key-status-label">AI 规划助手：</span>
+              <span class="api-key-status-value" id="aiAssistantStatus">❌ 不可用</span>
+            </div>
+            <div class="api-key-status-item">
+              <span class="api-key-status-label">前台检测：</span>
+              <span class="api-key-status-value" id="foregroundStatus">❌ 不可用</span>
+            </div>
+          </div>
           <div class="api-key-input-group">
             <label class="api-key-label">API Key</label>
             <input 
@@ -299,7 +314,7 @@
           </div>
         </div>
         <div class="api-key-buttons">
-          <button class="api-key-btn api-key-btn-cancel" id="apiKeyCancel">稍后配置</button>
+          <button class="api-key-btn api-key-btn-cancel" id="apiKeyCancel">取消</button>
           <button class="api-key-btn api-key-btn-save" id="apiKeySave">保存</button>
         </div>
       </div>
