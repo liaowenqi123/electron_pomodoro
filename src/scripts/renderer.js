@@ -106,8 +106,8 @@
   // 专注模式开关事件
   if (DOM.focusModeSwitch) {
     DOM.focusModeSwitch.addEventListener('click', () => {
-      // 番茄钟运行时不允许切换专注模式（已在appState.js中通过pointer-events禁用）
-      if (Timer.getIsRunning()) {
+      // 番茄钟运行中或暂停中不允许切换专注模式
+      if (Timer.getIsRunning() || Timer.getIsPaused()) {
         return
       }
       

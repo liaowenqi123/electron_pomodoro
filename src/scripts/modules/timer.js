@@ -10,6 +10,7 @@
   let timeLeft = totalTime
   let timerId = null
   let isRunning = false
+  let isPaused = false  // 跟踪暂停状态
   let minuteCounter = 0  // 用于跟踪分钟数
 
   const radius = 116
@@ -27,6 +28,7 @@
   function start() {
     if (timeLeft === 0) timeLeft = totalTime
     isRunning = true
+    isPaused = false
     minuteCounter = 0  // 重置分钟计数器
     elements.startBtn.textContent = '暂停'
     
@@ -68,6 +70,7 @@
 
   function pause() {
     isRunning = false
+    isPaused = true
     clearInterval(timerId)
     elements.startBtn.textContent = '继续'
     
@@ -79,6 +82,7 @@
   function reset() {
     clearInterval(timerId)
     isRunning = false
+    isPaused = false
     timeLeft = totalTime
     updateDisplay()
     elements.startBtn.textContent = '开始'
@@ -121,6 +125,10 @@
     return isRunning
   }
 
+  function getIsPaused() {
+    return isPaused
+  }
+
   function init(els, cbs) {
     elements = els
     callbacks = cbs || {}
@@ -143,6 +151,7 @@
     setTime: setTime,
     getTimeLeft: getTimeLeft,
     getTotalTime: getTotalTime,
-    getIsRunning: getIsRunning
+    getIsRunning: getIsRunning,
+    getIsPaused: getIsPaused
   }
 })()
