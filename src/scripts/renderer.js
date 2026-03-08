@@ -184,7 +184,7 @@
   })
 
   // 重置按钮
-  DOM.btnReset.addEventListener('click', () => {
+  DOM.btnReset.addEventListener('click', async () => {
     // 先保存当前计时器运行状态（在重置之前）
     const wasRunning = Timer.getIsRunning()
     
@@ -195,7 +195,7 @@
     
     // 专注模式下，如果计时器正在运行，弹出确认框
     if (AppState.focusModeEnabled && wasRunning) {
-      const confirmed = confirm('确定要中断专注吗？所有正在生长的作物将会枯萎！')
+      const confirmed = await window.showConfirmModal('确定要中断专注吗？所有正在生长的作物将会枯萎！')
       if (!confirmed) {
         return // 用户取消，不执行重置
       }
@@ -266,6 +266,62 @@
         hiddenButtons.classList.remove('expanded')
         expandBtn.title = '展开'
       }
+    })
+  }
+
+  // ============ 自定义确认弹窗 ============
+  // 显示自定义确认弹窗
+  window.showConfirmModal = function(message) {
+    return new Promise((resolve) => {
+      const modal = document.getElementById('confirmModal')
+      const messageEl = modal.querySelector('.confirm-message')
+      const cancelBtn = document.getElementById('confirmCancelBtn')
+      const okBtn = document.getElementById('confirmOkBtn')
+
+      // 设置消息
+      messageEl.textContent = message
+
+      // 显示弹窗
+      modal.classList.add('show')
+
+      // 取消按钮点击
+      const handleCancel = () => {
+        cleanup()
+        resolve(false)
+      }
+
+      // 确认按钮点击
+      const handleOk = () => {
+        cleanup()
+        resolve(true)
+      }
+
+      // 清理函数
+      const cleanup = () => {
+        modal.classList.remove('show')
+        cancelBtn.removeEventListener('click', handleCancel)
+        okBtn.removeEventListener('click', handleOk)
+      }
+
+      // 绑定事件
+      cancelBtn.addEventListener('click', handleCancel)
+      okBtn.addEventListener('click', handleOk)
+
+      // 点击遮罩层关闭
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          handleCancel()
+        }
+      })
+
+      // ESC 键关闭
+      const handleEsc = (e) => {
+        if (e.key === 'Escape') {
+          handleCancel()
+          document.removeEventListener('keydown', handleEsc)
+        }
+      }
+      document.addEventListener('keydown', handleEsc)
     })
   }
 

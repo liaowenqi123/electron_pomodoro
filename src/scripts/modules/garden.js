@@ -251,6 +251,12 @@
    * 种植作物
    */
   async function plantCrop(plotIndex, cropKey) {
+    // 专注模式下禁止种植
+    if (window.AppState && window.AppState.focusModeEnabled && window.Timer && window.Timer.getIsRunning()) {
+      updateTip('专注模式下无法种植作物，请先停止专注')
+      return
+    }
+
     const seeds = gardenData.seeds || {}
     
     // 检查是否有种子
