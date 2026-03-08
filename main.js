@@ -216,7 +216,7 @@ function createWindow() {
   })
   
   musicProcess.onNoMusic((data) => {
-    win.webContents.send('music-no-music', data)
+    sendToRenderer('music-no-music', data)
   })
   
   musicProcess.onPlayError((data) => {

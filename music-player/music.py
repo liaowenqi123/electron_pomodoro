@@ -589,6 +589,13 @@ if __name__ == "__main__":
     
     if not has_music:
         print("没有找到音乐文件", file=sys.stderr)
+        # 先发送 ready 事件，让加载页面能正常结束
+        state.send_event("ready", {
+            "name": "", 
+            "duration": 0,
+            "has_prev": False
+        })
+        # 再发送 no_music 事件
         state.send_event("no_music", {"message": "music文件夹中没有音乐文件"})
         while True:
             with state.lock:
