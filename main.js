@@ -38,6 +38,7 @@ function ensureDataDir() {
 // 创建默认数据结构（与渲染进程 utils.js 保持一致）
 function createDefaultData() {
   return {
+    apiKey: null, // DeepSeek API Key
     stats: {
       date: new Date().toDateString(),
       todayCount: 0,
@@ -185,6 +186,16 @@ function createWindow() {
   // 读取保存的设备ID
   const savedData = readData()
   const savedDeviceId = savedData.audioDevice
+  
+  // 读取并设置API Key
+  const apiKey = savedData.apiKey
+  if (apiKey) {
+    aiAssistant.setApiKey(apiKey)
+    foregroundInspection.setApiKey(apiKey)
+    console.log('[Main] API Key已加载')
+  } else {
+    console.log('[Main] 未配置API Key')
+  }
   
   musicProcess.start(musicExePath, savedDeviceId)
   
@@ -374,6 +385,27 @@ ipcMain.handle('read-data', () => {
 
 ipcMain.handle('write-data', (event, data) => {
   return writeData(data)
+})
+
+// ============ API Key 管理 IPC 处理 ============
+
+ipcMain.handle('get-api-key', () => {
+  const data = readData()
+  return data.apiKey || null
+})
+
+ipcMain.handle('save-api-key', (event, apiKey) => {
+  const data = readData()
+  data.apiKey = apiKey
+  const success = writeData(data)
+  
+  if (success) {
+    // 更新AI助手和前台检测的API Key
+    aiAssistant.setApiKey(apiKey)
+    foregroundInspection.setApiKey(apiKey)
+  }
+  
+  return success
 })
 
 // ============ 音乐播放器 IPC 处理 ============

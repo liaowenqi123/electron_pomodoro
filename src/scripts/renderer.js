@@ -72,6 +72,23 @@
     aiApplyBtn: DOM.aiApplyBtn
   })
 
+  // ============ 初始化API Key管理器 ============
+  APIKeyManager.init({
+    apiKeyModal: document.getElementById('apiKeyModal'),
+    apiKeyInput: document.getElementById('apiKeyInput'),
+    apiKeySave: document.getElementById('apiKeySave'),
+    apiKeyCancel: document.getElementById('apiKeyCancel')
+  })
+
+  // 检查并提示配置API Key
+  await APIKeyManager.checkAndPrompt()
+
+  // 当保存API Key后，更新AI助手和前台检测
+  APIKeyManager.onSave(async (apiKey) => {
+    console.log('API Key已保存，重新加载模块...')
+    // 可以在这里添加重新初始化逻辑
+  })
+
   // ============ 初始化音乐播放器 ============
   MusicPlayer.init({
     playBtn: DOM.playBtn,

@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="styles/modal.css">
   <link rel="stylesheet" href="styles/modes.css">
   <link rel="stylesheet" href="styles/ai-helper.css">
+  <link rel="stylesheet" href="styles/api-key-modal.css">
 </head>
 <body>
   <div class="window-frame">
@@ -272,6 +273,37 @@
         </div>
       </div>
     </div>
+
+    <!-- API Key 配置弹窗 -->
+    <div class="api-key-modal" id="apiKeyModal">
+      <div class="api-key-modal-content">
+        <div class="api-key-modal-header">
+          <span class="api-key-modal-icon">🔑</span>
+          <h2>配置 DeepSeek API Key</h2>
+        </div>
+        <div class="api-key-modal-body">
+          <p class="api-key-description">
+            为了使用 AI 规划助手和前台检测功能，需要配置 DeepSeek API Key。
+          </p>
+          <div class="api-key-input-group">
+            <label class="api-key-label">API Key</label>
+            <input 
+              type="text" 
+              class="api-key-input" 
+              id="apiKeyInput" 
+              placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+            />
+            <div class="api-key-hint">
+              还没有 API Key？<a href="https://platform.deepseek.com" target="_blank">前往 DeepSeek 获取</a>
+            </div>
+          </div>
+        </div>
+        <div class="api-key-buttons">
+          <button class="api-key-btn api-key-btn-cancel" id="apiKeyCancel">稍后配置</button>
+          <button class="api-key-btn api-key-btn-save" id="apiKeySave">保存</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- 按依赖顺序加载 JS 模块 -->
@@ -280,6 +312,7 @@
   <script src="scripts/modules/dom.js"></script>
   <script src="scripts/modules/dataStore.js"></script>
   <script src="scripts/modules/stats.js"></script>
+  <script src="scripts/modules/apiKeyManager.js"></script>
   
   <!-- 功能模块 -->
   <script src="scripts/modules/wheelPicker.js"></script>

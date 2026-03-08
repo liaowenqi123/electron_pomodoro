@@ -23,6 +23,14 @@ const { contextBridge, ipcRenderer } = require('electron')
   // 写入数据
   writeData: (data) => ipcRenderer.invoke('write-data', data),
 
+  // ============ API Key 管理 API ============
+  
+  // 获取API Key
+  getApiKey: () => ipcRenderer.invoke('get-api-key'),
+  
+  // 保存API Key
+  saveApiKey: (apiKey) => ipcRenderer.invoke('save-api-key', apiKey),
+
   // ============ 音乐播放器控制 ============
   
   // 音乐播放器控制命令

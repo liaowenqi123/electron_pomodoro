@@ -1,0 +1,185 @@
+/**
+ * API Key 配置弹窗样式
+ */
+
+/* API Key 配置弹窗 */
+.api-key-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 3000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 20px;
+}
+
+.api-key-modal.show {
+  display: flex;
+}
+
+.api-key-modal-content {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  width: 90%;
+  max-width: 480px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.dark-mode .api-key-modal-content {
+  background: #2d2d2d;
+  color: #e0e0e0;
+}
+
+.api-key-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.api-key-modal-icon {
+  font-size: 32px;
+}
+
+.api-key-modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.dark-mode .api-key-modal-header h2 {
+  color: #e0e0e0;
+}
+
+.api-key-modal-body {
+  margin-bottom: 24px;
+}
+
+.api-key-description {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.dark-mode .api-key-description {
+  color: #aaa;
+}
+
+.api-key-input-group {
+  margin-bottom: 16px;
+}
+
+.api-key-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.dark-mode .api-key-label {
+  color: #e0e0e0;
+}
+
+.api-key-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  transition: border-color 0.3s ease;
+}
+
+.api-key-input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.dark-mode .api-key-input {
+  background: #3d3d3d;
+  border-color: #555;
+  color: #e0e0e0;
+}
+
+.dark-mode .api-key-input:focus {
+  border-color: #667eea;
+}
+
+.api-key-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #999;
+}
+
+.api-key-hint a {
+  color: #667eea;
+  text-decoration: none;
+}
+
+.api-key-hint a:hover {
+  text-decoration: underline;
+}
+
+.api-key-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.api-key-btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.api-key-btn-cancel {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.api-key-btn-cancel:hover {
+  background: #d0d0d0;
+}
+
+.dark-mode .api-key-btn-cancel {
+  background: #3d3d3d;
+  color: #e0e0e0;
+}
+
+.dark-mode .api-key-btn-cancel:hover {
+  background: #4d4d4d;
+}
+
+.api-key-btn-save {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.api-key-btn-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.api-key-btn-save:active {
+  transform: translateY(0);
+}
+
+.api-key-btn-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}

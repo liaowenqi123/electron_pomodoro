@@ -251,6 +251,45 @@ class ForegroundInspection {
     return this.sendCommand({ command: 'move_blacklist_to_whitelist', keyword })
   }
 
+  /**
+   * 设置API Key
+   * @param {string} apiKey - DeepSeek API Key
+   */
+  setApiKey(apiKey) {
+    // 更新 api_config.json 文件
+    const fs = require('fs')
+    const configPath = path.join(__dirname, '../../foreground_inspection/api_config.json')
+    
+    try {
+      const config = { api_key: apiKey }
+      fs.writeFileSync(configPath, JSON.stringify(config, null, 4), 'utf-8')
+      console.log('[ForegroundInspection] API Key 已更新')
+      return true
+    } catch (err) {
+      console.error('[ForegroundInspection] 更新 API Key 失败:', err)
+      return false
+    }
+  }
+  /**
+   * 设置API Key
+   * @param {string} apiKey - DeepSeek API Key
+   */
+  setApiKey(apiKey) {
+    // 更新 api_config.json 文件
+    const fs = require('fs')
+    const configPath = path.join(__dirname, '../../foreground_inspection/api_config.json')
+
+    try {
+      const config = { api_key: apiKey }
+      fs.writeFileSync(configPath, JSON.stringify(config, null, 4), 'utf-8')
+      console.log('[ForegroundInspection] API Key 已更新')
+      return true
+    } catch (err) {
+      console.error('[ForegroundInspection] 更新 API Key 失败:', err)
+      return false
+    }
+  }
+
   // ============ 回调设置 ============
 
   onReady(callback) {
