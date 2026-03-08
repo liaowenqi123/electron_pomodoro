@@ -13,10 +13,8 @@
 .title {
   font-size: 24px;
   color: #fff;
-  margin-bottom: 12px;
   font-weight: 600;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  margin-top: 5px;
 }
 
 .draggable {
@@ -83,7 +81,6 @@
 .mode-switch {
   display: flex;
   gap: 8px;
-  margin-bottom: 12px;
   -webkit-app-region: no-drag;
 }
 
@@ -127,8 +124,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 10px 0;
   position: relative;
+  transition: width 0.15s cubic-bezier(0.5, 0, 0.5, 1) 0s,
+              height 0.15s cubic-bezier(0.5, 0, 0.5, 1) 0s;
 }
 
 .progress-ring {
@@ -136,6 +134,8 @@
   width: 200px;
   height: 200px;
   transform: rotate(-90deg);
+  transition: width 0.15s cubic-bezier(0.5, 0, 0.5, 1) 0s,
+              height 0.15s cubic-bezier(0.5, 0, 0.5, 1) 0s;
 }
 
 .progress-ring circle {
@@ -167,6 +167,8 @@
   align-items: center;
   box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.08);
   border: 2px solid rgba(255, 255, 255, 0.12);
+  transition: width 0.15s cubic-bezier(0.5, 0, 0.5, 1) 0s,
+              height 0.15s cubic-bezier(0.5, 0, 0.5, 1) 0s;
 }
 
 .time-display {
@@ -180,7 +182,6 @@
 .buttons {
   display: flex;
   gap: 12px;
-  margin-top: 15px;
   -webkit-app-region: no-drag;
 }
 
@@ -239,54 +240,50 @@
 
 /* ============ 计时器区域容器 ============ */
 .timer-section {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 1;
   justify-content: center;
-  min-height: 0;
+  gap: 8px;
+  padding-bottom: 110px;
+  transition: padding-bottom 0.15s cubic-bezier(0.5, 0, 0.5, 1) 0s,
+              gap 0.15s cubic-bezier(0.5, 0, 0.5, 1) 0s;
+}
+
+/* 音乐播放器收起时：增大间距和计时环 */
+.main-content:has(.music-player.collapsed) .timer-section {
+  gap: 18px;
+  padding-bottom: 20px;
+  transition: padding-bottom 0.45s cubic-bezier(0.5, 0, 0.5, 1) 0.3s,
+              gap 0.45s cubic-bezier(0.5, 0, 0.5, 1) 0.3s;
+}
+
+/* 计时环收起时放大 */
+.main-content:has(.music-player.collapsed) .timer-container {
+  width: 220px;
+  height: 220px;
+  transition: width 0.45s cubic-bezier(0.5, 0, 0.5, 1) 0.3s,
+              height 0.45s cubic-bezier(0.5, 0, 0.5, 1) 0.3s;
+}
+
+.main-content:has(.music-player.collapsed) .progress-ring {
+  width: 220px;
+  height: 220px;
+  transition: width 0.45s cubic-bezier(0.5, 0, 0.5, 1) 0.3s,
+              height 0.45s cubic-bezier(0.5, 0, 0.5, 1) 0.3s;
+}
+
+.main-content:has(.music-player.collapsed) .timer-inner {
+  width: 182px;
+  height: 182px;
+  transition: width 0.45s cubic-bezier(0.5, 0, 0.5, 1) 0.3s,
+              height 0.45s cubic-bezier(0.5, 0, 0.5, 1) 0.3s;
 }
 
 .status {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.85);
-  margin-top: 8px;
-}
-
-/* 播放器收起时，增加内部元素间距 - 使用 transform 避免颤抖 */
-.main-content:has(.music-player.collapsed) .timer-section .title {
-  transform: translateY(-3px);
-}
-
-.main-content:has(.music-player.collapsed) .timer-section .mode-switch {
-  transform: translateY(-3px);
-}
-
-.main-content:has(.music-player.collapsed) .timer-section .timer-container {
-  transform: scale(1.01);
-}
-
-.main-content:has(.music-player.collapsed) .timer-section .focus-mode-container {
-  transform: translateY(4px);
-}
-
-.main-content:has(.music-player.collapsed) .timer-section .buttons {
-  transform: translateY(3px);
-}
-
-.main-content:has(.music-player.collapsed) .timer-section .status {
-  transform: translateY(7px);
-}
-
-/* 计时器内部元素添加过渡动画 - 延迟0.05s开始，总共0.2s（在主动画0.3s结束前0.05s结束） */
-.timer-section .title,
-.timer-section .mode-switch,
-.timer-section .timer-container,
-.timer-section .focus-mode-container,
-.timer-section .buttons,
-.timer-section .status {
-  transition: transform 0.10s cubic-bezier(0.4, 0, 0.2, 1);
-  transition-delay: 0.1s;
 }
 
 /* ============ 顶部按钮组 ============ */
@@ -369,7 +366,6 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 12px;
   padding: 8px 16px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 20px;

@@ -31,7 +31,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js')
     }
   })
-
+  
   // 先显示加载页面
   win.loadFile('src/loading.html')
   

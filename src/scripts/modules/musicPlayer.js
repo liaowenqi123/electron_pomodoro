@@ -24,8 +24,7 @@ const MusicPlayer = (function() {
     volume: 1.0,  // 音量 0-1
     isVolumeSliderOpen: false,  // 音量滑块是否展开
     lastVolumeSendTime: 0,  // 上次发送音量的时间戳（节流用）
-    isCollapsed: false,  // 是否收起
-    visualizerInterval: null  // 律动条动画定时器
+    isCollapsed: false  // 是否收起
   }
   
   // 播放超时时间（毫秒）
@@ -368,25 +367,12 @@ const MusicPlayer = (function() {
   // ============ 律动条动画 ============
 
   function startVisualizer() {
-    if (state.visualizerInterval) return
     if (!elements.visualizerBars || elements.visualizerBars.length === 0) return
-
-    // 添加播放状态类
+    // 添加播放状态类，CSS animation 会自动启动
     elements.visualizerBars.forEach(bar => bar.classList.add('playing'))
-
-    state.visualizerInterval = setInterval(() => {
-      elements.visualizerBars.forEach(bar => {
-        const height = Math.random() * 14 + 2  // 2-16px 随机高度
-        bar.style.setProperty('--bar-height', `${height}px`)
-      })
-    }, 150)
   }
 
   function stopVisualizer() {
-    if (state.visualizerInterval) {
-      clearInterval(state.visualizerInterval)
-      state.visualizerInterval = null
-    }
     if (elements.visualizerBars) {
       elements.visualizerBars.forEach(bar => {
         bar.classList.remove('playing')

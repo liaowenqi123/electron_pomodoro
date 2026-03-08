@@ -1,32 +1,35 @@
 /* 番茄钟 - 音乐播放器样式 */
 
 .music-player {
-  flex-shrink: 0;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   width: 100%;
   max-width: 300px;
   -webkit-app-region: no-drag;
-  position: relative;
-  display: grid;
-  grid-template-rows: 1fr;
-  transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  overflow: visible;  /* 始终允许菜单显示 */
 }
 
+/* 展开状态：wrapper 不裁剪，允许菜单弹出 */
 .music-wrapper {
-  min-height: 0;
   overflow: visible;
+  max-height: 200px;
+  transition: max-height 0.45s cubic-bezier(0.5, 0, 0.5, 1);
+}
+
+/* 收起状态：wrapper 高度为 0，使用 overflow: hidden 裁剪内容 */
+.music-player.collapsed .music-wrapper {
+  max-height: 0;
+  overflow: hidden;
 }
 
 /* 收起状态 */
-.music-player.collapsed {
-  grid-template-rows: 0fr;
-}
-
 .music-player.collapsed .music-content {
   opacity: 0;
-  overflow: hidden;
 }
 
 .music-player.collapsed .music-collapse-btn {
@@ -58,7 +61,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.45s cubic-bezier(0.5, 0, 0.5, 1);
   pointer-events: none;
 }
 
@@ -72,7 +75,7 @@
   gap: 2px;
   height: 16px;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.45s cubic-bezier(0.5, 0, 0.5, 1);
   pointer-events: none;
 }
 
@@ -84,12 +87,35 @@
   width: 3px;
   background: rgba(255, 255, 255, 0.5);
   border-radius: 2px;
-  transition: height 0.1s ease;
   height: 2px;
+  transition: height 0.05s ease-out;
 }
 
 .visualizer-bar.playing {
-  animation: visualizer-bounce 0.3s ease infinite alternate;
+  animation: visualizer-bounce var(--bar-duration, 0.35s) ease-in-out infinite alternate;
+  animation-delay: var(--bar-delay, 0s);
+}
+
+/* 每个条不同的动画时长和延迟 */
+.visualizer-bar:nth-child(1) {
+  --bar-duration: 0.4s;
+  --bar-delay: 0s;
+  --bar-height: 12px;
+}
+.visualizer-bar:nth-child(2) {
+  --bar-duration: 0.35s;
+  --bar-delay: 0.1s;
+  --bar-height: 8px;
+}
+.visualizer-bar:nth-child(3) {
+  --bar-duration: 0.45s;
+  --bar-delay: 0.15s;
+  --bar-height: 14px;
+}
+.visualizer-bar:nth-child(4) {
+  --bar-duration: 0.3s;
+  --bar-delay: 0.05s;
+  --bar-height: 10px;
 }
 
 @keyframes visualizer-bounce {
@@ -140,11 +166,10 @@
 /* 音乐内容区域动画 */
 .music-content {
   opacity: 1;
-  max-height: 200px;
   padding: 12px;
   padding-top: 10px;
-  overflow: visible;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* 同步动画：展开时内容淡入，收起时淡出 */
+  transition: opacity 0.45s cubic-bezier(0.5, 0, 0.5, 1);
 }
 
 .music-info {
