@@ -14,6 +14,9 @@ let focusModeEnabled = false
 let timerRunning = false
 let timerPaused = false
 
+// 前台检测就绪状态（供渲染进程查询）
+let foregroundInspectionReady = false
+
 // 数据文件路径
 let dataFilePath = null
 
@@ -246,11 +249,13 @@ function createWindow() {
     foregroundExePath = path.join(__dirname, 'foreground_inspection', 'foreground_inspection.exe')
   }
   
-  foregroundInspection.start(foregroundExePath)
+  // 启动前台检测，传入 API Key（进程启动前会先写入配置）
+  foregroundInspection.start(foregroundExePath, apiKey)
   
   // 设置前台检测回调，转发到渲染进程
   foregroundInspection.onReady((data) => {
     foregroundReady = true
+    foregroundInspectionReady = true  // 标记前台检测已就绪
     updateLoadingProgress()
     // 使用 sendToRenderer 而不是 win.webContents.send，确保事件被缓存
     sendToRenderer('foreground-ready', data)
@@ -453,6 +458,11 @@ ipcMain.handle('ai-generate-plan', async (event, userInput) => {
 })
 
 // ============ 前台检测 IPC 处理 ============
+
+// 查询前台检测是否就绪
+ipcMain.handle('foreground-is-ready', () => {
+  return foregroundInspectionReady
+})
 
 ipcMain.on('foreground-start', () => {
   foregroundInspection.startDetection()

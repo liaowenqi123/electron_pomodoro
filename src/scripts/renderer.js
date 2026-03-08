@@ -112,7 +112,7 @@
 
   // ============ 初始化前台检测模块 ============
   if (window.ForegroundDetection) {
-    window.ForegroundDetection.init()
+    await window.ForegroundDetection.init()
   }
 
   // ============ 事件绑定 ============

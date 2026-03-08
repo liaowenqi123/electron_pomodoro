@@ -126,14 +126,15 @@ def validate_api_key(api_config, model_config):
     """
     验证 API key 是否有效
     返回: (is_valid, error_message)
+    注意：无效时不报错，只是返回 False，让后续逻辑跳过 AI 验证
     """
     api_key = api_config.get("api_key", "")
     
-    # 1. 检查是否是默认值
-    if not api_key or api_key == "<your api key>":
-        return False, "API key 未配置，请配置有效的 API key"
+    # 检查是否是默认值或空
+    if not api_key or api_key == "<your api key>" or api_key == "":
+        return False, None
     
-    # 2. 做一次实验性请求
+    # 尝试一次简单请求验证
     try:
         client = OpenAI(
             api_key=api_key,
@@ -142,7 +143,6 @@ def validate_api_key(api_config, model_config):
         
         model = model_config.get("model", "deepseek-chat")
         
-        # 发送一个简单的测试请求
         response = client.chat.completions.create(
             model=model,
             messages=[
@@ -152,8 +152,8 @@ def validate_api_key(api_config, model_config):
         )
         return True, None
     except Exception as e:
-        error_msg = str(e)
-        return False, f"API key 验证失败: {error_msg}"
+        # 验证失败，静默处理
+        return False, None
 
 
 # ============ 窗口检测 ============
@@ -181,14 +181,14 @@ def check_list(window_title, keyword_list):
     return False
 
 
-def check_is_entertainment(window_title, api_config, model_config, list_config):
+def check_is_entertainment(window_title, api_config, model_config, list_config, api_key_valid=True):
     """
     检查窗口是否为娱乐类应用
     优先级：白名单 -> 黑名单 -> 历史记录 -> AI API
     
     返回: (结果, 来源, 关键字, list_config)
     - 结果: "是" / "不是" / "查询失败"
-    - 来源: "whitelist" / "blacklist" / "history" / "ai"
+    - 来源: "whitelist" / "blacklist" / "history" / "ai" / "no_api"
     - 关键字: 匹配到的关键字（黑名单时为匹配的关键字，history时为完整窗口标题）
     """
     # 1. 先查白名单（优先级最高）
@@ -208,7 +208,11 @@ def check_is_entertainment(window_title, api_config, model_config, list_config):
     if window_title in history:
         return history[window_title], "history", window_title, list_config
     
-    # 4. 调用 AI API
+    # 4. API Key 无效时，跳过 AI 验证，默认返回"不是"
+    if not api_key_valid:
+        return "不是", "no_api", window_title, list_config
+    
+    # 5. 调用 AI API
     try:
         client = OpenAI(
             api_key=api_config.get("api_key", "<your api key>"),
@@ -263,6 +267,7 @@ class DetectionState:
         self.api_config = None
         self.model_config = None
         self.list_config = None
+        self.api_key_valid = False  # API Key 是否有效
     
     def send_event(self, event_type, data):
         """向stdout发送事件（给Electron）"""
@@ -383,30 +388,21 @@ def detection_loop():
     """检测循环（主线程）"""
     print("前台检测程序已启动，等待命令...", file=sys.stderr)
     
-    # 验证 API key
-    is_valid, error_message = validate_api_key(state.api_config, state.model_config)
+    # 验证 API key（静默验证，无效时跳过 AI 功能）
+    is_valid, _ = validate_api_key(state.api_config, state.model_config)
+    state.api_key_valid = is_valid
     
-    if not is_valid:
-        # API key 无效，发送错误事件
-        print(f"API key 验证失败: {error_message}", file=sys.stderr)
-        state.send_event("api_key_invalid", {
-            "error": error_message,
-            "config_path": API_CONFIG_FILE
-        })
-        # 发送准备就绪事件（但标记为无效状态）
-        state.send_event("ready", {
-            "whitelist_count": len(state.list_config.get("whitelist", [])),
-            "blacklist_count": len(state.list_config.get("blacklist", [])),
-            "api_key_valid": False
-        })
+    if is_valid:
+        print("API key 验证成功，AI 识别功能可用", file=sys.stderr)
     else:
-        print("API key 验证成功", file=sys.stderr)
-        # 发送准备就绪事件
-        state.send_event("ready", {
-            "whitelist_count": len(state.list_config.get("whitelist", [])),
-            "blacklist_count": len(state.list_config.get("blacklist", [])),
-            "api_key_valid": True
-        })
+        print("API key 未配置或无效，AI 识别功能不可用（仅使用黑白名单匹配）", file=sys.stderr)
+    
+    # 发送准备就绪事件
+    state.send_event("ready", {
+        "whitelist_count": len(state.list_config.get("whitelist", [])),
+        "blacklist_count": len(state.list_config.get("blacklist", [])),
+        "api_key_valid": is_valid
+    })
     
     last_check_time = 0
     check_interval = 1.0  # 检测间隔（秒）
@@ -434,7 +430,7 @@ def detection_loop():
                 if current_title:  # 非空标题才查询
                     # 判断是否为娱乐应用
                     is_entertainment, source, keyword, state.list_config = check_is_entertainment(
-                        current_title, state.api_config, state.model_config, state.list_config
+                        current_title, state.api_config, state.model_config, state.list_config, state.api_key_valid
                     )
                     
                     with state.lock:

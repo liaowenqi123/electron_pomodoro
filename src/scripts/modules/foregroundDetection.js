@@ -23,7 +23,7 @@
   /**
    * 初始化模块
    */
-  function init() {
+  async function init() {
     // 获取 DOM 元素
     elements = {
       warningModal: document.getElementById('warningModal'),
@@ -52,8 +52,10 @@
     // 设置 Electron 事件监听
     setupElectronListeners()
     
+    // 主动查询前台检测是否就绪（解决事件时序问题）
+    await checkReady()
+    
     // 预热：提前调用一次显示/隐藏流程，解决第一次警告弹窗不能正确置顶的问题
-    // 原理：让 Windows 系统提前准备好窗口置顶机制
     warmUpBringToFront()
   }
 
@@ -111,6 +113,11 @@
 
     // 监听状态更新
     window.electronAPI.onForegroundStatus((data) => {
+      // 收到状态响应说明前台检测进程已就绪
+      if (!state.isReady) {
+        state.isReady = true
+        console.log('[ForegroundDetection] 前台检测进程已就绪（通过状态查询确认）')
+      }
       state.isDetecting = data.running
       console.log('[ForegroundDetection] 状态更新', data)
     })
@@ -119,6 +126,27 @@
     window.electronAPI.onForegroundError((data) => {
       console.error('[ForegroundDetection] 错误', data)
     })
+  }
+
+  /**
+   * 检查前台检测是否就绪（主动查询）
+   */
+  async function checkReady() {
+    if (!window.electronAPI) return false
+    
+    try {
+      const isReady = await window.electronAPI.foregroundIsReady()
+      if (isReady) {
+        state.isReady = true
+        console.log('[ForegroundDetection] 前台检测进程已就绪（主动查询确认）')
+        // 获取当前状态
+        window.electronAPI.foregroundGetStatus()
+      }
+      return isReady
+    } catch (err) {
+      console.error('[ForegroundDetection] 查询就绪状态失败', err)
+      return false
+    }
   }
 
   /**

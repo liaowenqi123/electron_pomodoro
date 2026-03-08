@@ -117,6 +117,9 @@ const { contextBridge, ipcRenderer } = require('electron')
   
   // ============ 前台检测 API ============
   
+  // 查询前台检测是否就绪
+  foregroundIsReady: () => ipcRenderer.invoke('foreground-is-ready'),
+  
   // 前台检测控制命令
   foregroundStart: () => ipcRenderer.send('foreground-start'),
   foregroundStop: () => ipcRenderer.send('foreground-stop'),

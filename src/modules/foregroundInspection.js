@@ -22,8 +22,9 @@ class ForegroundInspection {
   /**
    * 启动前台检测进程
    * @param {string} exePath - foreground_inspection.exe 的路径
+   * @param {string} apiKey - API Key（启动前写入配置）
    */
-  start(exePath) {
+  start(exePath, apiKey = null) {
     if (this.process) {
       console.log('[ForegroundInspection] 进程已在运行')
       return
@@ -32,6 +33,11 @@ class ForegroundInspection {
     const fullPath = exePath || path.join(__dirname, '../../foreground_inspection/foreground_inspection.exe')
     
     try {
+      // 在启动进程前，先写入 API Key 配置
+      if (apiKey !== null) {
+        this.writeApiKeyConfig(fullPath, apiKey)
+      }
+
       this.process = spawn(fullPath, [], {
         stdio: ['pipe', 'pipe', 'pipe'],
         cwd: path.dirname(fullPath),
@@ -252,42 +258,39 @@ class ForegroundInspection {
   }
 
   /**
-   * 设置API Key
-   * @param {string} apiKey - DeepSeek API Key
+   * 写入 API Key 配置文件
+   * @param {string} exePath - exe 路径（用于确定配置文件位置）
+   * @param {string} apiKey - API Key
    */
-  setApiKey(apiKey) {
-    // 更新 api_config.json 文件
+  writeApiKeyConfig(exePath, apiKey) {
     const fs = require('fs')
-    const configPath = path.join(__dirname, '../../foreground_inspection/api_config.json')
-    
+    const configDir = path.dirname(exePath)
+    const configPath = path.join(configDir, 'api_config.json')
+
     try {
-      const config = { api_key: apiKey }
+      const config = { api_key: apiKey || '' }
       fs.writeFileSync(configPath, JSON.stringify(config, null, 4), 'utf-8')
-      console.log('[ForegroundInspection] API Key 已更新')
+      console.log('[ForegroundInspection] API Key 配置已写入:', configPath)
       return true
     } catch (err) {
-      console.error('[ForegroundInspection] 更新 API Key 失败:', err)
+      console.error('[ForegroundInspection] 写入 API Key 配置失败:', err)
       return false
     }
   }
+
   /**
-   * 设置API Key
+   * 设置API Key（运行时更新）
    * @param {string} apiKey - DeepSeek API Key
    */
   setApiKey(apiKey) {
-    // 更新 api_config.json 文件
-    const fs = require('fs')
-    const configPath = path.join(__dirname, '../../foreground_inspection/api_config.json')
-
-    try {
-      const config = { api_key: apiKey }
-      fs.writeFileSync(configPath, JSON.stringify(config, null, 4), 'utf-8')
-      console.log('[ForegroundInspection] API Key 已更新')
-      return true
-    } catch (err) {
-      console.error('[ForegroundInspection] 更新 API Key 失败:', err)
-      return false
+    if (this.process) {
+      // 进程已运行，写入配置文件
+      const exePath = this.process.spawnfile
+      return this.writeApiKeyConfig(exePath, apiKey)
     }
+    // 进程未运行，写入默认位置
+    const defaultPath = path.join(__dirname, '../../foreground_inspection/foreground_inspection.exe')
+    return this.writeApiKeyConfig(defaultPath, apiKey)
   }
 
   // ============ 回调设置 ============
