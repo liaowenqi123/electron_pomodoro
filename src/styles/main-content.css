@@ -237,10 +237,55 @@
   transform: translateY(-2px);
 }
 
+/* ============ 计时器区域容器 ============ */
+.timer-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+  min-height: 0;
+}
+
 .status {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.85);
   margin-top: 8px;
+}
+
+/* 播放器收起时，增加内部元素间距 - 使用 transform 避免颤抖 */
+.main-content:has(.music-player.collapsed) .timer-section .title {
+  transform: translateY(-4px);
+}
+
+.main-content:has(.music-player.collapsed) .timer-section .mode-switch {
+  transform: translateY(-4px);
+}
+
+.main-content:has(.music-player.collapsed) .timer-section .timer-container {
+  transform: scale(1.02);
+}
+
+.main-content:has(.music-player.collapsed) .timer-section .focus-mode-container {
+  transform: translateY(4px);
+}
+
+.main-content:has(.music-player.collapsed) .timer-section .buttons {
+  transform: translateY(4px);
+}
+
+.main-content:has(.music-player.collapsed) .timer-section .status {
+  transform: translateY(8px);
+}
+
+/* 计时器内部元素添加过渡动画 */
+.timer-section .title,
+.timer-section .mode-switch,
+.timer-section .timer-container,
+.timer-section .focus-mode-container,
+.timer-section .buttons,
+.timer-section .status {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ============ 顶部按钮组 ============ */

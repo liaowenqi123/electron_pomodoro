@@ -98,44 +98,46 @@
           </div>
           <button class="btn-header btn-expand" id="expandBtn" title="展开"></button>
         </div>
-        <h1 class="title">🍅 番茄钟</h1>
-        
-        <div class="mode-switch">
-          <div class="mode-btn active" data-mode="work">
-            <span class="mode-icon">💼</span>
-            <span class="mode-text">工作</span>
+        <div class="timer-section">
+          <h1 class="title">🍅 番茄钟</h1>
+          
+          <div class="mode-switch">
+            <div class="mode-btn active" data-mode="work">
+              <span class="mode-icon">💼</span>
+              <span class="mode-text">工作</span>
+            </div>
+            <div class="mode-btn" data-mode="break">
+              <span class="mode-icon">☕</span>
+              <span class="mode-text">休息</span>
+            </div>
           </div>
-          <div class="mode-btn" data-mode="break">
-            <span class="mode-icon">☕</span>
-            <span class="mode-text">休息</span>
+          
+          <div class="timer-container">
+            <svg class="progress-ring" viewBox="0 0 240 240">
+              <circle class="bg" cx="120" cy="120" r="116"></circle>
+              <circle class="progress" cx="120" cy="120" r="116" id="progressCircle"></circle>
+            </svg>
+            <div class="timer-inner">
+              <div class="time-display" id="timeDisplay">25:00</div>
+            </div>
           </div>
-        </div>
-        
-        <div class="timer-container">
-          <svg class="progress-ring" viewBox="0 0 240 240">
-            <circle class="bg" cx="120" cy="120" r="116"></circle>
-            <circle class="progress" cx="120" cy="120" r="116" id="progressCircle"></circle>
-          </svg>
-          <div class="timer-inner">
-            <div class="time-display" id="timeDisplay">25:00</div>
+          
+          <!-- 专注模式开关 -->
+          <div class="focus-mode-container">
+            <span class="focus-mode-label">专注模式</span>
+            <div class="focus-mode-switch" id="focusModeSwitch">
+              <div class="focus-mode-slider"></div>
+            </div>
+            <span class="focus-mode-status" id="focusModeStatus">关闭</span>
           </div>
-        </div>
-        
-        <!-- 专注模式开关 -->
-        <div class="focus-mode-container">
-          <span class="focus-mode-label">专注模式</span>
-          <div class="focus-mode-switch" id="focusModeSwitch">
-            <div class="focus-mode-slider"></div>
+          
+          <div class="buttons">
+            <button class="btn btn-start" id="startBtn">开始</button>
+            <button class="btn btn-reset">重置</button>
           </div>
-          <span class="focus-mode-status" id="focusModeStatus">关闭</span>
+          
+          <p class="status" id="status">准备开始专注工作</p>
         </div>
-        
-        <div class="buttons">
-          <button class="btn btn-start" id="startBtn">开始</button>
-          <button class="btn btn-reset">重置</button>
-        </div>
-        
-        <p class="status" id="status">准备开始专注工作</p>
 
         <!-- 音乐播放器 -->
         <div class="music-player" id="musicPlayer">

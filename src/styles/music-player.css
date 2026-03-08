@@ -1,7 +1,7 @@
 /* 番茄钟 - 音乐播放器样式 */
 
 .music-player {
-  margin-top: auto;
+  flex-shrink: 0;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -154,7 +154,6 @@
   margin-bottom: 8px;
   position: relative;
   overflow: visible;
-}
 }
 
 .music-icon {
