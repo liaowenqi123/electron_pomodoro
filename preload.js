@@ -112,7 +112,7 @@ const { contextBridge, ipcRenderer } = require('electron')
 
   // ============ AI助手 API ============
   
-  // 生成AI计划
+  // AI计划
   aiGeneratePlan: (userInput) => ipcRenderer.invoke('ai-generate-plan', userInput),
   
   // ============ 前台检测 API ============
