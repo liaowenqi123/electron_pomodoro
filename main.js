@@ -4,40 +4,11 @@
 
 const { app, BrowserWindow, ipcMain, Notification } = require('electron')
 const path = require('path')
-const fs = require('fs')
-const crypto = require('crypto')
 const musicProcess = require('./src/modules/musicProcess')
 const aiAssistant = require('./src/modules/aiAssistant')
 const foregroundInspection = require('./src/modules/foregroundInspection')
-const { createClient } = require('@supabase/supabase-js')
-
-// Supabase 配置
-const SUPABASE_URL = 'https://sjexeynibnfqxvwehnxk.supabase.co'
-const SUPABASE_ANON_KEY = 'sb_publishable_NtzlEhTWwC4qpSY0DEvQ0Q_ER6yJoTz'
-
-let supabase = null
-let currentSession = null
-
-// 密码哈希函数
-function hashPassword(password, salt = null) {
-  if (!salt) {
-    salt = crypto.randomBytes(16).toString('hex')
-  }
-  const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex')
-  return { hash, salt }
-}
-
-// 验证密码
-function verifyPassword(password, hash, salt) {
-  const result = hashPassword(password, salt)
-  return result.hash === hash
-}
-
-// 初始化 Supabase
-function initSupabase() {
-  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  console.log('[Supabase] 客户端已初始化')
-}
+const cloudAuth = require('./src/modules/cloudAuth')
+const dataManager = require('./src/modules/dataManager')
 
 // 专注模式和计时器状态（供菜园子窗口查询）
 let focusModeEnabled = false
@@ -46,99 +17,6 @@ let timerPaused = false
 
 // 前台检测就绪状态（供渲染进程查询）
 let foregroundInspectionReady = false
-
-// 数据文件路径
-let dataFilePath = null
-
-function getDataFilePath() {
-  if (dataFilePath) return dataFilePath
-  
-  // 数据存放在用户数据目录（可读写）
-  // 开发环境和打包后都使用这个路径
-  const userDataPath = app.getPath('userData')
-  dataFilePath = path.join(userDataPath, 'data', 'data.json')
-  return dataFilePath
-}
-
-// 确保数据目录存在
-function ensureDataDir() {
-  const dataDir = path.dirname(getDataFilePath())
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true })
-  }
-}
-
-// 创建默认数据结构（与渲染进程 utils.js 保持一致）
-function createDefaultData() {
-  return {
-    apiKey: null, // DeepSeek API Key
-    stats: {
-      date: new Date().toDateString(),
-      todayCount: 0,
-      totalMinutes: 0
-    },
-    presets: {
-      work: [15, 25, 45, 60],
-      break: [5, 10, 15]
-    },
-    planList: [],
-    audioDevice: null,
-    // 菜园子系统
-    garden: {
-      coins: 0,
-      seeds: { carrot: 5, tomato: 2, sunflower: 0, rose: 0, osmanthus: 0 },
-      plots: [
-        { id: 0, crop: null, progress: 0, plantedAt: null },
-        { id: 1, crop: null, progress: 0, plantedAt: null },
-        { id: 2, crop: null, progress: 0, plantedAt: null },
-        { id: 3, crop: null, progress: 0, plantedAt: null },
-        { id: 4, crop: null, progress: 0, plantedAt: null },
-        { id: 5, crop: null, progress: 0, plantedAt: null },
-        { id: 6, crop: null, progress: 0, plantedAt: null, locked: true },
-        { id: 7, crop: null, progress: 0, plantedAt: null, locked: true },
-        { id: 8, crop: null, progress: 0, plantedAt: null, locked: true },
-        { id: 9, crop: null, progress: 0, plantedAt: null, locked: true },
-        { id: 10, crop: null, progress: 0, plantedAt: null, locked: true },
-        { id: 11, crop: null, progress: 0, plantedAt: null, locked: true }
-      ],
-      warehouse: []
-    }
-  }
-}
-
-// 读取数据
-function readData() {
-  ensureDataDir()
-  const filePath = getDataFilePath()
-  const defaultData = createDefaultData()
-  
-  // 如果文件不存在，创建默认数据
-  if (!fs.existsSync(filePath)) {
-    fs.writeFileSync(filePath, JSON.stringify(defaultData, null, 2), 'utf-8')
-    return defaultData
-  }
-  
-  try {
-    const content = fs.readFileSync(filePath, 'utf-8')
-    return JSON.parse(content)
-  } catch (e) {
-    console.error('读取数据文件失败:', e)
-    return defaultData
-  }
-}
-
-// 写入数据
-function writeData(data) {
-  ensureDataDir()
-  const filePath = getDataFilePath()
-  try {
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8')
-    return true
-  } catch (e) {
-    console.error('写入数据文件失败:', e)
-    return false
-  }
-}
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -217,7 +95,7 @@ function createWindow() {
   }
   
   // 读取保存的设备ID
-  const savedData = readData()
+  const savedData = dataManager.readData()
   const savedDeviceId = savedData.audioDevice
   
   // API Key 现在从云端获取，启动时不再自动加载
@@ -335,7 +213,8 @@ function createGardenWindow() {
   })
 }
 
-// 处理关闭窗口请求
+// ============ 基础窗口操作 IPC 处理 ============
+
 ipcMain.on('close-window', () => {
   const win = BrowserWindow.getFocusedWindow()
   if (win) {
@@ -345,7 +224,6 @@ ipcMain.on('close-window', () => {
   }
 })
 
-// 处理最小化窗口请求
 ipcMain.on('minimize-window', () => {
   const win = BrowserWindow.getFocusedWindow()
   if (win) {
@@ -353,7 +231,6 @@ ipcMain.on('minimize-window', () => {
   }
 })
 
-// 处理显示通知请求
 ipcMain.on('show-notification', (event, data) => {
   if (Notification.isSupported()) {
     const notification = new Notification({
@@ -367,37 +244,31 @@ ipcMain.on('show-notification', (event, data) => {
 
 // ============ 菜园子窗口 IPC 处理 ============
 
-// 打开菜园子窗口
 ipcMain.on('open-garden', () => {
   createGardenWindow()
 })
 
-// 关闭菜园子窗口
 ipcMain.on('close-garden', () => {
   if (gardenWindow) {
     gardenWindow.close()
   }
 })
 
-// 刷新菜园子窗口
 ipcMain.on('refresh-garden', () => {
   if (gardenWindow && !gardenWindow.isDestroyed()) {
     gardenWindow.webContents.send('refresh-garden')
   }
 })
 
-// 更新专注模式状态
 ipcMain.on('update-focus-mode', (event, enabled) => {
   focusModeEnabled = enabled
 })
 
-// 更新计时器状态
 ipcMain.on('update-timer-status', (event, running, paused) => {
   timerRunning = running
   timerPaused = paused
 })
 
-// 查询专注模式和计时器状态（供菜园子窗口调用）
 ipcMain.handle('get-timer-state', () => {
   return {
     focusModeEnabled: focusModeEnabled,
@@ -409,265 +280,64 @@ ipcMain.handle('get-timer-state', () => {
 // ============ 数据存储 IPC 处理 ============
 
 ipcMain.handle('read-data', () => {
-  return readData()
+  return dataManager.readData()
 })
 
 ipcMain.handle('write-data', (event, data) => {
-  return writeData(data)
+  return dataManager.writeData(data)
 })
 
 // ============ 凭据存储 IPC 处理 ============
 
-// 凭据文件路径
-function getCredentialsPath() {
-  return path.join(app.getPath('userData'), 'credentials.json')
-}
-
-// 保存凭据
 ipcMain.handle('save-credentials', (event, credentials) => {
-  try {
-    const credentialsPath = getCredentialsPath()
-    fs.writeFileSync(credentialsPath, JSON.stringify(credentials, null, 2), 'utf-8')
-    return { success: true }
-  } catch (err) {
-    console.error('[Credentials] 保存失败:', err)
-    return { success: false, error: err.message }
-  }
+  return cloudAuth.saveCredentials(credentials)
 })
 
-// 加载凭据
 ipcMain.handle('load-credentials', () => {
-  try {
-    const credentialsPath = getCredentialsPath()
-    if (fs.existsSync(credentialsPath)) {
-      const data = fs.readFileSync(credentialsPath, 'utf-8')
-      return { success: true, credentials: JSON.parse(data) }
-    }
-    return { success: true, credentials: null }
-  } catch (err) {
-    console.error('[Credentials] 加载失败:', err)
-    return { success: false, error: err.message }
-  }
+  return cloudAuth.loadCredentials()
 })
 
-// 清除凭据
 ipcMain.handle('clear-credentials', () => {
-  try {
-    const credentialsPath = getCredentialsPath()
-    if (fs.existsSync(credentialsPath)) {
-      fs.unlinkSync(credentialsPath)
-    }
-    return { success: true }
-  } catch (err) {
-    console.error('[Credentials] 清除失败:', err)
-    return { success: false, error: err.message }
-  }
+  return cloudAuth.clearCredentials()
 })
 
 // ============ 云端登录 IPC 处理 ============
 
-// 测试云端连接
 ipcMain.handle('cloud-test-connection', async () => {
-  if (!supabase) {
-    return { success: false, error: 'Supabase 未初始化' }
-  }
-
-  try {
-    const { data, error } = await supabase.from('users').select('count').limit(1)
-    
-    if (error && error.code !== 'PGRST116') {
-      return { success: false, error: error.message }
-    }
-    
-    return { success: true }
-  } catch (err) {
-    return { success: false, error: err.message }
-  }
+  return await cloudAuth.testConnection()
 })
 
-// 获取当前会话
 ipcMain.handle('cloud-get-session', async () => {
-  if (!currentSession) {
-    return { success: true, session: null, deepseekKey: null }
-  }
-  
-  // 如果是 admin，重新获取 DeepSeek API Key
-  let deepseekKey = null
-  if (currentSession.admin && supabase) {
-    try {
-      const { data: keyData } = await supabase
-        .from('api_keys')
-        .select('api_key')
-        .eq('name', 'deepseek')
-        .limit(1)
-
-      if (keyData && keyData.length > 0) {
-        deepseekKey = keyData[0].api_key
-        // 只更新 AI 助手的 API Key（前台检测在专注模式启动时设置）
-        aiAssistant.setApiKey(deepseekKey)
-      }
-    } catch (err) {
-      console.error('[Supabase] 获取 API Key 失败:', err)
-    }
-  }
-  
-  return { success: true, session: currentSession, deepseekKey: deepseekKey }
+  return await cloudAuth.getSessionWithKey(aiAssistant)
 })
 
-// 登录
 ipcMain.handle('cloud-login', async (event, { username, password }) => {
-  if (!supabase) {
-    return { success: false, error: 'Supabase 未初始化' }
-  }
-
-  try {
-    const { data: users, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('username', username)
-      .limit(1)
-
-    if (error) {
-      return { success: false, error: '登录失败' }
-    }
-
-    if (!users || users.length === 0) {
-      return { success: false, error: '用户名不存在' }
-    }
-
-    const user = users[0]
-
-    if (!verifyPassword(password, user.password_hash, user.salt)) {
-      return { success: false, error: '密码错误' }
-    }
-
-    // 更新最后登录时间
-    await supabase
-      .from('users')
-      .update({ last_login: new Date().toISOString() })
-      .eq('id', user.id)
-
-    // 创建会话
-    currentSession = {
-      id: user.id,
-      username: user.username,
-      created_at: user.created_at,
-      admin: user.admin || false
-    }
-
-    // 如果是 admin，获取 DeepSeek API Key
-    let deepseekKey = null
-    if (user.admin) {
-      const { data: keyData } = await supabase
-        .from('api_keys')
-        .select('api_key')
-        .eq('name', 'deepseek')
-        .limit(1)
-
-      if (keyData && keyData.length > 0) {
-        deepseekKey = keyData[0].api_key
-        // 只更新 AI 助手的 API Key（前台检测在专注模式启动时设置）
-        aiAssistant.setApiKey(deepseekKey)
-        console.log('[Supabase] Admin 用户登录，已获取 DeepSeek API Key（仅内存）')
-      }
-    }
-
-    console.log('[Supabase] 登录成功:', username, user.admin ? '(Admin)' : '')
-    return { 
-      success: true, 
-      user: currentSession,
-      deepseekKey: deepseekKey 
-    }
-  } catch (err) {
-    console.error('[Supabase] 登录异常:', err)
-    return { success: false, error: err.message }
-  }
+  return await cloudAuth.login(username, password, aiAssistant)
 })
 
-// 注册
 ipcMain.handle('cloud-register', async (event, { username, password }) => {
-  if (!supabase) {
-    return { success: false, error: 'Supabase 未初始化' }
-  }
-
-  if (!username || username.length < 2) {
-    return { success: false, error: '用户名至少需要2个字符' }
-  }
-
-  if (!password || password.length < 6) {
-    return { success: false, error: '密码至少需要6个字符' }
-  }
-
-  try {
-    // 检查用户名是否已存在
-    const { data: existingUsers } = await supabase
-      .from('users')
-      .select('username')
-      .eq('username', username)
-      .limit(1)
-
-    if (existingUsers && existingUsers.length > 0) {
-      return { success: false, error: '用户名已存在' }
-    }
-
-    // 哈希密码
-    const { hash, salt } = hashPassword(password)
-
-    // 插入用户
-    const { data, error } = await supabase
-      .from('users')
-      .insert([
-        {
-          username: username,
-          password_hash: hash,
-          salt: salt,
-          created_at: new Date().toISOString()
-        }
-      ])
-      .select()
-
-    if (error) {
-      if (error.code === '23505') {
-        return { success: false, error: '用户名已存在' }
-      }
-      return { success: false, error: error.message }
-    }
-
-    console.log('[Supabase] 注册成功:', username)
-    return { success: true, data: data[0] }
-  } catch (err) {
-    console.error('[Supabase] 注册异常:', err)
-    return { success: false, error: err.message }
-  }
+  return await cloudAuth.register(username, password)
 })
 
-// 退出登录
 ipcMain.handle('cloud-logout', async () => {
-  currentSession = null
-  // 清除 AI 助手的 API Key
-  aiAssistant.setApiKey(null)
-  // 清除前台检测的 API Key（发送空值）
-  foregroundInspection.setApiKey(null)
-  console.log('[Supabase] 已退出登录，已清除内存中的 API Key')
-  return { success: true }
+  return cloudAuth.logout(aiAssistant, foregroundInspection)
 })
 
 // ============ API Key 管理 IPC 处理（保留兼容） ============
 
 ipcMain.handle('get-api-key', () => {
-  // 优先从会话获取（admin 用户）
-  if (currentSession && currentSession.admin) {
-    // 需要重新获取 API Key
-    return null // 暂时返回 null，由前端处理
+  const session = cloudAuth.getSession()
+  if (session && session.admin) {
+    return null // admin 用户需要从云端获取
   }
-  const data = readData()
+  const data = dataManager.readData()
   return data.apiKey || null
 })
 
 ipcMain.handle('save-api-key', (event, apiKey) => {
-  const data = readData()
+  const data = dataManager.readData()
   data.apiKey = apiKey
-  const success = writeData(data)
+  const success = dataManager.writeData(data)
   
   if (success) {
     aiAssistant.setApiKey(apiKey)
@@ -710,9 +380,9 @@ ipcMain.on('music-get-devices', () => {
 ipcMain.on('music-set-device', (event, deviceId) => {
   musicProcess.setDevice(deviceId)
   // 保存设备ID到数据文件
-  const data = readData()
+  const data = dataManager.readData()
   data.audioDevice = deviceId
-  writeData(data)
+  dataManager.writeData(data)
 })
 
 // ============ AI助手 IPC 处理 ============
@@ -723,7 +393,6 @@ ipcMain.handle('ai-generate-plan', async (event, userInput) => {
 
 // ============ 前台检测 IPC 处理 ============
 
-// 查询前台检测是否就绪
 ipcMain.handle('foreground-is-ready', () => {
   return foregroundInspectionReady
 })
@@ -769,23 +438,16 @@ ipcMain.on('set-always-on-top', (event, onTop) => {
   }
 })
 
-// ============ 窗口抢占前台 IPC 处理 ============
-
 ipcMain.on('bring-to-front', (event) => {
-  // 获取主窗口（番茄钟窗口）
   const windows = BrowserWindow.getAllWindows()
   const mainWindow = windows.find(w => !w.isDestroyed())
   
   if (mainWindow) {
-    // 先设置置顶，确保能抢占前台
     mainWindow.setAlwaysOnTop(true)
-    // 显示窗口（如果被最小化）
     if (mainWindow.isMinimized()) {
       mainWindow.restore()
     }
-    // 抢占前台焦点
     mainWindow.focus()
-    // 移动到最上层
     mainWindow.moveTop()
   }
 })
@@ -799,9 +461,11 @@ ipcMain.on('cancel-always-on-top', (event) => {
   }
 })
 
+// ============ 应用生命周期 ============
+
 app.whenReady().then(() => {
-  // 初始化 Supabase
-  initSupabase()
+  // 初始化云端认证
+  cloudAuth.init()
   createWindow()
 
   app.on('activate', () => {
@@ -812,9 +476,7 @@ app.whenReady().then(() => {
 })
 
 app.on('window-all-closed', () => {
-  // 停止音乐播放器进程
   musicProcess.stop()
-  // 停止前台检测进程
   foregroundInspection.stop()
   
   if (process.platform !== 'darwin') {
@@ -823,8 +485,6 @@ app.on('window-all-closed', () => {
 })
 
 app.on('before-quit', () => {
-  // 确保在退出前停止音乐播放器进程
   musicProcess.stop()
-  // 确保在退出前停止前台检测进程
   foregroundInspection.stop()
 })
