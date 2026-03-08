@@ -236,7 +236,8 @@ function createWindow() {
   foregroundInspection.onReady((data) => {
     foregroundReady = true
     updateLoadingProgress()
-    win.webContents.send('foreground-ready', data)
+    // 使用 sendToRenderer 而不是 win.webContents.send，确保事件被缓存
+    sendToRenderer('foreground-ready', data)
   })
   
   foregroundInspection.onApiKeyInvalid((data) => {
