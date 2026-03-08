@@ -51,6 +51,30 @@
 
     // 设置 Electron 事件监听
     setupElectronListeners()
+    
+    // 预热：提前调用一次显示/隐藏流程，解决第一次警告弹窗不能正确置顶的问题
+    // 原理：让 Windows 系统提前准备好窗口置顶机制
+    warmUpBringToFront()
+  }
+
+  /**
+   * 预热窗口置顶功能
+   * 解决第一次警告弹窗不能正确置顶的问题
+   */
+  function warmUpBringToFront() {
+    if (window.electronAPI && elements.warningModal) {
+      // 快速执行一次显示/隐藏 + 置顶/取消置顶
+      elements.warningModal.classList.add('visible')
+      window.electronAPI.bringToFront()
+      // 使用 requestAnimationFrame 确保渲染一帧后再隐藏
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          elements.warningModal.classList.remove('visible')
+          window.electronAPI.cancelAlwaysOnTop()
+          console.log('[ForegroundDetection] 预热完成')
+        })
+      })
+    }
   }
 
   /**
