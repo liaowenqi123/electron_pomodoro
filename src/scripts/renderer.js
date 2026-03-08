@@ -8,6 +8,11 @@
   // ============ 加载数据 ============
   await DataStore.load()
 
+  // ============ 初始化备注模块 ============
+  if (window.NoteManager) {
+    NoteManager.init()
+  }
+
   // ============ 初始化统计模块 ============
   Stats.init({
     todayCount: DOM.todayCountEl,
@@ -40,13 +45,29 @@
   )
 
   // ============ 初始化计时器 ============
+    // 获取原有回调（如果存在）
+  const originalTimerCallbacks = Callbacks.getTimerCallbacks ? Callbacks.getTimerCallbacks() : {}
+  const timerCallbacks = {
+    ...originalTimerCallbacks,
+    onStart: function() {
+      // 计时开始时，显示备注按钮（如果有备注）
+      if (window.NoteManager) NoteManager.updateNoteButton()
+      if (originalTimerCallbacks.onStart) originalTimerCallbacks.onStart()
+    },
+    onComplete: function() {
+      // 计时完成时，保留原有逻辑
+      if (originalTimerCallbacks.onComplete) originalTimerCallbacks.onComplete()
+      // 备注不清除，等待用户重置
+    }
+  }
+
   Timer.init(
     {
       timeDisplay: DOM.timeDisplay,
       startBtn: DOM.startBtn,
       progressCircle: DOM.progressCircle
     },
-    Callbacks.getTimerCallbacks()
+    timerCallbacks
   )
 
   // ============ 初始化模式模块 ============
@@ -101,10 +122,7 @@
     deviceList: DOM.deviceList,
     volumeBtn: DOM.volumeBtn,
     volumeSlider: DOM.volumeSlider,
-    volumeRange: DOM.volumeRange,
-    collapseBtn: DOM.collapseBtn,
-    collapsedTrack: DOM.collapsedTrack,
-    visualizerBars: DOM.visualizerBars
+    volumeRange: DOM.volumeRange
   })
 
   // ============ 初始化前台检测模块 ============
@@ -113,7 +131,51 @@
   }
 
   // ============ 事件绑定 ============
+
+  DOM.startBtn.removeEventListener('click', Timer.toggle);
   
+  // 定义新的开始按钮处理函数
+  const newStartHandler = function() {
+    const isRunning = Timer.getIsRunning()
+    const isPaused = Timer.getIsPaused()
+
+    if (isRunning) {
+      // 正在运行 -> 暂停（专注模式下禁用，Timer.toggle 内部已处理）
+      Timer.toggle()
+      return
+    }
+
+    if (isPaused) {
+      // 暂停状态 -> 继续（不弹出备注）
+      Timer.toggle()
+      return
+    }
+
+    // 准备状态 -> 弹出备注
+    // 如果是计划模式且计划列表为空，则不允许开始
+    if (AppState.appMode === 'plan' && !PlanMode.hasPlan()) {
+      alert('请先添加计划任务')
+      return
+    }
+
+    // 显示备注编辑模态框，保存后真正开始计时
+    NoteManager.showEditModal((savedNote) => {
+      if (AppState.appMode === 'plan') {
+        // 计划模式：启动计划，获取第一个任务
+        const firstItem = PlanMode.startPlan()
+        if (firstItem) {
+          Timer.setTime(firstItem.minutes)
+          Timer.start()
+        }
+      } else {
+        // 单次模式：直接开始
+        Timer.start()
+      }
+    })
+  }
+
+  // 绑定新的事件
+  DOM.startBtn.addEventListener('click', newStartHandler)
   // 滚轮选择器回调
   WheelPicker.setChangeCallback((value) => {
     // 滚轮值变化时的处理
@@ -222,6 +284,8 @@
     // 先停止计时器
     Timer.reset()
     
+    NoteManager.clearNote()
+
     if (AppState.appMode === 'plan') {
       // 计划模式下，重置 = 停止整个计划，恢复到第一个计划
       PlanMode.stopPlan()
