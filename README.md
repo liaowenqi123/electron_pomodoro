@@ -15,6 +15,8 @@
 - 📖 **使用教程** - 内置应用使用说明
 - ➖ **窗口最小化** - 支持最小化到任务栏
 - ⏳ **启动加载页面** - 显示 Python 进程启动进度
+- ☁️ **云端登录** - 用户注册/登录，支持记住密码和自动登录
+- 🔑 **API Key 云端管理** - Admin 用户自动获取 DeepSeek API Key（内存中，不本地持久化）
 
 ## 📋 待办事项
 
@@ -197,42 +199,32 @@ AI规划助手可以根据您的自然语言描述，自动生成合理的番茄
 
 ##### 配置步骤
 
-###### 1. 获取 DeepSeek API 密钥
+###### 1. 云端登录（推荐）
 
-1. 访问 [DeepSeek 平台](https://platform.deepseek.com/)
-2. 注册账号并登录
-3. 在控制台创建 API Key
-4. 复制您的 API Key
-
-###### 2. 在应用中配置 API 密钥
-
-**方式一：通过界面配置（推荐）**
-
+**普通用户**：
 1. 启动番茄钟应用
-2. 点击顶部的 🔑 按钮打开 API Key 配置窗口
-3. 在输入框中粘贴您的 API Key
-4. 点击"保存"按钮
+2. 点击顶部的 ☁️ 按钮打开登录窗口
+3. 注册账号或使用已有账号登录
+4. 登录成功后可使用 AI 规划助手
 
-配置完成后，窗口会显示：
-- 当前配置状态（已配置/未配置）
-- 遮蔽后的 API Key（例如：sk-bb40...b66a）
-- AI 规划助手状态（✅ 可用 / ❌ 不可用）
-- 前台检测状态（✅ 可用 / ❌ 不可用）
+**Admin 用户**：
+1. 使用 Admin 账号登录
+2. 系统自动从云端获取 DeepSeek API Key
+3. API Key 仅存储在内存中，不进行本地持久化
+4. 开启专注模式时自动发送 API Key 到前台检测程序
 
-**方式二：手动编辑文件（不推荐）**
+**登录选项**：
+- **记住密码**：下次启动时自动填充用户名和密码
+- **自动登录**：下次启动时自动登录并配置 API Key
 
-如果需要手动配置，可以编辑以下文件：
+###### 2. 获取 Admin 权限
 
-1. 主进程配置：`src/modules/aiAssistant.js` 第 11 行
-2. 前台检测配置：`foreground_inspection/api_config.json`
+如需使用前台检测功能，需要 Admin 权限：
 
-但推荐使用界面配置，因为它会自动同步到所有需要的地方。
-
-###### 3. 验证配置
-
-点击顶部的 🔑 按钮，查看配置状态：
-- ✅ 已配置：显示遮蔽后的 API Key，两个功能都可用
-- ❌ 未配置：需要输入 API Key
+1. 在 Supabase Dashboard 中打开 `users` 表
+2. 找到您的用户记录
+3. 将 `admin` 字段设置为 `true`
+4. 重新登录即可
 
 ##### 使用方法
 
@@ -482,34 +474,30 @@ foreground_inspection/
 
 ##### 配置文件说明
 
-配置文件分为三个，位于 `foreground_inspection/` 目录下：
+配置文件位于 `foreground_inspection/` 目录下：
 
 | 文件名 | 说明 | 是否上传 Git |
 |--------|------|--------------|
-| `api_config.json` | API 密钥配置（**敏感信息**） | ❌ 不上传 |
 | `model_config.json` | 模型配置（API 地址、模型名称） | ✅ 上传 |
 | `list_config.json` | 黑白名单、历史记录 | ✅ 上传 |
 
+> **注意**：API Key 现在通过云端登录获取，不再使用本地配置文件。Admin 用户登录后，API Key 存储在内存中，开启专注模式时自动发送给前台检测程序。
+
 ---
 
-**1. api_config.json（需手动创建）**
-
-此文件包含 API 密钥，**不会上传到 Git**，需要手动创建。
-
-首次运行程序时会自动生成模板，或手动创建：
+**1. model_config.json（自动生成）**
 
 ```json
 {
-    "api_key": "your-api-key-here"
+    "base_url": "https://api.deepseek.com",
+    "model": "deepseek-chat"
 }
 ```
 
-**如何获取 API Key：**
-
-1. 访问 [DeepSeek 开放平台](https://platform.deepseek.com/)
-2. 注册/登录账号
-3. 进入「API Keys」页面，点击「创建 API Key」
-4. 复制生成的密钥，填入 `api_config.json`
+| 字段 | 说明 | 示例值 |
+|------|------|--------|
+| `base_url` | API 服务地址 | `https://api.deepseek.com` |
+| `model` | 使用的模型名称 | `deepseek-chat` |
 
 **其他兼容 API：**
 
@@ -524,23 +512,7 @@ foreground_inspection/
 
 ---
 
-**2. model_config.json（自动生成）**
-
-```json
-{
-    "base_url": "https://api.deepseek.com",
-    "model": "deepseek-chat"
-}
-```
-
-| 字段 | 说明 | 示例值 |
-|------|------|--------|
-| `base_url` | API 服务地址 | `https://api.deepseek.com` |
-| `model` | 使用的模型名称 | `deepseek-chat` |
-
----
-
-**3. list_config.json（自动生成）**
+**2. list_config.json（自动生成）**
 
 ```json
 {
@@ -573,8 +545,8 @@ foreground_inspection/
 **首次使用步骤：**
 
 1. 确保 `foreground_inspection/` 目录存在
-2. 在该目录下创建 `api_config.json`，填入你的 API Key
-3. 运行 `foreground_inspection.exe` 或 `python foreground_inspection.py`
+2. 在番茄钟应用中使用 Admin 账号登录（API Key 自动获取）
+3. 开启专注模式，API Key 会自动发送给前台检测程序
 4. 程序会自动生成 `model_config.json` 和 `list_config.json`（如不存在）
 
 ### ✅ 已完成
@@ -589,6 +561,8 @@ foreground_inspection/
 - ~~📝 **番茄计划模式** - 创建计划列表自动依次执行~~
 - ~~📊 **数据持久化** - 统计数据本地存储~~
 - ~~🎯 **惩罚奖励机制（第一阶段）** - 数据层：菜园子数据结构~~
+- ~~☁️ **云端登录** - 用户注册/登录，记住密码，自动登录~~
+- ~~🔑 **API Key 云端管理** - Admin 用户自动获取，内存存储，专注模式时发送~~
 - ~~🎯 **惩罚奖励机制（第二阶段）** - 专注模式开关 UI~~
 - ~~🎯 **惩罚奖励机制（第三阶段）** - 菜园子页面和窗口~~
 - ~~🔒 **前台专注检测（第一阶段）** - 基础检测能力：窗口标题获取、黑白名单匹配、历史记录~~

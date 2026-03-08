@@ -162,6 +162,15 @@
     state.warningCount = 0
     state.isDetecting = true
     
+    // 在开始检测前，发送 API Key 给 Python
+    if (window.CloudAuth && window.CloudAuth.hasApiKey()) {
+      const apiKey = window.CloudAuth.getApiKey()
+      if (window.electronAPI) {
+        window.electronAPI.foregroundSetApiKey(apiKey)
+        console.log('[ForegroundDetection] 已发送 API Key 到前台检测')
+      }
+    }
+    
     if (window.electronAPI) {
       window.electronAPI.foregroundStart()
     }

@@ -23,13 +23,41 @@ const { contextBridge, ipcRenderer } = require('electron')
   // 写入数据
   writeData: (data) => ipcRenderer.invoke('write-data', data),
 
-  // ============ API Key 管理 API ============
+  // ============ API Key 管理 API（保留兼容） ============
   
   // 获取API Key
   getApiKey: () => ipcRenderer.invoke('get-api-key'),
   
   // 保存API Key
   saveApiKey: (apiKey) => ipcRenderer.invoke('save-api-key', apiKey),
+
+  // ============ 云端登录 API ============
+  
+  // 测试云端连接
+  cloudTestConnection: () => ipcRenderer.invoke('cloud-test-connection'),
+  
+  // 获取当前会话
+  cloudGetSession: () => ipcRenderer.invoke('cloud-get-session'),
+  
+  // 登录
+  cloudLogin: (credentials) => ipcRenderer.invoke('cloud-login', credentials),
+  
+  // 注册
+  cloudRegister: (userData) => ipcRenderer.invoke('cloud-register', userData),
+  
+  // 退出登录
+  cloudLogout: () => ipcRenderer.invoke('cloud-logout'),
+
+  // ============ 凭据存储 API ============
+  
+  // 保存凭据
+  saveCredentials: (credentials) => ipcRenderer.invoke('save-credentials', credentials),
+  
+  // 加载凭据
+  loadCredentials: () => ipcRenderer.invoke('load-credentials'),
+  
+  // 清除凭据
+  clearCredentials: () => ipcRenderer.invoke('clear-credentials'),
 
   // ============ 音乐播放器控制 ============
   
@@ -124,6 +152,7 @@ const { contextBridge, ipcRenderer } = require('electron')
   foregroundStart: () => ipcRenderer.send('foreground-start'),
   foregroundStop: () => ipcRenderer.send('foreground-stop'),
   foregroundGetStatus: () => ipcRenderer.send('foreground-get-status'),
+  foregroundSetApiKey: (apiKey) => ipcRenderer.send('foreground-set-api-key', apiKey),
   foregroundAddWhitelist: (keyword) => ipcRenderer.send('foreground-add-whitelist', keyword),
   foregroundAddBlacklist: (keyword) => ipcRenderer.send('foreground-add-blacklist', keyword),
   foregroundMarkHistoryNot: (windowTitle) => ipcRenderer.send('foreground-mark-history-not', windowTitle),

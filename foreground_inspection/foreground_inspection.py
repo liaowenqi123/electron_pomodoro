@@ -7,6 +7,7 @@
   - {"command": "start"} - 开始检测
   - {"command": "stop"} - 停止检测
   - {"command": "get_status"} - 获取当前状态
+  - {"command": "set_api_key", "api_key": "xxx"} - 设置 API Key（运行时）
   - {"command": "add_whitelist", "keyword": "xxx"} - 添加到白名单
   - {"command": "add_blacklist", "keyword": "xxx"} - 添加到黑名单
   
@@ -45,16 +46,11 @@ def get_base_path():
 
 
 BASE_PATH = get_base_path()
-API_CONFIG_FILE = os.path.join(BASE_PATH, "api_config.json")
 MODEL_CONFIG_FILE = os.path.join(BASE_PATH, "model_config.json")
 LIST_CONFIG_FILE = os.path.join(BASE_PATH, "list_config.json")
 
 
 # ============ 默认配置 ============
-
-DEFAULT_API_CONFIG = {
-    "api_key": "<your api key>"
-}
 
 DEFAULT_MODEL_CONFIG = {
     "base_url": "https://api.deepseek.com",
@@ -102,11 +98,6 @@ def save_json_file(file_path, config):
         json.dump(config, f, ensure_ascii=False, indent=4)
 
 
-def load_api_config():
-    """加载 API 密钥配置"""
-    return load_json_file(API_CONFIG_FILE, DEFAULT_API_CONFIG)
-
-
 def load_model_config():
     """加载模型配置（base_url, model）"""
     return load_json_file(MODEL_CONFIG_FILE, DEFAULT_MODEL_CONFIG)
@@ -122,16 +113,14 @@ def save_list_config(config):
     save_json_file(LIST_CONFIG_FILE, config)
 
 
-def validate_api_key(api_config, model_config):
+def validate_api_key(api_key, model_config):
     """
     验证 API key 是否有效
     返回: (is_valid, error_message)
     注意：无效时不报错，只是返回 False，让后续逻辑跳过 AI 验证
     """
-    api_key = api_config.get("api_key", "")
-    
-    # 检查是否是默认值或空
-    if not api_key or api_key == "<your api key>" or api_key == "":
+    # 检查是否是空值
+    if not api_key:
         return False, None
     
     # 尝试一次简单请求验证
@@ -181,7 +170,7 @@ def check_list(window_title, keyword_list):
     return False
 
 
-def check_is_entertainment(window_title, api_config, model_config, list_config, api_key_valid=True):
+def check_is_entertainment(window_title, api_key, model_config, list_config, api_key_valid=True):
     """
     检查窗口是否为娱乐类应用
     优先级：白名单 -> 黑名单 -> 历史记录 -> AI API
@@ -215,7 +204,7 @@ def check_is_entertainment(window_title, api_config, model_config, list_config, 
     # 5. 调用 AI API
     try:
         client = OpenAI(
-            api_key=api_config.get("api_key", "<your api key>"),
+            api_key=api_key,
             base_url=model_config.get("base_url", "https://api.deepseek.com"),
         )
         
@@ -264,7 +253,7 @@ class DetectionState:
         self.lock = threading.Lock()
         
         # 配置
-        self.api_config = None
+        self.api_key = None  # API Key（运行时设置，内存中）
         self.model_config = None
         self.list_config = None
         self.api_key_valid = False  # API Key 是否有效
@@ -311,6 +300,24 @@ def process_command(command_obj):
     
     elif command == "get_status":
         state.send_status()
+    
+    elif command == "set_api_key":
+        # 运行时设置 API Key
+        api_key = command_obj.get("api_key")
+        with state.lock:
+            state.api_key = api_key
+            # 验证新的 API Key
+            if api_key:
+                is_valid, _ = validate_api_key(api_key, state.model_config)
+                state.api_key_valid = is_valid
+                if is_valid:
+                    print("API key 设置成功，AI 识别功能可用", file=sys.stderr)
+                else:
+                    print("API key 无效，AI 识别功能不可用", file=sys.stderr)
+            else:
+                state.api_key_valid = False
+                print("API key 已清除", file=sys.stderr)
+            state.send_event("api_key_updated", {"valid": state.api_key_valid})
     
     elif command == "add_whitelist":
         keyword = command_obj.get("keyword")
@@ -388,20 +395,11 @@ def detection_loop():
     """检测循环（主线程）"""
     print("前台检测程序已启动，等待命令...", file=sys.stderr)
     
-    # 验证 API key（静默验证，无效时跳过 AI 功能）
-    is_valid, _ = validate_api_key(state.api_config, state.model_config)
-    state.api_key_valid = is_valid
-    
-    if is_valid:
-        print("API key 验证成功，AI 识别功能可用", file=sys.stderr)
-    else:
-        print("API key 未配置或无效，AI 识别功能不可用（仅使用黑白名单匹配）", file=sys.stderr)
-    
-    # 发送准备就绪事件
+    # 发送准备就绪事件（API Key 需要运行时设置）
     state.send_event("ready", {
         "whitelist_count": len(state.list_config.get("whitelist", [])),
         "blacklist_count": len(state.list_config.get("blacklist", [])),
-        "api_key_valid": is_valid
+        "api_key_valid": False  # 初始时没有 API Key
     })
     
     last_check_time = 0
@@ -430,7 +428,7 @@ def detection_loop():
                 if current_title:  # 非空标题才查询
                     # 判断是否为娱乐应用
                     is_entertainment, source, keyword, state.list_config = check_is_entertainment(
-                        current_title, state.api_config, state.model_config, state.list_config, state.api_key_valid
+                        current_title, state.api_key, state.model_config, state.list_config, state.api_key_valid
                     )
                     
                     with state.lock:
@@ -459,12 +457,12 @@ def detection_loop():
 # ============ 主程序 ============
 
 if __name__ == "__main__":
-    # 加载配置
-    state.api_config = load_api_config()
+    # 加载配置（不再加载 API 配置文件）
     state.model_config = load_model_config()
     state.list_config = load_list_config()
     
     print(f"API 地址: {state.model_config.get('base_url')} | 模型: {state.model_config.get('model')}", file=sys.stderr)
+    print("等待 Electron 发送 API Key...", file=sys.stderr)
     
     # 启动stdin读取线程
     stdin_thread = threading.Thread(target=stdin_reader, daemon=True)

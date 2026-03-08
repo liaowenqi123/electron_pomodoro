@@ -22,9 +22,8 @@ class ForegroundInspection {
   /**
    * 启动前台检测进程
    * @param {string} exePath - foreground_inspection.exe 的路径
-   * @param {string} apiKey - API Key（启动前写入配置）
    */
-  start(exePath, apiKey = null) {
+  start(exePath) {
     if (this.process) {
       console.log('[ForegroundInspection] 进程已在运行')
       return
@@ -33,11 +32,6 @@ class ForegroundInspection {
     const fullPath = exePath || path.join(__dirname, '../../foreground_inspection/foreground_inspection.exe')
     
     try {
-      // 在启动进程前，先写入 API Key 配置
-      if (apiKey !== null) {
-        this.writeApiKeyConfig(fullPath, apiKey)
-      }
-
       this.process = spawn(fullPath, [], {
         stdio: ['pipe', 'pipe', 'pipe'],
         cwd: path.dirname(fullPath),
@@ -258,39 +252,16 @@ class ForegroundInspection {
   }
 
   /**
-   * 写入 API Key 配置文件
-   * @param {string} exePath - exe 路径（用于确定配置文件位置）
-   * @param {string} apiKey - API Key
-   */
-  writeApiKeyConfig(exePath, apiKey) {
-    const fs = require('fs')
-    const configDir = path.dirname(exePath)
-    const configPath = path.join(configDir, 'api_config.json')
-
-    try {
-      const config = { api_key: apiKey || '' }
-      fs.writeFileSync(configPath, JSON.stringify(config, null, 4), 'utf-8')
-      console.log('[ForegroundInspection] API Key 配置已写入:', configPath)
-      return true
-    } catch (err) {
-      console.error('[ForegroundInspection] 写入 API Key 配置失败:', err)
-      return false
-    }
-  }
-
-  /**
-   * 设置API Key（运行时更新）
-   * @param {string} apiKey - DeepSeek API Key
+   * 设置API Key（运行时通过 stdin 发送）
+   * @param {string|null} apiKey - DeepSeek API Key，null 表示清除
    */
   setApiKey(apiKey) {
-    if (this.process) {
-      // 进程已运行，写入配置文件
-      const exePath = this.process.spawnfile
-      return this.writeApiKeyConfig(exePath, apiKey)
+    if (!this.process || !this.process.stdin.writable) {
+      // 进程未运行时静默返回（比如退出登录时进程可能已停止）
+      console.log('[ForegroundInspection] 进程未运行，跳过设置 API Key')
+      return false
     }
-    // 进程未运行，写入默认位置
-    const defaultPath = path.join(__dirname, '../../foreground_inspection/foreground_inspection.exe')
-    return this.writeApiKeyConfig(defaultPath, apiKey)
+    return this.sendCommand({ command: 'set_api_key', api_key: apiKey || '' })
   }
 
   // ============ 回调设置 ============

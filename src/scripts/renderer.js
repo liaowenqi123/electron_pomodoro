@@ -72,24 +72,18 @@
     aiApplyBtn: DOM.aiApplyBtn
   })
 
-  // ============ 初始化API Key管理器 ============
-  APIKeyManager.init({
-    apiKeyModal: document.getElementById('apiKeyModal'),
-    apiKeyInput: document.getElementById('apiKeyInput'),
-    apiKeySave: document.getElementById('apiKeySave'),
-    apiKeyCancel: document.getElementById('apiKeyCancel')
-  })
-
-  // 静默检查API Key（不自动弹窗）
-  const hasApiKey = await APIKeyManager.checkAndPrompt()
-  if (!hasApiKey) {
-    console.log('未配置API Key，可通过顶部按钮配置')
+  // ============ 初始化云端登录模块 ============
+  if (window.CloudAuth) {
+    CloudAuth.init()
+    
+    // 登录成功后的回调
+    CloudAuth.onLogin((user, deepseekKey) => {
+      console.log('用户已登录:', user.username)
+      if (deepseekKey) {
+        console.log('DeepSeek API Key 已获取')
+      }
+    })
   }
-
-  // 当保存API Key后，更新AI助手和前台检测
-  APIKeyManager.onSave(async (apiKey) => {
-    console.log('API Key已保存，功能已启用')
-  })
 
   // ============ 初始化音乐播放器 ============
   MusicPlayer.init({
