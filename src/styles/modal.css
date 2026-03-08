@@ -453,3 +453,173 @@
 .confirm-btn-confirm:hover {
   background: rgba(220, 80, 80, 1);
 }
+
+/* 备注按钮 */
+.note-button-container {
+  text-align: center;
+  margin: 10px 0;
+}
+.btn-note {
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  max-width: 200px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  transition: all 0.3s;
+}
+.btn-note:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* 备注模态框 */
+.note-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 400;
+  border-radius: 20px;
+}
+.note-modal.show {
+  display: flex;
+}
+
+/* 弹窗显示时应用弹跳动画 */
+.note-modal.show .note-modal-content {
+  animation: noteBounceIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.note-modal-content {
+  background: linear-gradient(135deg, #6ab0f5, #4a90e2);
+  border-radius: 15px;
+  padding: 25px;
+  width: 280px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+   border: 2px solid #ffffff;
+  color: #fff;
+}
+.note-modal-content h3 {
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+.note-form label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+.note-form .required {
+  color: #ffaaaa;
+}
+.note-form .optional {
+  color: rgba(255,255,255,0.6);
+  font-size: 12px;
+}
+.note-form input,
+.note-form textarea {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 15px;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+.note-form input::placeholder,
+.note-form textarea::placeholder {
+  color: rgba(255,255,255,0.5);
+}
+.note-form textarea {
+  resize: vertical;
+}
+.note-modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+.note-modal-buttons button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.btn-note-cancel {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.5) !important;
+  color: #fff;
+}
+.btn-note-cancel:hover {
+  background: rgba(255,255,255,0.15);
+}
+.btn-note-save,
+.btn-note-close {
+  background: rgba(92, 140, 222, 0.5);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important; 
+}
+.btn-note-save:hover,
+.btn-note-close:hover {
+  background: rgba(92, 140, 222, 0.5);
+  color: #fff;
+}
+.note-view-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  word-break: break-word;
+}
+.note-view-detail {
+  font-size: 14px;
+  background: rgba(0,0,0,0.2);
+  padding: 12px;
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-bottom: 15px;
+}
+/* 休息模式下的备注弹窗 */
+.container.break-mode .note-modal-content,
+.window-frame.break-mode .note-modal-content {
+  background: rgba(165, 214, 165, 0.85);
+  backdrop-filter: blur(8px);
+  border: 2px solid #ffffff; }
+
+  /* 备注弹窗弹跳动画 */
+@keyframes noteBounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) translateY(-20px);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.08) translateY(5px);
+  }
+  60% {
+    transform: scale(0.96) translateY(-2px);
+  }
+  80% {
+    transform: scale(1.02) translateY(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
