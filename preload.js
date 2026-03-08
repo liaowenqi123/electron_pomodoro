@@ -93,6 +93,15 @@ const { contextBridge, ipcRenderer } = require('electron')
     ipcRenderer.on('refresh-garden', () => callback())
   },
 
+  // 更新专注模式状态（供主窗口调用）
+  updateFocusMode: (enabled) => ipcRenderer.send('update-focus-mode', enabled),
+
+  // 更新计时器状态（供主窗口调用）
+  updateTimerStatus: (running, paused) => ipcRenderer.send('update-timer-status', running, paused),
+
+  // 查询计时器状态（供菜园子窗口调用）
+  getTimerState: () => ipcRenderer.invoke('get-timer-state'),
+
   // ============ AI助手 API ============
   
   // 生成AI计划

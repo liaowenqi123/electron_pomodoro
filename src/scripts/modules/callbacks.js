@@ -24,6 +24,13 @@
       },
       
       onStatusChange: (status) => {
+        // 通知主进程更新计时器状态
+        if (window.electronAPI && window.electronAPI.updateTimerStatus) {
+          const isRunning = status === 'running'
+          const isPaused = status === 'paused'
+          window.electronAPI.updateTimerStatus(isRunning, isPaused)
+        }
+
         if (AppState.appMode === 'single') {
           const mode = Mode.getMode()
           if (status === 'running') {

@@ -251,10 +251,17 @@
    * 种植作物
    */
   async function plantCrop(plotIndex, cropKey) {
-    // 专注模式下禁止种植
-    if (window.AppState && window.AppState.focusModeEnabled && window.Timer && window.Timer.getIsRunning()) {
-      updateTip('专注模式下无法种植作物，请先停止专注')
-      return
+    // 通过 IPC 查询专注模式和计时器状态
+    if (window.electronAPI && window.electronAPI.getTimerState) {
+      try {
+        const state = await window.electronAPI.getTimerState()
+        if (state.focusModeEnabled && state.timerRunning) {
+          updateTip('专注模式下无法种植作物，请先停止专注')
+          return
+        }
+      } catch (e) {
+        console.error('获取计时器状态失败:', e)
+      }
     }
 
     const seeds = gardenData.seeds || {}

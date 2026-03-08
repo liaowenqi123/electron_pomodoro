@@ -119,6 +119,9 @@
         DOM.focusModeStatus.classList.toggle('active', AppState.focusModeEnabled)
       }
       
+      // 通知主进程更新专注模式状态
+      window.electronAPI.updateFocusMode(AppState.focusModeEnabled)
+      
       // 更新菜园子按钮状态
       updateGardenButtonState()
       

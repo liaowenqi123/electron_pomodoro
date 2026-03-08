@@ -9,6 +9,11 @@ const musicProcess = require('./src/modules/musicProcess')
 const aiAssistant = require('./src/modules/aiAssistant')
 const foregroundInspection = require('./src/modules/foregroundInspection')
 
+// 专注模式和计时器状态（供菜园子窗口查询）
+let focusModeEnabled = false
+let timerRunning = false
+let timerPaused = false
+
 // 数据文件路径
 let dataFilePath = null
 
@@ -338,6 +343,26 @@ ipcMain.on('close-garden', () => {
 ipcMain.on('refresh-garden', () => {
   if (gardenWindow && !gardenWindow.isDestroyed()) {
     gardenWindow.webContents.send('refresh-garden')
+  }
+})
+
+// 更新专注模式状态
+ipcMain.on('update-focus-mode', (event, enabled) => {
+  focusModeEnabled = enabled
+})
+
+// 更新计时器状态
+ipcMain.on('update-timer-status', (event, running, paused) => {
+  timerRunning = running
+  timerPaused = paused
+})
+
+// 查询专注模式和计时器状态（供菜园子窗口调用）
+ipcMain.handle('get-timer-state', () => {
+  return {
+    focusModeEnabled: focusModeEnabled,
+    timerRunning: timerRunning,
+    timerPaused: timerPaused
   }
 })
 
