@@ -192,9 +192,23 @@ const AIHelper = (function() {
     
     elements.aiResult.innerHTML = html
     
-    // 显示应用按钮
+    // 显示应用按钮，并根据番茄钟状态设置禁用状态
     if (elements.aiApplyBtn) {
+      const isTimerRunning = window.Timer && window.Timer.getIsRunning()
+      
       elements.aiApplyBtn.style.display = 'block'
+      elements.aiApplyBtn.disabled = isTimerRunning
+      
+      if (isTimerRunning) {
+        elements.aiApplyBtn.style.opacity = '0.5'
+        elements.aiApplyBtn.style.cursor = 'not-allowed'
+        elements.aiApplyBtn.title = '请先停止当前番茄钟'
+      } else {
+        elements.aiApplyBtn.style.opacity = '1'
+        elements.aiApplyBtn.style.cursor = 'pointer'
+        elements.aiApplyBtn.title = ''
+      }
+      
       // 保存计划数据到按钮
       elements.aiApplyBtn.dataset.plan = JSON.stringify(data.plan)
     }
@@ -204,6 +218,12 @@ const AIHelper = (function() {
    * 应用计划到番茄钟
    */
   async function handleApplyPlan() {
+    // 检查番茄钟是否正在运行
+    if (window.Timer && window.Timer.getIsRunning()) {
+      showError('请先停止当前番茄钟再应用计划')
+      return
+    }
+
     const planData = elements.aiApplyBtn?.dataset.plan
     
     if (!planData) {
