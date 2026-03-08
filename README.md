@@ -168,12 +168,23 @@
 #### ygd板块 备注功能 深色模式
 - **在...（哪里）增加备注，允许用户...**
 - **深色模式**
+- ##### 功能介绍
+提供亮色/深色两种主题切换，保护用户夜间使用时的视力，提升使用体验。
 - ✅ 1.1 在 index.html 添加主题切换按钮（位于 header-buttons 容器）
 - ✅ 1.2 创建 theme.js 模块，管理主题切换逻辑
 - ✅ 1.3 扩展 utils.js 默认数据结构，添加 theme 字段
 - ✅ 1.4 扩展 dataStore.js，添加 getTheme/updateTheme 方法
 - ✅ 1.5 在 renderer.js 中初始化主题模块
 - ✅ 1.6 添加 CSS 变量并修改各样式文件，实现颜色切换
+      1.6.1 在 base.css 中添加 CSS 变量，定义亮色/深色配色方案（包括主渐变、侧边栏背景、边框等）
+      1.6.2 修改 main-content.css、sidebar.css、modal.css 等样式文件，将固定颜色替换为 CSS 变量
+      1.6.3 适配休息模式：修改 modes.css，使 .container.break-mode 使用深色变量，实现休息模式独立深色背景
+      1.6.4 修改 modes.css，使计划模式下工作/休息的主内容区背景使用深色变量
+            为计划模式侧边栏添加专用变量 --plan-sidebar-work-bg 和 --plan-sidebar-break-bg，并在深色模式下定义对应值
+            修改 sidebar.css，将计划项背景、删除按钮、拖拽手柄等颜色替换为变量
+      1.6.5 进度条颜色跟随模式：在 main-content.css 中为进度条添加 --progress-work-stroke 和 --progress-break-stroke 变量，并              在深色模式下设置暗色值
+
+
   ##### 界面修改
   | header-buttons 容器 | 添加主题切换按钮（🌙/☀️） |
 - **...**
