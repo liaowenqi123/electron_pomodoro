@@ -14,6 +14,37 @@
   <link rel="stylesheet" href="styles/ai-helper.css">
   <link rel="stylesheet" href="styles/api-key-modal.css">
 </head>
+    <!-- 备注编辑模态框 -->
+    <div class="note-modal" id="noteEditModal">
+      <div class="note-modal-content">
+        <h3>添加备注</h3>
+        <div class="note-form">
+          <label for="noteTitleInput">标题 <span class="required">*</span></label>
+          <input type="text" id="noteTitleInput" maxlength="50" placeholder="例如：复习数学或小憩一下">
+          
+          <label for="noteDetailInput">详细备注 <span class="optional">(可选)</span></label>
+          <textarea id="noteDetailInput" rows="4" placeholder="可以写下具体计划或想法..."></textarea>
+        </div>
+        <div class="note-modal-buttons">
+          <button class="btn-note-cancel" id="noteCancelBtn">取消</button>
+          <button class="btn-note-save" id="noteSaveBtn">完成</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 备注查看模态框 -->
+    <div class="note-modal" id="noteViewModal">
+      <div class="note-modal-content">
+        <h3>备注详情</h3>
+        <div class="note-view">
+          <div class="note-view-title" id="viewNoteTitle"></div>
+          <div class="note-view-detail" id="viewNoteDetail"></div>
+        </div>
+        <div class="note-modal-buttons">
+          <button class="btn-note-close" id="noteViewCloseBtn">关闭</button>
+        </div>
+      </div>
+    </div>
 <body>
   <div class="window-frame">
     <div class="container">
@@ -121,6 +152,11 @@
           </div>
         </div>
         
+        <!-- 备注按钮容器 -->
+        <div class="note-button-container" id="noteButtonContainer" style="display: none;">
+          <button class="btn-note" id="showNoteBtn" title="查看备注"></button>
+        </div>
+
         <!-- 专注模式开关 -->
         <div class="focus-mode-container">
           <span class="focus-mode-label">专注模式</span>
@@ -381,6 +417,7 @@
   <script src="scripts/modules/wheelPicker.js"></script>
   <script src="scripts/modules/presets.js"></script>
   <script src="scripts/modules/planMode.js"></script>
+    <script src="scripts/modules/noteManager.js"></script>
   <script src="scripts/modules/timer.js"></script>
   <script src="scripts/modules/mode.js"></script>
   <script src="scripts/modules/musicPlayer.js"></script>
