@@ -8,6 +8,7 @@ const AIHelper = (function() {
 
   let elements = {}
   let isProcessing = false
+  let currentRequestId = 0
 
   /**
    * 初始化AI助手
@@ -28,13 +29,13 @@ const AIHelper = (function() {
 
     // 关闭弹窗
     if (elements.aiModalClose) {
-      elements.aiModalClose.addEventListener('click', hideAIModal)
+      elements.aiModalClose.addEventListener('click', handleCloseClick)
     }
 
-    // 点击背景关闭
+    // 点击背景关闭（仅在非生成状态）
     if (elements.aiModal) {
       elements.aiModal.addEventListener('click', (e) => {
-        if (e.target === elements.aiModal) {
+        if (e.target === elements.aiModal && !isProcessing) {
           hideAIModal()
         }
       })
@@ -62,11 +63,77 @@ const AIHelper = (function() {
   }
 
   /**
+   * 处理关闭按钮点击
+   */
+  function handleCloseClick() {
+    if (isProcessing) {
+      // 正在生成，显示确认提示
+      showConfirmDialog()
+    } else {
+      // 不在生成，直接关闭
+      hideAIModal()
+    }
+  }
+
+  /**
+   * 显示确认对话框
+   */
+  function showConfirmDialog() {
+    const dialog = document.createElement('div')
+    dialog.className = 'ai-confirm-dialog'
+    dialog.innerHTML = `
+      <div class="ai-confirm-content">
+        <div class="ai-confirm-icon">⚠️</div>
+        <div class="ai-confirm-title">计划正在生成中</div>
+        <div class="ai-confirm-message">确定要关闭吗？</div>
+        <div class="ai-confirm-buttons">
+          <button class="ai-confirm-btn ai-confirm-btn-cancel" id="aiConfirmCancel">否</button>
+          <button class="ai-confirm-btn ai-confirm-btn-confirm" id="aiConfirmOk">是</button>
+        </div>
+      </div>
+    `
+    
+    document.body.appendChild(dialog)
+    
+    // 触发动画
+    setTimeout(() => {
+      dialog.classList.add('show')
+    }, 10)
+    
+    // 绑定按钮事件
+    const cancelBtn = dialog.querySelector('#aiConfirmCancel')
+    const okBtn = dialog.querySelector('#aiConfirmOk')
+    
+    cancelBtn.addEventListener('click', () => {
+      hideConfirmDialog(dialog)
+    })
+    
+    okBtn.addEventListener('click', () => {
+      hideConfirmDialog(dialog)
+      hideAIModal()
+    })
+  }
+
+  /**
+   * 隐藏确认对话框
+   */
+  function hideConfirmDialog(dialog) {
+    dialog.classList.remove('show')
+    setTimeout(() => {
+      dialog.remove()
+    }, 300)
+  }
+
+  /**
    * 显示AI助手弹窗
    */
   function showAIModal() {
     if (elements.aiModal) {
+      // 确保状态已重置
+      isProcessing = false
+      
       elements.aiModal.classList.add('show')
+      
       // 清空之前的内容
       if (elements.aiInput) {
         elements.aiInput.value = ''
@@ -76,6 +143,7 @@ const AIHelper = (function() {
       }
       if (elements.aiApplyBtn) {
         elements.aiApplyBtn.style.display = 'none'
+        elements.aiApplyBtn.dataset.plan = ''
       }
     }
   }
@@ -86,6 +154,24 @@ const AIHelper = (function() {
   function hideAIModal() {
     if (elements.aiModal) {
       elements.aiModal.classList.remove('show')
+      
+      // 取消当前请求（通过增加requestId使旧请求失效）
+      currentRequestId++
+      
+      // 清空所有内容和状态
+      if (elements.aiInput) {
+        elements.aiInput.value = ''
+      }
+      if (elements.aiResult) {
+        elements.aiResult.innerHTML = ''
+      }
+      if (elements.aiApplyBtn) {
+        elements.aiApplyBtn.style.display = 'none'
+        elements.aiApplyBtn.dataset.plan = ''
+      }
+      
+      // 重置生成状态
+      isProcessing = false
     }
   }
 
@@ -105,10 +191,16 @@ const AIHelper = (function() {
     }
 
     isProcessing = true
+    const requestId = ++currentRequestId
     showLoading()
 
     try {
       const result = await window.electronAPI.aiGeneratePlan(input)
+      
+      // 检查请求是否已过期（弹窗已关闭）
+      if (requestId !== currentRequestId) {
+        return
+      }
       
       if (result.success) {
         displayPlan(result.data)
@@ -116,10 +208,18 @@ const AIHelper = (function() {
         showError(result.error || '生成计划失败，请重试')
       }
     } catch (error) {
+      // 检查请求是否已过期
+      if (requestId !== currentRequestId) {
+        return
+      }
+      
       console.error('AI助手错误:', error)
       showError('网络错误，请检查连接后重试')
     } finally {
-      isProcessing = false
+      // 只有当前请求才重置状态
+      if (requestId === currentRequestId) {
+        isProcessing = false
+      }
     }
   }
 
