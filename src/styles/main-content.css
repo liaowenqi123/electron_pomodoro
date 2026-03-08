@@ -255,15 +255,15 @@
 
 /* 播放器收起时，增加内部元素间距 - 使用 transform 避免颤抖 */
 .main-content:has(.music-player.collapsed) .timer-section .title {
-  transform: translateY(-4px);
+  transform: translateY(-3px);
 }
 
 .main-content:has(.music-player.collapsed) .timer-section .mode-switch {
-  transform: translateY(-4px);
+  transform: translateY(-3px);
 }
 
 .main-content:has(.music-player.collapsed) .timer-section .timer-container {
-  transform: scale(1.02);
+  transform: scale(1.01);
 }
 
 .main-content:has(.music-player.collapsed) .timer-section .focus-mode-container {
@@ -271,21 +271,22 @@
 }
 
 .main-content:has(.music-player.collapsed) .timer-section .buttons {
-  transform: translateY(4px);
+  transform: translateY(3px);
 }
 
 .main-content:has(.music-player.collapsed) .timer-section .status {
-  transform: translateY(8px);
+  transform: translateY(7px);
 }
 
-/* 计时器内部元素添加过渡动画 */
+/* 计时器内部元素添加过渡动画 - 延迟0.05s开始，总共0.2s（在主动画0.3s结束前0.05s结束） */
 .timer-section .title,
 .timer-section .mode-switch,
 .timer-section .timer-container,
 .timer-section .focus-mode-container,
 .timer-section .buttons,
 .timer-section .status {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.10s cubic-bezier(0.4, 0, 0.2, 1);
+  transition-delay: 0.1s;
 }
 
 /* ============ 顶部按钮组 ============ */
