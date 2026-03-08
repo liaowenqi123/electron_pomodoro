@@ -58,7 +58,7 @@
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  border: 1px solid transparent;
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .preset-item:hover {
@@ -141,7 +141,7 @@
   border-radius: 8px;
   cursor: grab;
   transition: all 0.2s ease;
-  border: 1px solid transparent;
+  border: 2px solid transparent;
 }
 
 .plan-item.work {
@@ -195,7 +195,7 @@
   height: 18px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.1);
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.5);
   color: rgba(255, 255, 255, 0.6);
   font-size: 12px;
   cursor: pointer;
@@ -233,7 +233,7 @@
   flex: 1;
   height: 28px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   color: #fff;
   font-size: 14px;
   font-weight: bold;
@@ -246,7 +246,7 @@
 
 .btn-add-work {
   background: linear-gradient(135deg, rgba(200, 100, 100, 0.5), rgba(180, 80, 80, 0.4));
-  border-color: rgba(255, 150, 150, 0.4);
+  border-color: rgba(250, 249, 249, 0.4);
 }
 
 .btn-add-work:hover {
@@ -255,7 +255,7 @@
 
 .btn-add-break {
   background: linear-gradient(135deg, rgba(80, 160, 100, 0.5), rgba(60, 140, 80, 0.4));
-  border-color: rgba(150, 220, 170, 0.4);
+  border-color: rgba(253, 253, 253, 0.4);
 }
 
 .btn-add-break:hover {
@@ -288,7 +288,7 @@
   width: 55px;
   height: 32px;
   background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.4);
   border-radius: 8px;
   overflow: hidden;
   cursor: ns-resize;
@@ -403,4 +403,7 @@
 
 .sidebar-stats .stat-unit {
   color: rgba(255, 255, 255, 0.6);
+}
+.plan-list .plan-item {
+border: 2px solid rgba(255, 255, 255, 0.5);
 }
