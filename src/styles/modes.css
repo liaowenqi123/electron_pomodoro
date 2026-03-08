@@ -9,14 +9,19 @@
   background: transparent;
 }
 
-.container.plan-mode .sidebar,
-.container.plan-mode.break-mode .sidebar {
-  background: rgba(50, 60, 80, 0.75);
-  border-right-color: rgba(100, 120, 150, 0.3);
+
+.container.plan-mode .sidebar {
+  background: var(--plan-sidebar-work-bg);
+  border-right-color: var(--plan-sidebar-border);
 }
 
+
+.container.plan-mode.break-mode .sidebar {
+  background: var(--plan-sidebar-break-bg);
+  border-right-color: var(--plan-sidebar-border);
+}
 .container.plan-mode .main-content {
-  background: linear-gradient(135deg, rgba(200, 100, 100, 0.88), rgba(180, 110, 110, 0.78));
+  background: linear-gradient(135deg, var(--container-gradient-start), var(--container-gradient-end));
   border-radius: 0 20px 20px 0;
 }
 
@@ -50,11 +55,6 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
-.container.break-mode .progress-ring .progress {
-  stroke: rgba(255, 255, 255, 0.85);
-  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
-}
-
 .container.break-mode .timer-inner {
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
   border-color: rgba(255, 255, 255, 0.12);
@@ -66,4 +66,11 @@
 
 .container.break-mode .music-player {
   border-color: rgba(255, 255, 255, 0.2);
+}
+.container:not(.break-mode) {
+  --sidebar-border: var(--sidebar-border-work);
+}
+
+.container.break-mode {
+  --sidebar-border: var(--sidebar-border-break);
 }
