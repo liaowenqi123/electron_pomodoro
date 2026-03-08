@@ -129,21 +129,14 @@
     })
   }
 
-  // 更新菜园子按钮状态（专注模式下番茄钟运行时禁用）
+  // 更新菜园子按钮状态（始终可用，种植限制在菜园子内部判断）
   function updateGardenButtonState() {
     if (DOM.gardenBtn) {
-      // 专注模式开启且番茄钟运行时，禁用菜园子按钮
-      if (AppState.focusModeEnabled && Timer.getIsRunning()) {
-        DOM.gardenBtn.disabled = true
-        DOM.gardenBtn.style.opacity = '0.5'
-        DOM.gardenBtn.style.cursor = 'not-allowed'
-        DOM.gardenBtn.title = '专注模式下番茄钟运行中，无法使用菜园'
-      } else {
-        DOM.gardenBtn.disabled = false
-        DOM.gardenBtn.style.opacity = '1'
-        DOM.gardenBtn.style.cursor = 'pointer'
-        DOM.gardenBtn.title = ''
-      }
+      // 始终保持可用状态
+      DOM.gardenBtn.disabled = false
+      DOM.gardenBtn.style.opacity = '1'
+      DOM.gardenBtn.style.cursor = 'pointer'
+      DOM.gardenBtn.title = '菜园子'
     }
   }
 

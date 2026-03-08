@@ -74,22 +74,6 @@
             DOM.startBtn.classList.remove('focus-mode-disabled')
           }
         }
-        // 专注模式下番茄钟运行时，禁用菜园子按钮
-        if (AppState.focusModeEnabled && !enabled) {
-          if (DOM.gardenBtn) {
-            DOM.gardenBtn.disabled = true
-            DOM.gardenBtn.style.opacity = '0.5'
-            DOM.gardenBtn.style.cursor = 'not-allowed'
-            DOM.gardenBtn.title = '专注模式下番茄钟运行中，无法使用菜园'
-          }
-        } else {
-          if (DOM.gardenBtn) {
-            DOM.gardenBtn.disabled = false
-            DOM.gardenBtn.style.opacity = '1'
-            DOM.gardenBtn.style.cursor = 'pointer'
-            DOM.gardenBtn.title = ''
-          }
-        }
       },
       
       onComplete: () => {

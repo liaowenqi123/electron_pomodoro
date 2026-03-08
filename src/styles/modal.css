@@ -391,10 +391,10 @@
 }
 
 .confirm-btn-confirm {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(220, 80, 80, 0.8);
   color: #fff;
 }
 
 .confirm-btn-confirm:hover {
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(220, 80, 80, 1);
 }
