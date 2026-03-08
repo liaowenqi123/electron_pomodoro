@@ -101,7 +101,10 @@
     deviceList: DOM.deviceList,
     volumeBtn: DOM.volumeBtn,
     volumeSlider: DOM.volumeSlider,
-    volumeRange: DOM.volumeRange
+    volumeRange: DOM.volumeRange,
+    collapseBtn: DOM.collapseBtn,
+    collapsedTrack: DOM.collapsedTrack,
+    visualizerBars: DOM.visualizerBars
   })
 
   // ============ 初始化前台检测模块 ============

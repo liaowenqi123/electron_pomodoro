@@ -23,7 +23,9 @@ const MusicPlayer = (function() {
     playTimeout: null,  // 播放超时计时器
     volume: 1.0,  // 音量 0-1
     isVolumeSliderOpen: false,  // 音量滑块是否展开
-    lastVolumeSendTime: 0  // 上次发送音量的时间戳（节流用）
+    lastVolumeSendTime: 0,  // 上次发送音量的时间戳（节流用）
+    isCollapsed: false,  // 是否收起
+    visualizerInterval: null  // 律动条动画定时器
   }
   
   // 播放超时时间（毫秒）
@@ -45,7 +47,10 @@ const MusicPlayer = (function() {
     deviceList: null,
     volumeBtn: null,
     volumeSlider: null,
-    volumeRange: null
+    volumeRange: null,
+    collapseBtn: null,
+    collapsedTrack: null,
+    visualizerBars: null
   }
 
   // ============ 工具函数 ============
@@ -157,6 +162,10 @@ const MusicPlayer = (function() {
     if (elements.trackNameEl) {
       elements.trackNameEl.textContent = state.trackName || '未播放'
     }
+    // 更新收起状态下的曲目显示
+    if (elements.collapsedTrack) {
+      elements.collapsedTrack.textContent = state.trackName || '未播放'
+    }
   }
 
   function updatePlayButton() {
@@ -164,6 +173,7 @@ const MusicPlayer = (function() {
       elements.playBtn.textContent = state.playing ? '⏸' : '▶'
       elements.playBtn.setAttribute('data-playing', state.playing)
     }
+    updateVisualizerState()
   }
 
   function updatePrevButton() {
@@ -341,6 +351,58 @@ const MusicPlayer = (function() {
     }
   }
 
+  // ============ 收起/展开 ============
+
+  function toggleCollapse() {
+    state.isCollapsed = !state.isCollapsed
+    if (elements.musicPlayer) {
+      elements.musicPlayer.classList.toggle('collapsed', state.isCollapsed)
+    }
+    if (elements.collapseBtn) {
+      elements.collapseBtn.title = state.isCollapsed ? '展开' : '收起'
+    }
+    // 收起状态变化时更新律动条
+    updateVisualizerState()
+  }
+
+  // ============ 律动条动画 ============
+
+  function startVisualizer() {
+    if (state.visualizerInterval) return
+    if (!elements.visualizerBars || elements.visualizerBars.length === 0) return
+
+    // 添加播放状态类
+    elements.visualizerBars.forEach(bar => bar.classList.add('playing'))
+
+    state.visualizerInterval = setInterval(() => {
+      elements.visualizerBars.forEach(bar => {
+        const height = Math.random() * 14 + 2  // 2-16px 随机高度
+        bar.style.setProperty('--bar-height', `${height}px`)
+      })
+    }, 150)
+  }
+
+  function stopVisualizer() {
+    if (state.visualizerInterval) {
+      clearInterval(state.visualizerInterval)
+      state.visualizerInterval = null
+    }
+    if (elements.visualizerBars) {
+      elements.visualizerBars.forEach(bar => {
+        bar.classList.remove('playing')
+        bar.style.height = '2px'
+      })
+    }
+  }
+
+  function updateVisualizerState() {
+    if (state.playing && state.isCollapsed) {
+      startVisualizer()
+    } else {
+      stopVisualizer()
+    }
+  }
+
   // ============ 事件监听器 ============
   
   function setupEventListeners() {
@@ -415,6 +477,11 @@ const MusicPlayer = (function() {
       closeDeviceListOnClickOutside(e)
       closeVolumeSliderOnClickOutside(e)
     })
+    
+    // 收起/展开按钮
+    if (elements.collapseBtn) {
+      elements.collapseBtn.addEventListener('click', toggleCollapse)
+    }
   }
 
   function setupIPCListeners() {

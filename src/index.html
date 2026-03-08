@@ -139,7 +139,19 @@
 
         <!-- 音乐播放器 -->
         <div class="music-player" id="musicPlayer">
-          <div class="music-info">
+          <div class="music-collapse-btn" id="musicCollapseBtn" title="收起">
+            <span class="music-collapse-icon">▼</span>
+          </div>
+          <div class="music-collapsed-track" id="musicCollapsedTrack">未播放</div>
+          <div class="music-visualizer" id="musicVisualizer">
+            <span class="visualizer-bar"></span>
+            <span class="visualizer-bar"></span>
+            <span class="visualizer-bar"></span>
+            <span class="visualizer-bar"></span>
+          </div>
+          <div class="music-wrapper">
+            <div class="music-content" id="musicContent">
+            <div class="music-info">
             <span class="music-icon">🎵</span>
             <span class="music-track-name" id="trackName">未播放</span>
             <div class="volume-control">
@@ -163,6 +175,8 @@
             <button class="music-btn music-prev" id="prevBtn">⏮</button>
             <button class="music-btn music-play" id="playBtn" data-playing="false">▶</button>
             <button class="music-btn music-next" id="nextBtn">⏭</button>
+          </div>
+          </div>
           </div>
         </div>
       </div>

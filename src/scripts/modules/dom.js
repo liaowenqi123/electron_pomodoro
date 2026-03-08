@@ -76,6 +76,9 @@
     volumeBtn: document.getElementById('volumeBtn'),
     volumeSlider: document.getElementById('volumeSlider'),
     volumeRange: document.getElementById('volumeRange'),
+    collapseBtn: document.getElementById('musicCollapseBtn'),
+    collapsedTrack: document.getElementById('musicCollapsedTrack'),
+    visualizerBars: document.querySelectorAll('.visualizer-bar'),
     
     // 按钮
     btnClose: document.querySelector('.btn-close'),

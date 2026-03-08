@@ -2,7 +2,6 @@
 
 .music-player {
   margin-top: auto;
-  padding: 12px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -10,6 +9,142 @@
   max-width: 300px;
   -webkit-app-region: no-drag;
   position: relative;
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.music-wrapper {
+  min-height: 0;
+  overflow: visible;
+}
+
+/* 收起状态 */
+.music-player.collapsed {
+  grid-template-rows: 0fr;
+}
+
+.music-player.collapsed .music-content {
+  opacity: 0;
+  overflow: hidden;
+}
+
+.music-player.collapsed .music-collapse-btn {
+  border-radius: 0 0 6px 6px;
+  border-top: none;
+  top: 0;
+}
+
+.music-player.collapsed .music-collapse-btn:hover {
+  width: 70px;
+  height: 10px;
+  border-radius: 0 0 9px 9px;
+}
+
+.music-player.collapsed .music-collapsed-track {
+  opacity: 1;
+}
+
+/* 收起状态下的曲目名称 - absolute定位在底部 */
+.music-collapsed-track {
+  position: absolute;
+  bottom: 0;
+  left: 12px;
+  right: 50px;
+  opacity: 0;
+  padding: 8px 0;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+/* 音乐律动条 */
+.music-visualizer {
+  position: absolute;
+  bottom: 6px;
+  right: 12px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 16px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.music-player.collapsed .music-visualizer {
+  opacity: 1;
+}
+
+.visualizer-bar {
+  width: 3px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  transition: height 0.1s ease;
+  height: 2px;
+}
+
+.visualizer-bar.playing {
+  animation: visualizer-bounce 0.3s ease infinite alternate;
+}
+
+@keyframes visualizer-bounce {
+  0% { height: 2px; }
+  100% { height: var(--bar-height, 10px); }
+}
+
+/* 收起按钮 - 很胖很矮的直角梯形 */
+.music-collapse-btn {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  -webkit-app-region: no-drag;
+  z-index: 10;
+}
+
+.music-collapse-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  width: 70px;
+  height: 10px;
+  border-radius: 0 0 9px 9px;
+}
+
+.music-collapse-icon {
+  font-size: 6px;
+  color: rgba(255, 255, 255, 0.6);
+  transition: transform 0.2s ease;
+  transform: rotate(0deg);  /* 展开状态：▼向下 */
+}
+
+/* 收起状态：▲向上 */
+.music-player.collapsed .music-collapse-icon {
+  transform: rotate(180deg);
+}
+
+/* 音乐内容区域动画 */
+.music-content {
+  opacity: 1;
+  max-height: 200px;
+  padding: 12px;
+  padding-top: 10px;
+  overflow: visible;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .music-info {
@@ -18,6 +153,8 @@
   gap: 6px;
   margin-bottom: 8px;
   position: relative;
+  overflow: visible;
+}
 }
 
 .music-icon {
