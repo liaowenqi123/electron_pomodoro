@@ -31,11 +31,11 @@
    * 作物配置
    */
   const CROP_CONFIG = {
-    carrot: { name: '胡萝卜', growTime: 25, icon: '🥕', seedIcon: '🥕', rarity: 'common', value: 10 },
-    tomato: { name: '番茄', growTime: 50, icon: '🍅', seedIcon: '🌱', rarity: 'common', value: 20 },
-    sunflower: { name: '向日葵', growTime: 90, icon: '🌻', seedIcon: '🌰', rarity: 'rare', value: 50 },
-    rose: { name: '玫瑰', growTime: 120, icon: '🌹', seedIcon: '🌱', rarity: 'rare', value: 80 },
-    osmanthus: { name: '金桂树', growTime: 180, icon: '🌳', seedIcon: '🌰', rarity: 'legend', value: 150 }
+    carrot: { name: '胡萝卜', growTime: 25, icon: '🥕', seedType: 'carrot', rarity: 'common', value: 10 },
+    tomato: { name: '番茄', growTime: 50, icon: '🍅', seedType: 'tomato', rarity: 'common', value: 20 },
+    sunflower: { name: '向日葵', growTime: 90, icon: '🌻', seedType: 'sunflower', rarity: 'rare', value: 50 },
+    rose: { name: '玫瑰', growTime: 120, icon: '🌹', seedType: 'rose', rarity: 'rare', value: 80 },
+    osmanthus: { name: '金桂树', growTime: 180, icon: '🌳', seedType: 'osmanthus', rarity: 'legend', value: 150 }
   }
 
   /**

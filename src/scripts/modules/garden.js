@@ -181,7 +181,7 @@
       }
       
       seedEl.innerHTML = `
-        <span class="seed-icon">${crop.seedIcon}</span>
+        <span class="seed-icon seed-${crop.seedType}"></span>
         <div class="seed-info">
           <span class="seed-name">${crop.name}种子</span>
           <span class="seed-count">x${count}</span>

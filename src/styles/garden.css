@@ -266,6 +266,83 @@ body {
 
 .seed-icon {
   font-size: 18px;
+  display: inline-block;
+  width: 20px;
+  height: 12px;
+  border-radius: 50%;
+  position: relative;
+}
+
+/* 自定义种子样式 */
+.seed-icon.seed-carrot {
+  background: linear-gradient(135deg, #f5a623 0%, #e67e22 100%);
+  box-shadow: inset -2px -1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  border-radius: 40% 60% 50% 50%;
+  width: 18px;
+  height: 10px;
+}
+
+.seed-icon.seed-tomato {
+  background: linear-gradient(135deg, #ff6b6b 0%, #e74c3c 100%);
+  box-shadow: inset -2px -1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  border-radius: 50% 50% 50% 50%;
+  width: 14px;
+  height: 14px;
+}
+
+.seed-icon.seed-sunflower {
+  background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+  box-shadow: inset -2px -1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  border-radius: 30% 70% 70% 30%;
+  width: 20px;
+  height: 10px;
+  position: relative;
+}
+
+.seed-icon.seed-sunflower::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    #f5f5dc 0px,
+    #f5f5dc 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  border-radius: 30% 70% 70% 30%;
+}
+
+.seed-icon.seed-rose {
+  background: linear-gradient(135deg, #ff69b4 0%, #db7093 100%);
+  box-shadow: inset -2px -1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  width: 14px;
+  height: 14px;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.seed-icon.seed-osmanthus {
+  background: linear-gradient(135deg, #8b4513 0%, #5d3a1a 100%);
+  box-shadow: inset -2px -1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  position: relative;
+}
+
+.seed-icon.seed-osmanthus::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
 }
 
 .seed-info {
