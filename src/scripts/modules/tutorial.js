@@ -12,15 +12,24 @@
 
     // 关闭按钮
     DOM.tutorialClose.addEventListener('click', () => {
-      DOM.tutorialModal.classList.remove('show')
+      closeTutorial()
     })
 
     // 点击遮罩层关闭
     DOM.tutorialModal.addEventListener('click', (e) => {
       if (e.target === DOM.tutorialModal) {
-        DOM.tutorialModal.classList.remove('show')
+        closeTutorial()
       }
     })
+  }
+
+  function closeTutorial() {
+    DOM.tutorialModal.classList.remove('show')
+    DOM.tutorialModal.classList.add('hiding')
+    
+    setTimeout(() => {
+      DOM.tutorialModal.classList.remove('hiding')
+    }, 500)
   }
 
   // 导出到全局

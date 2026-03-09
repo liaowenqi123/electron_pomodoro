@@ -128,11 +128,18 @@ const Statistics = (function() {
    */
   function hideStatsModal() {
     if (elements.statsModal) {
+      // 移除show类，添加hiding类
       elements.statsModal.classList.remove('show')
-      if (chartInstance) {
-        chartInstance.destroy()
-        chartInstance = null
-      }
+      elements.statsModal.classList.add('hiding')
+      
+      // 等待动画完成后完全隐藏
+      setTimeout(() => {
+        elements.statsModal.classList.remove('hiding')
+        if (chartInstance) {
+          chartInstance.destroy()
+          chartInstance = null
+        }
+      }, 500)
     }
   }
 

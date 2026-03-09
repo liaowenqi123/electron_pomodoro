@@ -283,6 +283,11 @@ const CloudAuth = (function() {
   function hideModal() {
     if (elements.modal) {
       elements.modal.classList.remove('show')
+      elements.modal.classList.add('hiding')
+      
+      setTimeout(() => {
+        elements.modal.classList.remove('hiding')
+      }, 500)
     }
   }
 

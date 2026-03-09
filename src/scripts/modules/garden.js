@@ -31,7 +31,17 @@
 
     // 绑定关闭按钮事件
     elements.gardenCloseBtn.addEventListener('click', () => {
-      window.electronAPI.closeGarden()
+      // 添加关闭动画
+      const gardenFrame = document.querySelector('.garden-frame')
+      if (gardenFrame) {
+        gardenFrame.classList.add('closing')
+        // 等待动画完成后关闭窗口
+        setTimeout(() => {
+          window.electronAPI.closeGarden()
+        }, 500)
+      } else {
+        window.electronAPI.closeGarden()
+      }
     })
 
     // 监听刷新事件（当主页面更新作物数据时）

@@ -23,6 +23,10 @@ body {
   animation: gardenWindowBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
+.garden-frame.closing {
+  animation: gardenWindowBounceOut 0.5s cubic-bezier(0.6, -0.28, 0.74, 0.05) forwards;
+}
+
 @keyframes gardenWindowBounce {
   0% {
     transform: scale(0.7) translateY(-30px);
@@ -40,6 +44,20 @@ body {
   100% {
     transform: scale(1) translateY(0);
     opacity: 1;
+  }
+}
+
+@keyframes gardenWindowBounceOut {
+  0% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  30% {
+    transform: scale(1.05) translateY(-5px);
+  }
+  100% {
+    transform: scale(0.7) translateY(30px);
+    opacity: 0;
   }
 }
 

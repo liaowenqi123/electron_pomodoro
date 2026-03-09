@@ -153,25 +153,32 @@ const AIHelper = (function() {
    */
   function hideAIModal() {
     if (elements.aiModal) {
-      elements.aiModal.classList.remove('show')
-      
       // 取消当前请求（通过增加requestId使旧请求失效）
       currentRequestId++
       
-      // 清空所有内容和状态
-      if (elements.aiInput) {
-        elements.aiInput.value = ''
-      }
-      if (elements.aiResult) {
-        elements.aiResult.innerHTML = ''
-      }
-      if (elements.aiApplyBtn) {
-        elements.aiApplyBtn.style.display = 'none'
-        elements.aiApplyBtn.dataset.plan = ''
-      }
+      // 移除show类，添加hiding类
+      elements.aiModal.classList.remove('show')
+      elements.aiModal.classList.add('hiding')
       
-      // 重置生成状态
-      isProcessing = false
+      // 等待动画完成后清理
+      setTimeout(() => {
+        elements.aiModal.classList.remove('hiding')
+        
+        // 清空所有内容和状态
+        if (elements.aiInput) {
+          elements.aiInput.value = ''
+        }
+        if (elements.aiResult) {
+          elements.aiResult.innerHTML = ''
+        }
+        if (elements.aiApplyBtn) {
+          elements.aiApplyBtn.style.display = 'none'
+          elements.aiApplyBtn.dataset.plan = ''
+        }
+        
+        // 重置生成状态
+        isProcessing = false
+      }, 500)
     }
   }
 

@@ -17,12 +17,19 @@
   justify-content: center;
   padding: 20px;
   border-radius: 20px;
-  transition: background 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+.ai-modal.show,
+.ai-modal.hiding {
+  display: flex;
 }
 
 .ai-modal.show {
-  display: flex;
   animation: fadeIn 0.4s ease forwards;
+}
+
+.ai-modal.hiding {
+  animation: fadeOut 0.3s ease forwards;
 }
 
 @keyframes fadeIn {
@@ -33,6 +40,17 @@
   to {
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(4px);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+  }
+  to {
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
   }
 }
 
@@ -54,6 +72,31 @@
   transform-origin: center center;
   opacity: 0;
   animation: popOutFromButton 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.ai-modal.hiding .ai-modal-content {
+  animation: popBackToButton 0.5s cubic-bezier(0.6, -0.28, 0.74, 0.05) forwards;
+}
+
+@keyframes popBackToButton {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+    border-radius: 20px;
+  }
+  40% {
+    transform: translate(0, 0) scale(1.05);
+    border-radius: 20px;
+  }
+  70% {
+    opacity: 1;
+    border-radius: 50%;
+  }
+  100% {
+    transform: translate(-200px, -250px) scale(0.05);
+    opacity: 0;
+    border-radius: 50%;
+  }
 }
 
 @keyframes popOutFromButton {
