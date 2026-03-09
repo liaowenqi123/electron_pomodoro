@@ -31,11 +31,11 @@
    * 作物配置
    */
   const CROP_CONFIG = {
-    carrot: { name: '胡萝卜', growTime: 25, icon: '🥕', rarity: 'common', value: 10 },
-    tomato: { name: '番茄', growTime: 50, icon: '🍅', rarity: 'common', value: 20 },
-    sunflower: { name: '向日葵', growTime: 90, icon: '🌻', rarity: 'rare', value: 50 },
-    rose: { name: '玫瑰', growTime: 120, icon: '🌹', rarity: 'rare', value: 80 },
-    osmanthus: { name: '金桂树', growTime: 180, icon: '🌳', rarity: 'legend', value: 150 }
+    carrot: { name: '胡萝卜', growTime: 25, icon: '🥕', seedIcon: '🥕', rarity: 'common', value: 10 },
+    tomato: { name: '番茄', growTime: 50, icon: '🍅', seedIcon: '🌱', rarity: 'common', value: 20 },
+    sunflower: { name: '向日葵', growTime: 90, icon: '🌻', seedIcon: '🌰', rarity: 'rare', value: 50 },
+    rose: { name: '玫瑰', growTime: 120, icon: '🌹', seedIcon: '🌱', rarity: 'rare', value: 80 },
+    osmanthus: { name: '金桂树', growTime: 180, icon: '🌳', seedIcon: '🌰', rarity: 'legend', value: 150 }
   }
 
   /**
@@ -56,6 +56,7 @@
       garden: {
         coins: 0,
         seeds: { carrot: 5, tomato: 2, sunflower: 0, rose: 0, osmanthus: 0 },
+        crops: {}, // 作物背包：存储已收获的作物
         plots: [
           { id: 0, crop: null, progress: 0, plantedAt: null },
           { id: 1, crop: null, progress: 0, plantedAt: null },

@@ -24,6 +24,7 @@
       coinCount: document.getElementById('coinCount'),
       gardenGrid: document.getElementById('gardenGrid'),
       seedList: document.getElementById('seedList'),
+      cropList: document.getElementById('cropList'),
       gardenTip: document.getElementById('gardenTip'),
       gardenCloseBtn: document.getElementById('gardenCloseBtn')
     }
@@ -93,6 +94,7 @@
     renderCoins()
     renderPlots()
     renderSeeds()
+    renderCrops()
   }
 
   /**
@@ -179,9 +181,9 @@
       }
       
       seedEl.innerHTML = `
-        <span class="seed-icon">${crop.icon}</span>
+        <span class="seed-icon">${crop.seedIcon}</span>
         <div class="seed-info">
-          <span class="seed-name">${crop.name}</span>
+          <span class="seed-name">${crop.name}种子</span>
           <span class="seed-count">x${count}</span>
         </div>
       `
@@ -192,6 +194,43 @@
       }
       
       elements.seedList.appendChild(seedEl)
+    })
+  }
+
+  /**
+   * 渲染作物背包
+   */
+  function renderCrops() {
+    elements.cropList.innerHTML = ''
+    
+    const crops = gardenData.crops || {}
+    
+    // 检查是否有作物
+    const hasCrops = Object.values(crops).some(count => count > 0)
+    
+    if (!hasCrops) {
+      elements.cropList.innerHTML = '<div class="crop-list-empty">暂无收获的作物</div>'
+      return
+    }
+    
+    Object.keys(CROP_CONFIG).forEach(cropKey => {
+      const crop = CROP_CONFIG[cropKey]
+      const count = crops[cropKey] || 0
+      
+      if (count === 0) return
+      
+      const cropEl = document.createElement('div')
+      cropEl.className = `crop-item ${crop.rarity}`
+      
+      cropEl.innerHTML = `
+        <span class="crop-icon">${crop.icon}</span>
+        <div class="crop-info">
+          <span class="crop-name">${crop.name}</span>
+          <span class="crop-count">x${count}</span>
+        </div>
+      `
+      
+      elements.cropList.appendChild(cropEl)
     })
   }
 
@@ -297,12 +336,9 @@
     const plot = gardenData.plots[plotIndex]
     const cropConfig = CROP_CONFIG[plot.crop]
     
-    // 添加到仓库
-    gardenData.warehouse = gardenData.warehouse || []
-    gardenData.warehouse.push({
-      crop: plot.crop,
-      harvestedAt: new Date().toISOString()
-    })
+    // 添加到作物背包
+    gardenData.crops = gardenData.crops || {}
+    gardenData.crops[plot.crop] = (gardenData.crops[plot.crop] || 0) + 1
     
     // 获得金币（作物价值的一半）
     const reward = Math.floor(cropConfig.value / 2)
@@ -318,7 +354,7 @@
     
     // 保存并渲染
     await saveGardenData()
-    updateTip(`收获成功！获得 ${cropConfig.name} x1，金币 +${reward}`)
+    updateTip(`收获成功！${cropConfig.name} x1 已存入作物背包，金币 +${reward}`)
     render()
   }
 

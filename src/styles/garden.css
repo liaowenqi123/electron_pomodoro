@@ -288,6 +288,70 @@ body {
 .seed-item.rare .seed-name { color: #4fc3f7; }
 .seed-item.legend .seed-name { color: #ffc107; }
 
+/* 作物背包 */
+.garden-crop-bag {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 12px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.garden-crop-bag h3 {
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.crop-list {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-height: 40px;
+}
+
+/* 作物项 */
+.crop-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 10px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.crop-icon {
+  font-size: 18px;
+}
+
+.crop-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.crop-name {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.crop-count {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* 稀有度颜色 */
+.crop-item.common .crop-name { color: #fff; }
+.crop-item.rare .crop-name { color: #4fc3f7; }
+.crop-item.legend .crop-name { color: #ffc107; }
+
+/* 空背包提示 */
+.crop-list-empty {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  width: 100%;
+  padding: 10px 0;
+}
+
 /* 提示信息 */
 .garden-tip {
   text-align: center;
