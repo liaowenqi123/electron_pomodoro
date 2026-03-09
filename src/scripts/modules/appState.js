@@ -80,6 +80,45 @@
         DOM.focusModeSwitch.style.opacity = '1'
       }
     }
+    
+    // 更新备注输入框的禁用状态
+    updateNoteInputsDisabled()
+  }
+  
+  /**
+   * 更新备注输入框的禁用状态
+   */
+  function updateNoteInputsDisabled() {
+    const disabled = state.focusModeEnabled
+    
+    // 单次模式的备注输入框
+    const noteTitleInput = document.getElementById('noteTitleInput')
+    const noteDetailInput = document.getElementById('noteDetailInput')
+    
+    // 计划模式的备注输入框
+    const planNoteTitleInput = document.getElementById('planNoteTitleInput')
+    const planNoteDetailInput = document.getElementById('planNoteDetailInput')
+    
+    if (noteTitleInput) {
+      noteTitleInput.disabled = disabled
+      noteTitleInput.style.opacity = disabled ? '0.5' : '1'
+      noteTitleInput.style.cursor = disabled ? 'not-allowed' : 'text'
+    }
+    if (noteDetailInput) {
+      noteDetailInput.disabled = disabled
+      noteDetailInput.style.opacity = disabled ? '0.5' : '1'
+      noteDetailInput.style.cursor = disabled ? 'not-allowed' : 'text'
+    }
+    if (planNoteTitleInput) {
+      planNoteTitleInput.disabled = disabled
+      planNoteTitleInput.style.opacity = disabled ? '0.5' : '1'
+      planNoteTitleInput.style.cursor = disabled ? 'not-allowed' : 'text'
+    }
+    if (planNoteDetailInput) {
+      planNoteDetailInput.disabled = disabled
+      planNoteDetailInput.style.opacity = disabled ? '0.5' : '1'
+      planNoteDetailInput.style.cursor = disabled ? 'not-allowed' : 'text'
+    }
   }
 
   // ============ 模式切换逻辑 ============
