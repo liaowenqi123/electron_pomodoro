@@ -56,6 +56,9 @@
     aiResult: document.getElementById('aiResult'),
     aiApplyBtn: document.getElementById('aiApplyBtn'),
     
+    // 统计功能
+    statsBtn: document.getElementById('statsBtn'),
+    
     // 专注模式开关
     focusModeSwitch: document.getElementById('focusModeSwitch'),
     focusModeStatus: document.getElementById('focusModeStatus'),

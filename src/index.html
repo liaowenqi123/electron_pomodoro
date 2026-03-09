@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="styles/modes.css">
   <link rel="stylesheet" href="styles/ai-helper.css">
   <link rel="stylesheet" href="styles/api-key-modal.css">
+  <link rel="stylesheet" href="styles/statistics.css">
 </head>
     <!-- 备注编辑模态框 -->
     <div class="note-modal" id="noteEditModal">
@@ -123,6 +124,7 @@
           <button class="btn-header" id="tutorialBtn" title="教程">📖</button>
           <div class="header-buttons-hidden" id="hiddenButtons">
             <button class="btn-header" id="themeToggleBtn" title="切换深色模式">🌙</button>
+            <button class="btn-header" id="statsBtn" title="数据统计">📈</button>
             <button class="btn-header" id="aiBtn" title="AI规划助手">🤖</button>
             <button class="btn-header" id="gardenBtn" title="菜园子">🌱</button>
             <button class="btn-header" id="loginBtn2" title="云端登录">☁️</button>
@@ -288,6 +290,66 @@
       </div>
     </div>
 
+    <!-- 统计弹窗 -->
+    <div class="statistics-modal" id="statsModal">
+      <div class="statistics-modal-content">
+        <button class="statistics-modal-close" id="statsModalClose">×</button>
+        <h2>📊 数据统计</h2>
+        
+        <!-- 时间范围选择 -->
+        <div class="stats-period-selector">
+          <button class="stats-period-btn active" data-period="daily">每日</button>
+          <button class="stats-period-btn" data-period="weekly">每周</button>
+          <button class="stats-period-btn" data-period="monthly">每月</button>
+        </div>
+        
+        <!-- 统计概览 -->
+        <div class="stats-overview">
+          <div class="stats-card">
+            <div class="stats-card-value" id="statsTotalSessions">0</div>
+            <div class="stats-card-label">专注次数</div>
+          </div>
+          <div class="stats-card">
+            <div class="stats-card-value" id="statsTotalMinutes">0</div>
+            <div class="stats-card-label">专注时长（分钟）</div>
+          </div>
+          <div class="stats-card">
+            <div class="stats-card-value" id="statsAvgMinutes">0</div>
+            <div class="stats-card-label">平均时长（分钟）</div>
+          </div>
+        </div>
+        
+        <!-- 图表类型选择 -->
+        <div class="stats-chart-selector">
+          <button class="stats-chart-btn active" data-chart="bar" title="柱状图">📊</button>
+          <button class="stats-chart-btn" data-chart="line" title="折线图">📈</button>
+          <button class="stats-chart-btn" data-chart="pie" title="饼状图">🥧</button>
+        </div>
+        
+        <!-- 图表容器 -->
+        <div class="stats-chart-container" id="statsChartContainer">
+          <canvas id="statsChart"></canvas>
+        </div>
+        
+        <!-- 详细数据表格 -->
+        <div class="stats-details">
+          <h3>📋 详细数据</h3>
+          <table class="stats-table">
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>时长（分钟）</th>
+                <th>平均（分钟）</th>
+              </tr>
+            </thead>
+            <tbody id="statsTableBody">
+              <!-- 动态生成 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- 前台检测警告弹窗 -->
     <div class="warning-modal" id="warningModal">
       <div class="warning-modal-content">
@@ -408,6 +470,9 @@
   </div>
 
   <!-- 按依赖顺序加载 JS 模块 -->
+  <!-- Chart.js 库 -->
+  <script src="../node_modules/chart.js/dist/chart.umd.js"></script>
+  
   <!-- 基础模块 -->
   <script src="scripts/modules/utils.js"></script>
   <script src="scripts/modules/dom.js"></script>
@@ -430,6 +495,7 @@
   <script src="scripts/modules/callbacks.js"></script>
   <script src="scripts/modules/theme.js"></script>
   <script src="scripts/modules/aiHelper.js"></script>
+  <script src="scripts/modules/statistics.js"></script>
   <script src="scripts/modules/garden.js"></script>
   <script src="scripts/modules/foregroundDetection.js"></script>
   

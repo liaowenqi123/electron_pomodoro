@@ -19,6 +19,7 @@
 
   async function increment(minutes) {
     const stats = DataStore.getStats()
+    const data = DataStore.getData()
     
     // 更新统计
     const newStats = {
@@ -28,6 +29,29 @@
     }
     
     await DataStore.updateStats(newStats)
+    
+    // 记录到历史数据
+    const today = new Date().toISOString().split('T')[0]
+    if (!data.statisticsHistory) {
+      data.statisticsHistory = []
+    }
+    
+    // 查找今天的记录
+    let todayRecord = data.statisticsHistory.find(item => item.date === today)
+    if (todayRecord) {
+      todayRecord.count += 1
+      todayRecord.minutes += minutes
+    } else {
+      data.statisticsHistory.push({
+        date: today,
+        count: 1,
+        minutes: minutes
+      })
+    }
+    
+    // 保存历史数据
+    await window.electronAPI.writeData(data)
+    
     updateDisplay()
   }
 

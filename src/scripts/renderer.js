@@ -93,6 +93,19 @@
     aiApplyBtn: DOM.aiApplyBtn
   })
 
+  // ============ 初始化统计功能 ============
+  Statistics.init({
+    statsBtn: DOM.statsBtn,
+    statsModal: document.getElementById('statsModal'),
+    statsModalClose: document.getElementById('statsModalClose'),
+    statsChart: document.getElementById('statsChart'),
+    statsChartContainer: document.getElementById('statsChartContainer'),
+    statsTotalSessions: document.getElementById('statsTotalSessions'),
+    statsTotalMinutes: document.getElementById('statsTotalMinutes'),
+    statsAvgMinutes: document.getElementById('statsAvgMinutes'),
+    statsTableBody: document.getElementById('statsTableBody')
+  })
+
   // ============ 初始化云端登录模块 ============
   if (window.CloudAuth) {
     CloudAuth.init()

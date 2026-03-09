@@ -4,14 +4,14 @@
         "Visual Studio Code",
         "PowerShell",
         "PowerPoint",
-        "演示文稿"
+        "演示文稿",
+        "bilibili"
     ],
     "blacklist": [
         "抖音",
         "快手",
         "斗鱼",
-        "虎牙",
-        "bilibili"
+        "虎牙"
     ],
     "history": {
         "C:\\WINDOWS\\py.exe": "不是",
@@ -82,6 +82,12 @@
         "Commits · liaowenqi123/electron_pomodoro 和另外 40 个页面 - 用户1 - Microsoft​ Edge": "不是",
         "男子点外卖仅退款称餐漏了，商家上门“平台会退我，但骑手会被扣钱，我们家不惯毛病！”": "不是",
         "号主命令我野排疾风且速清巴克什！": "是",
-        "搜索": "不是"
+        "搜索": "不是",
+        "Commits · liaowenqi123/electron_pomodoro 和另外 1 个页面 - 个人 - Microsoft​ Edge": "不是",
+        "WeTab 新标签页 和另外 1 个页面 - 个人 - Microsoft​ Edge": "不是",
+        "api_config.json - electron_pomodoro-new - Kiro": "不是",
+        "无标题 和另外 3 个页面 - 个人 - Microsoft​ Edge": "不是",
+        "新通知": "不是",
+        "菜园子": "不是"
     }
 }
