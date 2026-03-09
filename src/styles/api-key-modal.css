@@ -29,6 +29,12 @@
   animation: fadeIn 0.4s ease forwards;
 }
 
+.api-key-modal.show.no-animation {
+  animation: none;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+}
+
 .api-key-modal.hiding {
   animation: fadeOut 0.3s ease forwards;
 }
@@ -64,6 +70,13 @@
   box-shadow: 0 20px 60px rgba(231, 76, 60, 0.25), 0 8px 24px rgba(0, 0, 0, 0.1);
   position: relative;
   border: 1px solid rgba(231, 76, 60, 0.1);
+  /* 默认状态：正常显示 */
+  transform: translate(0, 0) scale(1);
+  opacity: 1;
+}
+
+.api-key-modal.show:not(.no-animation) .api-key-modal-content {
+  /* 只有在有动画的情况下才设置初始状态 */
   transform: translate(200px, -250px) scale(0.05);
   transform-origin: center center;
   opacity: 0;
@@ -71,7 +84,7 @@
 }
 
 .api-key-modal.hiding .api-key-modal-content {
-  animation: popBackToCloudButton 0.5s cubic-bezier(0.6, -0.28, 0.74, 0.05) forwards;
+  animation: popBackToCloudButton 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
 }
 
 @keyframes popBackToCloudButton {

@@ -203,8 +203,8 @@ const CloudAuth = (function() {
         console.log('[CloudAuth] 自动登录成功')
         currentDeepseekKey = loginResult.deepseekKey
         
-        // 更新 UI
-        showLoggedInPanel(loginResult.user, loginResult.deepseekKey)
+        // 更新 UI（无动画关闭弹窗）
+        showLoggedInPanel(loginResult.user, loginResult.deepseekKey, false)
         
         // 调用回调
         if (onLoginCallback) {
@@ -220,8 +220,8 @@ const CloudAuth = (function() {
         elements.rememberPassword.checked = true
         elements.autoLogin.checked = false
         
-        // 显示登录弹窗
-        showModal()
+        // 显示登录弹窗（无动画）
+        showModal(false)
         showMessage('自动登录失败，请重新登录', 'error')
         
         // 清除无效凭据
@@ -246,7 +246,7 @@ const CloudAuth = (function() {
     try {
       const result = await window.electronAPI.cloudGetSession()
       if (result.success && result.session) {
-        showLoggedInPanel(result.session)
+        showLoggedInPanel(result.session, result.deepseekKey, false)
         // 获取 API Key（内存中）
         currentDeepseekKey = result.deepseekKey
       } else {
@@ -259,35 +259,48 @@ const CloudAuth = (function() {
           if (password) elements.rememberPassword.checked = true
           if (autoLogin) elements.autoLogin.checked = autoLogin
         }
-        // 显示登录弹窗
-        showModal()
+        // 显示登录弹窗（无动画，因为是初始加载）
+        showModal(false)
       }
     } catch (err) {
       console.error('检查会话失败:', err)
-      showModal()
+      showModal(false)
     }
   }
 
   /**
    * 显示弹窗
+   * @param {boolean} withAnimation - 是否显示动画（默认true）
    */
-  function showModal() {
+  function showModal(withAnimation = true) {
     if (elements.modal) {
-      elements.modal.classList.add('show')
+      if (withAnimation) {
+        elements.modal.classList.add('show')
+      } else {
+        // 无动画显示：直接设置为显示状态，跳过动画
+        elements.modal.classList.add('show', 'no-animation')
+      }
     }
   }
 
   /**
    * 隐藏弹窗
+   * @param {boolean} withAnimation - 是否显示动画（默认true）
    */
-  function hideModal() {
+  function hideModal(withAnimation = true) {
     if (elements.modal) {
-      elements.modal.classList.remove('show')
-      elements.modal.classList.add('hiding')
-      
-      setTimeout(() => {
-        elements.modal.classList.remove('hiding')
-      }, 500)
+      if (withAnimation) {
+        // 有动画：先移除show，添加hiding，等动画完成后移除hiding
+        elements.modal.classList.remove('show')
+        elements.modal.classList.add('hiding')
+        
+        setTimeout(() => {
+          elements.modal.classList.remove('hiding', 'no-animation')
+        }, 500)
+      } else {
+        // 无动画：直接移除所有类
+        elements.modal.classList.remove('show', 'hiding', 'no-animation')
+      }
     }
   }
 
@@ -320,8 +333,9 @@ const CloudAuth = (function() {
 
   /**
    * 显示已登录面板
+   * @param {boolean} hideWithAnimation - 是否用动画隐藏弹窗（默认true）
    */
-  function showLoggedInPanel(user, deepseekKey = null) {
+  function showLoggedInPanel(user, deepseekKey = null, hideWithAnimation = true) {
     elements.authPanel.style.display = 'none'
     elements.loggedInPanel.style.display = 'block'
     
@@ -343,7 +357,7 @@ const CloudAuth = (function() {
     }
     
     // 隐藏弹窗
-    hideModal()
+    hideModal(hideWithAnimation)
   }
 
   /**
