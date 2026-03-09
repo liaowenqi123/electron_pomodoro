@@ -4,7 +4,7 @@
 .sidebar {
   width: 160px;
   height: 100%;
-  background: rgba(0, 0, 0, 0.15);
+  background: transparent;
   display: flex;
   flex-direction: column;
   padding: 38px 12px 15px 12px;
@@ -267,6 +267,25 @@
 
 .plan-item.break:hover {
   background: rgba(100, 200, 120, 0.5);
+}
+
+/* 深色模式下计划模式的时间预设颜色 */
+body.dark-theme .container.plan-mode .plan-item.work {
+  background: rgba(120, 60, 60, 0.25);
+  border-color: rgba(150, 80, 80, 0.3);
+}
+
+body.dark-theme .container.plan-mode .plan-item.break {
+  background: rgba(50, 100, 60, 0.25);
+  border-color: rgba(80, 130, 90, 0.3);
+}
+
+body.dark-theme .container.plan-mode .plan-item.work:hover {
+  background: rgba(120, 60, 60, 0.4);
+}
+
+body.dark-theme .container.plan-mode .plan-item.break:hover {
+  background: rgba(50, 100, 60, 0.4);
 }
 
 .plan-item.active {
