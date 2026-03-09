@@ -36,13 +36,39 @@
         div.draggable = false
       }
       
+      // 构建左侧内容（拖拽手柄 + 时间 + 备注图标）
+      let leftContent = `
+        <span class="plan-item-drag-handle">⋮⋮</span>
+        <span class="plan-item-time">${item.minutes}分钟</span>
+      `
+      
+      if (item.note && (item.note.title || item.note.detail)) {
+        const tooltipText = item.note.title || '查看备注'
+        leftContent += `
+          <span class="preset-note-icon" data-index="${index}" title="${tooltipText}">
+            📒
+          </span>
+        `
+      }
+      
       div.innerHTML = `
         <div class="plan-item-left">
-          <span class="plan-item-drag-handle">⋮⋮</span>
-          <span class="plan-item-time">${item.minutes}分钟</span>
+          ${leftContent}
         </div>
         <button class="plan-item-delete">×</button>
       `
+      
+      // 点击备注图标
+      const noteIcon = div.querySelector('.preset-note-icon')
+      if (noteIcon) {
+        noteIcon.addEventListener('click', (e) => {
+          e.stopPropagation()
+          if (!isRunning) {
+            const idx = parseInt(e.target.dataset.index)
+            editNoteForPlan(idx, item.note)
+          }
+        })
+      }
       
       // 删除按钮
       const deleteBtn = div.querySelector('.plan-item-delete')
@@ -65,6 +91,99 @@
     
     // 触发回调，更新右侧颜色
     updateMainColor()
+  }
+
+  // 编辑计划的备注
+  function editNoteForPlan(index, currentNote) {
+    const modal = document.getElementById('noteViewModal')
+    const contentDiv = modal.querySelector('.note-view')
+    const titleEl = modal.querySelector('h3')
+    
+    // 改为可编辑的输入框
+    contentDiv.innerHTML = `
+      <input type="text" id="editNoteTitleInput" class="edit-note-input" placeholder="标题（可选）" value="${currentNote?.title || ''}" maxlength="50">
+      <textarea id="editNoteDetailInput" class="edit-note-textarea" placeholder="详细内容（可选）" rows="4">${currentNote?.detail || ''}</textarea>
+    `
+    
+    titleEl.textContent = '编辑备注'
+    
+    // 添加关闭按钮
+    let closeX = modal.querySelector('.note-modal-close')
+    if (!closeX) {
+      closeX = document.createElement('button')
+      closeX.className = 'note-modal-close'
+      closeX.innerHTML = '×'
+      modal.querySelector('.note-modal-content').insertBefore(closeX, titleEl)
+    }
+    
+    // 修改按钮容器
+    const buttonsContainer = modal.querySelector('.note-modal-buttons')
+    buttonsContainer.innerHTML = `
+      <button class="btn-note-delete" id="noteDeleteBtn" style="display: ${(currentNote && (currentNote.title || currentNote.detail)) ? 'inline-block' : 'none'}">删除备注</button>
+      <button class="btn-note-save" id="noteSaveBtn">保存</button>
+    `
+    
+    modal.classList.add('show')
+
+    const saveBtn = document.getElementById('noteSaveBtn')
+    const deleteBtn = document.getElementById('noteDeleteBtn')
+    
+    const saveHandler = async () => {
+      const titleInput = document.getElementById('editNoteTitleInput')
+      const detailInput = document.getElementById('editNoteDetailInput')
+      const newTitle = titleInput.value.trim()
+      const newDetail = detailInput.value.trim()
+      
+      const newNote = (newTitle || newDetail) ? { title: newTitle, detail: newDetail } : null
+      
+      await updatePlanNote(index, newNote)
+      
+      modal.classList.remove('show')
+      cleanup()
+    }
+    
+    const deleteNoteHandler = async () => {
+      if (confirm('确定要删除这条备注吗？')) {
+        await updatePlanNote(index, null)
+        modal.classList.remove('show')
+        cleanup()
+      }
+    }
+    
+    const closeHandler = () => {
+      modal.classList.remove('show')
+      cleanup()
+    }
+    
+    const overlayHandler = (e) => {
+      if (e.target === modal) {
+        closeHandler()
+      }
+    }
+    
+    const cleanup = () => {
+      saveBtn.removeEventListener('click', saveHandler)
+      deleteBtn.removeEventListener('click', deleteNoteHandler)
+      closeX.removeEventListener('click', closeHandler)
+      modal.removeEventListener('click', overlayHandler)
+      titleEl.textContent = '备注详情'
+      closeX.remove()
+      buttonsContainer.innerHTML = '<button class="btn-note-close" id="noteViewCloseBtn">关闭</button>'
+    }
+    
+    saveBtn.addEventListener('click', saveHandler)
+    deleteBtn.addEventListener('click', deleteNoteHandler)
+    closeX.addEventListener('click', closeHandler)
+    modal.addEventListener('click', overlayHandler)
+  }
+
+  // 更新计划的备注
+  async function updatePlanNote(index, newNote) {
+    if (index >= 0 && index < planList.length) {
+      planList[index].note = newNote
+      await savePlan()
+      render()
+    }
   }
 
   // 更新右侧主区域的颜色（根据列表第一项）
@@ -134,11 +253,12 @@
   }
 
   // 添加项目
-  async function addItem(minutes, type) {
+  async function addItem(minutes, type, note) {
     const item = {
       id: generateId(),
       minutes: parseInt(minutes),
-      type: type
+      type: type,
+      note: note || null
     }
     
     planList.push(item)

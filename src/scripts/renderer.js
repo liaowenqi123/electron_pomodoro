@@ -50,8 +50,7 @@
   const timerCallbacks = {
     ...originalTimerCallbacks,
     onStart: function() {
-      // 计时开始时，显示备注按钮（如果有备注）
-      if (window.NoteManager) NoteManager.updateNoteButton()
+      // 计时开始时的处理
       if (originalTimerCallbacks.onStart) originalTimerCallbacks.onStart()
     },
     onComplete: function() {
@@ -162,32 +161,30 @@
     }
 
     if (isPaused) {
-      // 暂停状态 -> 继续（不弹出备注）
+      // 暂停状态 -> 继续（不需要备注）
       Timer.toggle()
       return
     }
 
-    // 准备状态 -> 弹出备注
+    // 准备状态 -> 开始计时（备注可选）
     // 如果是计划模式且计划列表为空，则不允许开始
     if (AppState.appMode === 'plan' && !PlanMode.hasPlan()) {
       alert('请先添加计划任务')
       return
     }
 
-    // 显示备注编辑模态框，保存后真正开始计时
-    NoteManager.showEditModal((savedNote) => {
-      if (AppState.appMode === 'plan') {
-        // 计划模式：启动计划，获取第一个任务
-        const firstItem = PlanMode.startPlan()
-        if (firstItem) {
-          Timer.setTime(firstItem.minutes)
-          Timer.start()
-        }
-      } else {
-        // 单次模式：直接开始
+    // 开始计时
+    if (AppState.appMode === 'plan') {
+      // 计划模式：启动计划，获取第一个任务
+      const firstItem = PlanMode.startPlan()
+      if (firstItem) {
+        Timer.setTime(firstItem.minutes)
         Timer.start()
       }
-    })
+    } else {
+      // 单次模式：直接开始
+      Timer.start()
+    }
   }
 
   // 绑定新的事件
@@ -241,19 +238,33 @@
   DOM.addPresetBtn.addEventListener('click', async () => {
     if (AppState.appMode === 'single') {
       const minutes = WheelPicker.getValue()
-      await Presets.addPreset(minutes)
+      const note = NoteManager.getNote()
+      
+      // 备注改为可选，标题和详细内容都为空时，note为null
+      const finalNote = (note.title || note.detail) ? note : null
+      
+      await Presets.addPreset(minutes, finalNote)
+      
+      // 添加成功后清空备注输入框
+      NoteManager.clearNote()
     }
   })
 
   // 计划模式添加按钮
   DOM.addWorkBtn.addEventListener('click', async () => {
     const minutes = WheelPicker.getValue()
-    await PlanMode.addItem(minutes, 'work')
+    const note = NoteManager.getNote()
+    const finalNote = (note.title || note.detail) ? note : null
+    await PlanMode.addItem(minutes, 'work', finalNote)
+    NoteManager.clearNote()
   })
 
   DOM.addBreakBtn.addEventListener('click', async () => {
     const minutes = WheelPicker.getValue()
-    await PlanMode.addItem(minutes, 'break')
+    const note = NoteManager.getNote()
+    const finalNote = (note.title || note.detail) ? note : null
+    await PlanMode.addItem(minutes, 'break', finalNote)
+    NoteManager.clearNote()
   })
 
   // 应用模式切换滑块

@@ -24,8 +24,9 @@
 /* ============ 预设列表 ============ */
 .preset-list {
   flex: 0 1 auto;
-  max-height: 280px;
+  max-height: 180px;
   margin-bottom: 10px;
+  overflow-y: auto;
   -webkit-app-region: no-drag;
 }
 
@@ -75,10 +76,51 @@
   cursor: not-allowed;
 }
 
+.preset-item-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .preset-time {
   font-size: 14px;
   font-weight: 600;
   color: #fff;
+}
+
+.preset-note-icon {
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.preset-note-icon:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.preset-note-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  margin-bottom: 4px;
+  z-index: 10;
+}
+
+.preset-note-icon:hover .preset-note-tooltip {
+  opacity: 1;
 }
 
 .preset-delete {
@@ -105,11 +147,78 @@
   color: #fff;
 }
 
+/* ============ 备注输入区域 ============ */
+.note-input-section {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.note-input-header {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.note-title-input,
+.note-detail-input {
+  width: 100%;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 12px;
+  box-sizing: border-box;
+  transition: all 0.2s;
+}
+
+.note-title-input:focus,
+.note-detail-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.note-title-input::placeholder,
+.note-detail-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.note-detail-input {
+  resize: none;
+  font-family: inherit;
+  margin-bottom: 0;
+}
+
+.note-detail-input::-webkit-scrollbar {
+  width: 4px;
+}
+
+.note-detail-input::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.note-detail-input::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+.note-detail-input::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
 /* ============ 计划模式列表 ============ */
 .plan-list {
   flex: 0 1 auto;
-  max-height: 280px;
+  max-height: 180px;
   margin-bottom: 10px;
+  overflow-y: auto;
   -webkit-app-region: no-drag;
 }
 

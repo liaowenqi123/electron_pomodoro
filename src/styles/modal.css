@@ -497,29 +497,6 @@
   background: rgba(220, 80, 80, 1);
 }
 
-/* 备注按钮 */
-.note-button-container {
-  text-align: center;
-  margin: 10px 0;
-}
-.btn-note {
-  background: rgba(255,255,255,0.2);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: #fff;
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-  cursor: pointer;
-  max-width: 200px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  transition: all 0.3s;
-}
-.btn-note:hover {
-  background: rgba(255,255,255,0.3);
-}
-
 /* 备注模态框 */
 .note-modal {
   position: absolute;
@@ -544,17 +521,50 @@
 }
 
 .note-modal-content {
-  background: linear-gradient(135deg, #6ab0f5, #4a90e2);
+  background: linear-gradient(135deg, rgba(173, 216, 230, 0.85), rgba(135, 206, 250, 0.85));
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   border-radius: 15px;
   padding: 25px;
   width: 280px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-   border: 2px solid #ffffff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.6);
   color: #fff;
+  position: relative;
 }
+
+.note-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 1;
+  padding: 0;
+}
+
+.note-modal-close:hover {
+  background: rgba(255, 255, 255, 0.5);
+  color: #fff;
+  transform: rotate(90deg);
+}
+
 .note-modal-content h3 {
   margin: 0 0 20px 0;
   text-align: center;
+  color: #fff;
+  font-size: 16px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 .note-form label {
   display: block;
@@ -612,24 +622,28 @@
 }
 .btn-note-save,
 .btn-note-close {
-  background: rgba(92, 140, 222, 0.5);
+  background: rgba(255, 228, 196, 0.85);
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.5) !important; 
+  border: 1px solid rgba(255, 255, 255, 0.4) !important; 
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 .btn-note-save:hover,
 .btn-note-close:hover {
-  background: rgba(92, 140, 222, 0.5);
-  color: #fff;
+  background: rgba(255, 228, 196, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 .note-view-title {
   font-size: 16px;
   font-weight: bold;
   margin-bottom: 10px;
   word-break: break-word;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 .note-view-detail {
   font-size: 14px;
-  background: rgba(0,0,0,0.2);
+  background: rgba(255, 255, 255, 0.25);
   padding: 12px;
   border-radius: 8px;
   max-height: 200px;
@@ -637,13 +651,70 @@
   white-space: pre-wrap;
   word-break: break-word;
   margin-bottom: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
+
+/* 编辑备注输入框样式 */
+.edit-note-input,
+.edit-note-textarea {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.3);
+  color: #fff;
+  font-size: 14px;
+  box-sizing: border-box;
+  font-family: inherit;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.edit-note-input::placeholder,
+.edit-note-textarea::placeholder {
+  color: rgba(255,255,255,0.7);
+}
+
+.edit-note-input:focus,
+.edit-note-textarea:focus {
+  outline: none;
+  border-color: rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.35);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+}
+
+.edit-note-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.btn-note-delete {
+  background: rgba(255, 192, 203, 0.85);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  flex: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.btn-note-delete:hover {
+  background: rgba(255, 192, 203, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
 /* 休息模式下的备注弹窗 */
 .container.break-mode .note-modal-content,
 .window-frame.break-mode .note-modal-content {
-  background: rgba(165, 214, 165, 0.85);
-  backdrop-filter: blur(8px);
-  border: 2px solid #ffffff; }
+  background: linear-gradient(135deg, rgba(173, 216, 230, 0.85), rgba(135, 206, 250, 0.85));
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+}
 
   /* 备注弹窗弹跳动画 */
 @keyframes noteBounceIn {

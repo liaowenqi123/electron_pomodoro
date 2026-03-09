@@ -15,24 +15,6 @@
   <link rel="stylesheet" href="styles/api-key-modal.css">
   <link rel="stylesheet" href="styles/statistics.css">
 </head>
-    <!-- 备注编辑模态框 -->
-    <div class="note-modal" id="noteEditModal">
-      <div class="note-modal-content">
-        <h3>添加备注</h3>
-        <div class="note-form">
-          <label for="noteTitleInput">标题 <span class="required">*</span></label>
-          <input type="text" id="noteTitleInput" maxlength="50" placeholder="例如：复习数学或小憩一下">
-          
-          <label for="noteDetailInput">详细备注 <span class="optional">(可选)</span></label>
-          <textarea id="noteDetailInput" rows="4" placeholder="可以写下具体计划或想法..."></textarea>
-        </div>
-        <div class="note-modal-buttons">
-          <button class="btn-note-cancel" id="noteCancelBtn">取消</button>
-          <button class="btn-note-save" id="noteSaveBtn">完成</button>
-        </div>
-      </div>
-    </div>
-
     <!-- 备注查看模态框 -->
     <div class="note-modal" id="noteViewModal">
       <div class="note-modal-content">
@@ -74,6 +56,13 @@
           <div class="preset-list scrollable" id="presetList">
             <!-- 由 JS 动态生成 -->
           </div>
+          
+          <!-- 备注输入区域 -->
+          <div class="note-input-section" id="noteInputSection">
+            <div class="note-input-header">📝 备注（可选）</div>
+            <input type="text" class="note-title-input" id="noteTitleInput" placeholder="标题" maxlength="50">
+            <textarea class="note-detail-input" id="noteDetailInput" placeholder="详细内容" rows="2"></textarea>
+          </div>
         </div>
         
         <!-- 计划模式：任务列表 -->
@@ -83,6 +72,13 @@
           <!-- 计划列表 -->
           <div class="plan-list scrollable" id="planList">
             <!-- 由 JS 动态生成 -->
+          </div>
+          
+          <!-- 备注输入区域 -->
+          <div class="note-input-section" id="planNoteInputSection">
+            <div class="note-input-header">📝 备注（可选）</div>
+            <input type="text" class="note-title-input" id="planNoteTitleInput" placeholder="标题" maxlength="50">
+            <textarea class="note-detail-input" id="planNoteDetailInput" placeholder="详细内容" rows="2"></textarea>
           </div>
         </div>
         
@@ -170,11 +166,6 @@
           </div>
           
           <p class="status" id="status">准备开始专注工作</p>
-          
-          <!-- 备注按钮容器 -->
-          <div class="note-button-container" id="noteButtonContainer" style="display: none;">
-            <button class="btn-note" id="showNoteBtn" title="查看备注"></button>
-          </div>
         </div>
 
         <!-- 音乐播放器 -->
@@ -232,8 +223,10 @@
           <p>顶部滑块切换 <b>单次模式</b> 和 <b>计划模式</b></p>
           
           <h3>⏱️ 单次模式</h3>
-          <p>• 点击左侧预设设置时间，或用滚轮自定义（1-120分钟）p>
+          <p>• 点击左侧预设设置时间，或用滚轮自定义（1-120分钟）</p>
+          <p>• 可选：在备注区域填写标题和详细内容</p>
           <p>• 点击 "+" 添加新预设，点击 "×" 删除预设</p>
+          <p>• 预设旁的 📒 图标可编辑备注，悬停显示标题</p>
           <p>• "工作"/"休息" 按钮切换模式</p>
           
           <h3>📝 计划模式</h3>
