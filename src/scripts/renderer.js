@@ -365,8 +365,8 @@
     document.getElementById('miniMode').style.display = 'none'
     // 恢复窗口大小
     window.electronAPI.exitMiniMode()
-    // 返回 Promise，延迟1秒
-    return new Promise(resolve => setTimeout(resolve, 1000))
+    // 返回 Promise，延迟50ms确保窗口调整完成
+    return new Promise(resolve => setTimeout(resolve, 50))
   }
 
   // 暴露到全局

@@ -215,8 +215,8 @@ function createGardenWindow() {
 
 // ============ 基础窗口操作 IPC 处理 ============
 
-ipcMain.on('close-window', () => {
-  const win = BrowserWindow.getFocusedWindow()
+ipcMain.on('close-window', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender)
   if (win) {
     // 先停止音乐进程
     musicProcess.stop()
@@ -224,8 +224,8 @@ ipcMain.on('close-window', () => {
   }
 })
 
-ipcMain.on('minimize-window', () => {
-  const win = BrowserWindow.getFocusedWindow()
+ipcMain.on('minimize-window', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender)
   if (win) {
     win.minimize()
   }
@@ -432,7 +432,7 @@ ipcMain.on('foreground-move-blacklist-to-whitelist', (event, keyword) => {
 // ============ 窗口置顶 IPC 处理 ============
 
 ipcMain.on('set-always-on-top', (event, onTop) => {
-  const win = BrowserWindow.getFocusedWindow()
+  const win = BrowserWindow.fromWebContents(event.sender)
   if (win) {
     win.setAlwaysOnTop(onTop)
   }
@@ -487,8 +487,8 @@ function saveMiniModePosition() {
   dataManager.writeData(data)
 }
 
-ipcMain.on('enter-mini-mode', () => {
-  const win = BrowserWindow.getFocusedWindow()
+ipcMain.on('enter-mini-mode', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender)
   if (win) {
     // 保存当前正常模式位置
     normalModePosition = win.getPosition()
@@ -504,8 +504,8 @@ ipcMain.on('enter-mini-mode', () => {
   }
 })
 
-ipcMain.on('exit-mini-mode', () => {
-  const win = BrowserWindow.getFocusedWindow()
+ipcMain.on('exit-mini-mode', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender)
   if (win) {
     // 保存迷你模式位置（持久化）
     miniModePosition = win.getPosition()
@@ -523,8 +523,8 @@ ipcMain.on('exit-mini-mode', () => {
 })
 
 // 监听窗口移动，实时更新迷你模式位置
-ipcMain.on('update-mini-position', () => {
-  const win = BrowserWindow.getFocusedWindow()
+ipcMain.on('update-mini-position', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender)
   if (win) {
     miniModePosition = win.getPosition()
     saveMiniModePosition()
