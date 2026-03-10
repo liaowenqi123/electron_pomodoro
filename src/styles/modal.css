@@ -55,14 +55,11 @@
   background: linear-gradient(135deg, rgba(180, 90, 90, 0.98), rgba(160, 100, 100, 0.98));
   border-radius: 15px;
   padding: 25px;
-  max-width: 320px;
+  width: 380px;
   max-height: 80%;
-  overflow-y: auto;
   position: relative;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
   transform: translate(200px, -250px) scale(0.05);
   transform-origin: center center;
   opacity: 0;
@@ -118,24 +115,6 @@
   }
 }
 
-.tutorial-content::-webkit-scrollbar {
-  width: 5px;
-}
-
-.tutorial-content::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 3px;
-}
-
-.tutorial-content::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.25);
-  border-radius: 3px;
-}
-
-.tutorial-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4);
-}
-
 .tutorial-content h2 {
   color: #fff;
   font-size: 18px;
@@ -149,6 +128,26 @@
   line-height: 1.6;
   height: 280px;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+.tutorial-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.tutorial-body::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.tutorial-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 3px;
+}
+
+.tutorial-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
 }
 
 /* 教程分页标签 */
@@ -162,6 +161,7 @@
 
 .tutorial-tab {
   padding: 5px 10px;
+  min-width: 42px;
   border: none;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.15);
@@ -169,6 +169,7 @@
   font-size: 11px;
   cursor: pointer;
   transition: all 0.2s ease;
+  text-align: center;
 }
 
 .tutorial-tab:hover {
