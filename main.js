@@ -502,11 +502,10 @@ ipcMain.on('enter-mini-mode', (event) => {
     win.setMinimizable(false)
     win.setSkipTaskbar(true)
     
-    // 创建系统托盘图标（红色圆形代表番茄）
+    // 创建系统托盘图标
     if (!tray) {
-      // 使用 data URL 创建 16x16 红色圆形图标
-      const iconDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA3klEQVR4nK2SwQ3CMAxF3wqdgIjABdgK7QJ6gBLsAmQEKzABnUCxRoWJCBbcx5cUWzBhYOL/A/9YSNM0GQD5iCLLch9wkkUYhmGYpuu6rnP4XkQsFkVRdJN+v9/vuq5pmqZpW5ZlSYJvB/D6xXHcNE1Zluu6dF2XJEmSpGmapmkawzAMwzBd15VSco4Dq4Y45/i+b9u2fd/HcRxZlue6oiiiKIqmaRiG4f8MZIyh67rP81RVTdMUhcL3fdM0PQ6B53l+35VSGoZh+L5vW5aVUjIMQ9u2fd/HcRznMcYqgIj4U0r/tQD/AHzUYzd8H3zVAAAAAElFTkSuQmCC'
-      const icon = nativeImage.createFromDataURL(iconDataUrl)
+      const iconPath = path.join(__dirname, 'src/tomato-page-1.ico')
+      const icon = nativeImage.createFromPath(iconPath)
       tray = new Tray(icon)
       tray.setToolTip('番茄钟 - 迷你模式')
       tray.on('click', () => {
