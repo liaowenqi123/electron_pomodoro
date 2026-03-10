@@ -33,13 +33,30 @@
     <!-- 迷你模式容器 -->
     <div class="mini-mode" id="miniMode" style="display: none;">
       <div class="mini-draggable"></div>
-      <div class="mini-timer-container">
-        <svg class="mini-progress-ring" viewBox="0 0 130 130">
-          <circle class="bg" cx="65" cy="65" r="62"></circle>
-          <circle class="progress" cx="65" cy="65" r="62" id="miniProgressCircle"></circle>
-        </svg>
-        <div class="mini-timer-inner">
-          <div class="mini-time-display" id="miniTimeDisplay">25:00</div>
+      <!-- 番茄叶子装饰 -->
+      <div class="mini-leaves">
+        <div class="mini-leaf mini-leaf-left"></div>
+        <div class="mini-leaf mini-leaf-center"></div>
+        <div class="mini-leaf mini-leaf-right"></div>
+      </div>
+      <!-- 番茄主体 -->
+      <div class="mini-tomato">
+        <div class="mini-timer-container">
+          <svg class="mini-progress-ring" viewBox="0 0 130 130">
+            <circle class="bg" cx="65" cy="65" r="62"></circle>
+            <circle class="progress" cx="65" cy="65" r="62" id="miniProgressCircle"></circle>
+          </svg>
+          <div class="mini-timer-inner">
+            <div class="mini-time-display" id="miniTimeDisplay">25:00</div>
+          </div>
+        </div>
+        <!-- 种子装饰 -->
+        <div class="mini-seeds">
+          <span class="mini-seed" style="top: 25%; left: 30%;"></span>
+          <span class="mini-seed" style="top: 35%; left: 55%;"></span>
+          <span class="mini-seed" style="top: 55%; left: 25%;"></span>
+          <span class="mini-seed" style="top: 60%; left: 60%;"></span>
+          <span class="mini-seed" style="top: 75%; left: 40%;"></span>
         </div>
       </div>
       <button class="btn-expand-mini" id="expandMiniBtn" title="展开">⬆</button>

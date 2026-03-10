@@ -433,23 +433,22 @@
   background: rgba(244, 67, 54, 0.4);
 }
 
-/* ============ 迷你模式 ============ */
+/* ============ 迷你模式 - 番茄切片风格 ============ */
 
 .mini-mode {
   position: absolute;
   top: 0;
   left: 0;
-  width: 160px;
-  height: 160px;
+  width: 180px;
+  height: 220px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, rgba(255, 120, 120, 0.85) 0%, rgba(255, 100, 100, 0.8) 50%, rgba(240, 90, 90, 0.85) 100%);
-  border-radius: 50%;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  justify-content: flex-start;
+  padding-top: 5px;
+  background: transparent;
   z-index: 1000;
-  backdrop-filter: blur(10px);
+  overflow: visible;
 }
 
 .mini-draggable {
@@ -459,8 +458,139 @@
   left: 0;
   width: 100%;
   height: 100%;
-  border-radius: 50%;
   z-index: 1;
+}
+
+/* 叶子容器 */
+.mini-leaves {
+  position: relative;
+  width: 80px;
+  height: 40px;
+  z-index: 5;
+  margin-bottom: -12px;
+}
+
+/* 单片叶子 - 灵动自然的造型 */
+.mini-leaf {
+  position: absolute;
+  background: linear-gradient(145deg, #A5D6A7 0%, #81C784 30%, #66BB6A 60%, #4CAF50 100%);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
+  transition: transform 0.3s ease;
+}
+
+/* 叶脉 */
+.mini-leaf::after {
+  content: '';
+  position: absolute;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.5), rgba(255,255,255,0.1));
+  border-radius: 2px;
+}
+
+/* 中心叶子 - 水滴形状，微微上翘 */
+.mini-leaf-center {
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 28px;
+  border-radius: 50% 50% 45% 45% / 30% 30% 70% 70%;
+  z-index: 3;
+  animation: leafCenterSway 2.5s ease-in-out infinite;
+}
+
+.mini-leaf-center::after {
+  top: 4px;
+  left: 50%;
+  width: 2px;
+  height: 18px;
+  transform: translateX(-50%);
+  border-radius: 1px;
+}
+
+/* 左侧叶子 - 弯曲舒展 */
+.mini-leaf-left {
+  left: 5px;
+  top: 8px;
+  width: 22px;
+  height: 26px;
+  border-radius: 70% 30% 60% 40% / 40% 70% 30% 60%;
+  transform: rotate(-40deg) skewX(5deg);
+  z-index: 2;
+  animation: leafLeftSway 3s ease-in-out infinite;
+}
+
+.mini-leaf-left::after {
+  top: 6px;
+  left: 8px;
+  width: 1.5px;
+  height: 14px;
+  transform: rotate(20deg);
+  border-radius: 1px;
+}
+
+/* 右侧叶子 - 弯曲舒展 */
+.mini-leaf-right {
+  right: 5px;
+  top: 8px;
+  width: 22px;
+  height: 26px;
+  border-radius: 30% 70% 40% 60% / 70% 40% 60% 30%;
+  transform: rotate(40deg) skewX(-5deg);
+  z-index: 2;
+  animation: leafRightSway 3.2s ease-in-out infinite;
+}
+
+.mini-leaf-right::after {
+  top: 6px;
+  right: 8px;
+  width: 1.5px;
+  height: 14px;
+  transform: rotate(-20deg);
+  border-radius: 1px;
+}
+
+/* 叶子摆动动画 */
+@keyframes leafCenterSway {
+  0%, 100% { transform: translateX(-50%) rotate(0deg); }
+  25% { transform: translateX(-50%) rotate(-3deg); }
+  75% { transform: translateX(-50%) rotate(3deg); }
+}
+
+@keyframes leafLeftSway {
+  0%, 100% { transform: rotate(-40deg) skewX(5deg); }
+  50% { transform: rotate(-35deg) skewX(5deg); }
+}
+
+@keyframes leafRightSway {
+  0%, 100% { transform: rotate(40deg) skewX(-5deg); }
+  50% { transform: rotate(35deg) skewX(-5deg); }
+}
+
+/* 番茄主体 - 完整圆形，背景透明 */
+.mini-tomato {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #FF7043 0%, #FF5722 20%, #E53935 50%, #D32F2F 80%, #C62828 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+/* 番茄高光效果 */
+.mini-tomato::after {
+  content: '';
+  position: absolute;
+  top: 18px;
+  left: 25px;
+  width: 35px;
+  height: 25px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.35), transparent);
+  border-radius: 50%;
+  transform: rotate(-35deg);
 }
 
 .mini-timer-container {
@@ -471,7 +601,7 @@
   justify-content: center;
   align-items: center;
   position: relative;
-  z-index: 2;
+  z-index: 3;
 }
 
 .mini-progress-ring {
@@ -487,49 +617,69 @@
 }
 
 .mini-progress-ring .bg {
-  stroke: rgba(255, 255, 255, 0.2);
-  stroke-width: 6;
+  stroke: rgba(255, 255, 255, 0.15);
+  stroke-width: 5;
 }
 
 .mini-progress-ring .progress {
-  stroke: rgba(255, 255, 255, 0.95);
-  stroke-width: 6;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 5;
   stroke-dasharray: 389.56;
   stroke-dashoffset: 0;
   transition: stroke-dashoffset 1s linear;
-  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.5));
 }
 
 .mini-timer-inner {
-  width: 100px;
-  height: 100px;
+  width: 95px;
+  height: 95px;
   border-radius: 50%;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+  background: radial-gradient(circle at 30% 30%, rgba(255, 200, 180, 0.25), rgba(255, 138, 128, 0.15));
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.15);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .mini-time-display {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
   color: #fff;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  letter-spacing: 1px;
+}
+
+/* 种子装饰 */
+.mini-seeds {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.mini-seed {
+  position: absolute;
+  width: 6px;
+  height: 4px;
+  background: linear-gradient(135deg, #FFF59D 0%, #FFEE58 100%);
+  border-radius: 50%;
+  opacity: 0.7;
 }
 
 .btn-expand-mini {
   position: absolute;
-  bottom: 10px;
-  right: 10px;
-  width: 30px;
-  height: 30px;
+  bottom: 55px;
+  right: 15px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   color: white;
-  font-size: 14px;
+  font-size: 11px;
   cursor: pointer;
   display: flex;
   justify-content: center;
@@ -537,10 +687,12 @@
   -webkit-app-region: no-drag;
   z-index: 10;
   transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .btn-expand-mini:hover {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.35);
   transform: scale(1.1);
 }
 

@@ -479,7 +479,8 @@ let miniModePosition = null    // 迷你模式位置（持久化）
 // 正常模式窗口尺寸
 const NORMAL_WIDTH = 520
 const NORMAL_HEIGHT = 560
-const MINI_SIZE = 160
+const MINI_WIDTH = 180
+const MINI_HEIGHT = 220
 
 // 加载迷你模式位置
 function loadMiniModePosition() {
@@ -503,7 +504,7 @@ ipcMain.on('enter-mini-mode', (event) => {
     normalModePosition = win.getPosition()
     
     // 设置迷你模式尺寸并置顶，禁止最小化，隐藏任务栏图标
-    win.setSize(MINI_SIZE, MINI_SIZE)
+    win.setSize(MINI_WIDTH, MINI_HEIGHT)
     win.setAlwaysOnTop(true)
     win.setMinimizable(false)
     win.setSkipTaskbar(true)
