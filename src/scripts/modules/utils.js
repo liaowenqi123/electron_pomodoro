@@ -39,6 +39,34 @@
   }
 
   /**
+   * 签到奖励配置
+   */
+  // 每日基础奖励
+  const DAILY_REWARD = {
+    seeds: { carrot: 1 },
+    coins: 5
+  }
+
+  // 连续签到奖励（达到指定天数额外获得）
+  const CONTINUOUS_REWARDS = {
+    3:  { seeds: { tomato: 1 }, coins: 0, message: '连续签到3天！' },
+    7:  { seeds: { sunflower: 1 }, coins: 0, message: '连续签到7天！' },
+    14: { seeds: { rose: 1 }, coins: 0, message: '连续签到14天！' },
+    30: { seeds: { osmanthus: 1 }, coins: 0, message: '连续签到30天！' }
+  }
+
+  // 每周循环奖励（0=周日, 1=周一...）
+  const WEEKLY_REWARDS = {
+    1: { seeds: { carrot: 2 }, coins: 0, message: '周一奖励' },
+    2: { seeds: {}, coins: 10, message: '周二奖励' },
+    3: { seeds: { tomato: 1 }, coins: 0, message: '周三奖励' },
+    4: { seeds: {}, coins: 10, message: '周四奖励' },
+    5: { seeds: { sunflower: 1 }, coins: 0, message: '周五奖励' },
+    6: { seeds: {}, coins: 0, randomSeed: true, message: '周六随机奖励' },
+    0: { seeds: {}, coins: 20, message: '周日奖励' }
+  }
+
+  /**
    * 创建默认数据结构
    * @returns {Object} 默认数据对象
    */
@@ -71,7 +99,14 @@
           { id: 10, crop: null, progress: 0, plantedAt: null, locked: true },
           { id: 11, crop: null, progress: 0, plantedAt: null, locked: true }
         ],
-        warehouse: []
+        warehouse: [],
+        // 签到系统
+        signIn: {
+          lastDate: null,           // 上次签到日期
+          continuousDays: 0,        // 连续签到天数
+          totalDays: 0,             // 累计签到天数
+          weekRecords: [false, false, false, false, false, false, false]  // 本周签到记录
+        }
       },
       theme: 'light'  
     }
@@ -82,6 +117,9 @@
     formatTime: formatTime,
     DEFAULT_PRESETS: DEFAULT_PRESETS,
     createDefaultData: createDefaultData,
-    CROP_CONFIG: CROP_CONFIG
+    CROP_CONFIG: CROP_CONFIG,
+    DAILY_REWARD: DAILY_REWARD,
+    CONTINUOUS_REWARDS: CONTINUOUS_REWARDS,
+    WEEKLY_REWARDS: WEEKLY_REWARDS
   }
 })()

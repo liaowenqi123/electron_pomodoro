@@ -33,7 +33,16 @@
       shopCloseBtn: document.getElementById('shopCloseBtn'),
       shopBuyGrid: document.getElementById('shopBuyGrid'),
       shopSellGrid: document.getElementById('shopSellGrid'),
-      sellAllBtn: document.getElementById('sellAllBtn')
+      sellAllBtn: document.getElementById('sellAllBtn'),
+      // 签到相关
+      signinBtn: document.getElementById('signinBtn'),
+      signinModal: document.getElementById('signinModal'),
+      signinCloseBtn: document.getElementById('signinCloseBtn'),
+      signinContinuous: document.getElementById('signinContinuous'),
+      signinTotal: document.getElementById('signinTotal'),
+      signinWeekDots: document.getElementById('signinWeekDots'),
+      signinRewardsList: document.getElementById('signinRewardsList'),
+      signinConfirmBtn: document.getElementById('signinConfirmBtn')
     }
 
     // 绑定关闭按钮事件
@@ -69,6 +78,9 @@
     
     // 绑定商店事件
     initShopEvents()
+    
+    // 绑定签到事件
+    initSigninEvents()
   }
 
   /**
@@ -115,6 +127,7 @@
     renderPlots()
     renderSeeds()
     renderCrops()
+    updateSigninBtnStatus()
   }
 
   /**
@@ -691,6 +704,286 @@
     updateTip(`出售成功！共出售 ${totalItems} 个作物，获得 💰${totalCoins}`)
     render()
     renderShopSell()
+  }
+
+  /* ============ 签到系统 ============ */
+
+  /**
+   * 初始化签到事件
+   */
+  function initSigninEvents() {
+    if (elements.signinBtn) {
+      elements.signinBtn.addEventListener('click', openSigninModal)
+    }
+    if (elements.signinCloseBtn) {
+      elements.signinCloseBtn.addEventListener('click', closeSigninModal)
+    }
+    if (elements.signinModal) {
+      elements.signinModal.addEventListener('click', (e) => {
+        if (e.target === elements.signinModal) {
+          closeSigninModal()
+        }
+      })
+    }
+    if (elements.signinConfirmBtn) {
+      elements.signinConfirmBtn.addEventListener('click', handleSignIn)
+    }
+  }
+
+  /**
+   * 打开签到弹窗
+   */
+  function openSigninModal() {
+    if (elements.signinModal) {
+      elements.signinModal.classList.add('show')
+      renderSigninModal()
+    }
+  }
+
+  /**
+   * 关闭签到弹窗
+   */
+  function closeSigninModal() {
+    if (elements.signinModal) {
+      elements.signinModal.classList.remove('show')
+    }
+  }
+
+  /**
+   * 渲染签到弹窗
+   */
+  function renderSigninModal() {
+    const signInData = gardenData.signIn || {
+      lastDate: null,
+      continuousDays: 0,
+      totalDays: 0,
+      weekRecords: [false, false, false, false, false, false, false]
+    }
+    
+    // 更新统计
+    elements.signinContinuous.textContent = signInData.continuousDays
+    elements.signinTotal.textContent = signInData.totalDays
+    
+    // 更新本周签到状态
+    const today = new Date().getDay()
+    const dots = elements.signinWeekDots.querySelectorAll('.signin-dot')
+    dots.forEach((dot, index) => {
+      const dayIndex = index === 6 ? 0 : index + 1  // 调整顺序：一到日
+      dot.classList.remove('signed', 'today')
+      if (signInData.weekRecords[dayIndex]) {
+        dot.classList.add('signed')
+      }
+      if (dayIndex === today) {
+        dot.classList.add('today')
+      }
+    })
+    
+    // 渲染奖励列表
+    renderSigninRewards()
+    
+    // 更新签到按钮状态
+    const canSign = canSignIn()
+    elements.signinConfirmBtn.disabled = !canSign
+    elements.signinConfirmBtn.textContent = canSign ? '✅ 立即签到' : '今日已签到'
+  }
+
+  /**
+   * 渲染签到奖励
+   */
+  function renderSigninRewards() {
+    const today = new Date().getDay()
+    const signInData = gardenData.signIn || { continuousDays: 0 }
+    
+    let rewardsHtml = ''
+    
+    // 每日基础奖励
+    rewardsHtml += `<div class="signin-reward-item">
+      <span class="signin-reward-icon">🥕</span>
+      <span>胡萝卜种子 x${Utils.DAILY_REWARD.seeds.carrot}</span>
+    </div>`
+    rewardsHtml += `<div class="signin-reward-item">
+      <span class="signin-reward-icon">💰</span>
+      <span>金币 x${Utils.DAILY_REWARD.coins}</span>
+    </div>`
+    
+    // 每周奖励
+    const weeklyReward = Utils.WEEKLY_REWARDS[today]
+    if (weeklyReward) {
+      if (weeklyReward.randomSeed) {
+        rewardsHtml += `<div class="signin-reward-item extra">
+          <span class="signin-reward-icon">🎁</span>
+          <span>随机种子礼包 x1</span>
+        </div>`
+      } else if (Object.keys(weeklyReward.seeds).length > 0 || weeklyReward.coins > 0) {
+        const seedEntries = Object.entries(weeklyReward.seeds)
+        seedEntries.forEach(([seedKey, count]) => {
+          const crop = CROP_CONFIG[seedKey]
+          rewardsHtml += `<div class="signin-reward-item extra">
+            <span class="signin-reward-icon">${crop.icon}</span>
+            <span>${crop.name}种子 x${count}</span>
+          </div>`
+        })
+        if (weeklyReward.coins > 0) {
+          rewardsHtml += `<div class="signin-reward-item extra">
+            <span class="signin-reward-icon">💰</span>
+            <span>金币 x${weeklyReward.coins}</span>
+          </div>`
+        }
+      }
+    }
+    
+    // 连续签到奖励预览
+    const nextMilestone = getNextMilestone(signInData.continuousDays)
+    if (nextMilestone) {
+      const reward = Utils.CONTINUOUS_REWARDS[nextMilestone]
+      const seedKey = Object.keys(reward.seeds)[0]
+      const crop = CROP_CONFIG[seedKey]
+      rewardsHtml += `<div class="signin-reward-item extra">
+        <span class="signin-reward-icon">${crop.icon}</span>
+        <span>连续${nextMilestone}天: ${crop.name}种子 x${reward.seeds[seedKey]}</span>
+      </div>`
+    }
+    
+    elements.signinRewardsList.innerHTML = rewardsHtml
+  }
+
+  /**
+   * 检查是否可以签到
+   */
+  function canSignIn() {
+    const signInData = gardenData.signIn || { lastDate: null }
+    const today = new Date().toDateString()
+    return signInData.lastDate !== today
+  }
+
+  /**
+   * 获取下一个连续签到里程碑
+   */
+  function getNextMilestone(currentDays) {
+    const milestones = Object.keys(Utils.CONTINUOUS_REWARDS).map(Number).sort((a, b) => a - b)
+    for (const milestone of milestones) {
+      if (currentDays < milestone) {
+        return milestone
+      }
+    }
+    return null
+  }
+
+  /**
+   * 执行签到
+   */
+  async function handleSignIn() {
+    if (!canSignIn()) {
+      updateTip('今日已签到')
+      return
+    }
+    
+    const signInData = gardenData.signIn || {
+      lastDate: null,
+      continuousDays: 0,
+      totalDays: 0,
+      weekRecords: [false, false, false, false, false, false, false]
+    }
+    
+    // 计算连续签到天数
+    const today = new Date()
+    const todayStr = today.toDateString()
+    
+    if (signInData.lastDate) {
+      const lastDate = new Date(signInData.lastDate)
+      const diffTime = today - lastDate
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+      
+      if (diffDays === 1) {
+        // 连续签到
+        signInData.continuousDays++
+      } else if (diffDays > 1) {
+        // 断签，重置
+        signInData.continuousDays = 1
+        // 重置本周记录（新的一周）
+        signInData.weekRecords = [false, false, false, false, false, false, false]
+      }
+    } else {
+      // 首次签到
+      signInData.continuousDays = 1
+    }
+    
+    // 更新签到数据
+    signInData.lastDate = todayStr
+    signInData.totalDays++
+    
+    // 更新本周签到记录
+    const dayOfWeek = today.getDay()
+    signInData.weekRecords[dayOfWeek] = true
+    
+    // 发放奖励
+    await grantSigninRewards(signInData)
+    
+    // 保存数据
+    gardenData.signIn = signInData
+    await saveGardenData()
+    
+    // 更新按钮状态
+    updateSigninBtnStatus()
+    
+    // 重新渲染弹窗
+    renderSigninModal()
+    
+    // 更新界面
+    render()
+    
+    updateTip('签到成功！奖励已发放')
+  }
+
+  /**
+   * 发放签到奖励
+   */
+  async function grantSigninRewards(signInData) {
+    const today = new Date().getDay()
+    
+    // 发放每日基础奖励
+    Object.entries(Utils.DAILY_REWARD.seeds).forEach(([seedKey, count]) => {
+      gardenData.seeds[seedKey] = (gardenData.seeds[seedKey] || 0) + count
+    })
+    gardenData.coins += Utils.DAILY_REWARD.coins
+    
+    // 发放每周奖励
+    const weeklyReward = Utils.WEEKLY_REWARDS[today]
+    if (weeklyReward) {
+      if (weeklyReward.randomSeed) {
+        // 随机种子
+        const seedKeys = Object.keys(CROP_CONFIG)
+        const randomKey = seedKeys[Math.floor(Math.random() * seedKeys.length)]
+        gardenData.seeds[randomKey] = (gardenData.seeds[randomKey] || 0) + 1
+      } else {
+        Object.entries(weeklyReward.seeds).forEach(([seedKey, count]) => {
+          gardenData.seeds[seedKey] = (gardenData.seeds[seedKey] || 0) + count
+        })
+        gardenData.coins += weeklyReward.coins
+      }
+    }
+    
+    // 发放连续签到奖励
+    const continuousReward = Utils.CONTINUOUS_REWARDS[signInData.continuousDays]
+    if (continuousReward) {
+      Object.entries(continuousReward.seeds).forEach(([seedKey, count]) => {
+        gardenData.seeds[seedKey] = (gardenData.seeds[seedKey] || 0) + count
+      })
+      gardenData.coins += continuousReward.coins
+    }
+  }
+
+  /**
+   * 更新签到按钮状态
+   */
+  function updateSigninBtnStatus() {
+    if (elements.signinBtn) {
+      if (canSignIn()) {
+        elements.signinBtn.classList.remove('signed')
+      } else {
+        elements.signinBtn.classList.add('signed')
+      }
+    }
   }
 
   // 导出到全局

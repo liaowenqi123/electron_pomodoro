@@ -18,6 +18,7 @@
           <span class="coin-icon">💰</span>
           <span id="coinCount">0</span>
         </div>
+        <button class="garden-signin-btn" id="signinBtn" title="签到">📅</button>
         <button class="garden-shop-btn" id="shopBtn" title="商店">🏪</button>
       </div>
       <button class="garden-btn-close" id="gardenCloseBtn">×</button>
@@ -80,6 +81,62 @@
         </div>
         <button class="shop-sell-all" id="sellAllBtn">💰 一键出售全部</button>
       </div>
+    </div>
+  </div>
+
+  <!-- 签到弹窗 -->
+  <div class="signin-modal" id="signinModal">
+    <div class="signin-content">
+      <div class="signin-header">
+        <span class="signin-title">📅 每日签到</span>
+        <button class="signin-close" id="signinCloseBtn">×</button>
+      </div>
+      
+      <!-- 签到统计 -->
+      <div class="signin-stats">
+        <div class="signin-stat">
+          <span class="signin-stat-value" id="signinContinuous">0</span>
+          <span class="signin-stat-label">连续签到</span>
+        </div>
+        <div class="signin-stat-divider">|</div>
+        <div class="signin-stat">
+          <span class="signin-stat-value" id="signinTotal">0</span>
+          <span class="signin-stat-label">累计签到</span>
+        </div>
+      </div>
+      
+      <!-- 本周签到日历 -->
+      <div class="signin-calendar">
+        <div class="signin-calendar-row">
+          <span class="signin-day-label">一</span>
+          <span class="signin-day-label">二</span>
+          <span class="signin-day-label">三</span>
+          <span class="signin-day-label">四</span>
+          <span class="signin-day-label">五</span>
+          <span class="signin-day-label">六</span>
+          <span class="signin-day-label">日</span>
+        </div>
+        <div class="signin-calendar-row" id="signinWeekDots">
+          <span class="signin-dot" data-day="1"></span>
+          <span class="signin-dot" data-day="2"></span>
+          <span class="signin-dot" data-day="3"></span>
+          <span class="signin-dot" data-day="4"></span>
+          <span class="signin-dot" data-day="5"></span>
+          <span class="signin-dot" data-day="6"></span>
+          <span class="signin-dot" data-day="0"></span>
+        </div>
+      </div>
+      
+      <!-- 今日奖励 -->
+      <div class="signin-rewards">
+        <div class="signin-rewards-title">━━━ 今日奖励 ━━━</div>
+        <div class="signin-rewards-list" id="signinRewardsList">
+          <!-- 奖励由 JS 动态生成 -->
+        </div>
+      </div>
+      
+      <!-- 签到按钮 -->
+      <button class="signin-btn" id="signinConfirmBtn">✅ 立即签到</button>
     </div>
   </div>
 
