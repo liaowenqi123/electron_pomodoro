@@ -212,10 +212,5 @@ const { contextBridge, ipcRenderer } = require('electron')
   // 监听托盘退出应用事件
   onQuitAppFromTray: (callback) => {
     ipcRenderer.on('quit-app-from-tray', () => callback())
-  },
-  
-  // 监听显示托盘菜单事件
-  onShowTrayMenu: (callback) => {
-    ipcRenderer.on('show-tray-menu', (event, data) => callback(data))
   }
 })

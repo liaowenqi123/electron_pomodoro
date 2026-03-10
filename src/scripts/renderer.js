@@ -403,51 +403,6 @@
     })
   }
 
-  // ============ 托盘自定义菜单 ============
-  const trayMenu = document.getElementById('trayMenu')
-  const trayMenuExpand = document.getElementById('trayMenuExpand')
-  const trayMenuQuit = document.getElementById('trayMenuQuit')
-  
-  // 监听显示托盘菜单事件
-  if (window.electronAPI && window.electronAPI.onShowTrayMenu) {
-    window.electronAPI.onShowTrayMenu(() => {
-      if (trayMenu && isMiniMode) {
-        // 在窗口底部中央显示菜单
-        trayMenu.style.left = '50%'
-        trayMenu.style.transform = 'translateX(-50%)'
-        trayMenu.style.bottom = '10px'
-        trayMenu.style.top = 'auto'
-        trayMenu.classList.add('show')
-      }
-    })
-  }
-  
-  // 点击菜单外部关闭
-  document.addEventListener('click', (e) => {
-    if (trayMenu && !trayMenu.contains(e.target)) {
-      trayMenu.classList.remove('show')
-    }
-  })
-  
-  // 展开窗口
-  if (trayMenuExpand) {
-    trayMenuExpand.addEventListener('click', () => {
-      trayMenu.classList.remove('show')
-      exitMiniMode()
-    })
-  }
-  
-  // 退出应用
-  if (trayMenuQuit) {
-    trayMenuQuit.addEventListener('click', async () => {
-      trayMenu.classList.remove('show')
-      if (isMiniMode) {
-        exitMiniMode()
-      }
-      DOM.btnClose.click()
-    })
-  }
-
   // 迷你模式展开按钮事件
   const expandMiniBtn = document.getElementById('expandMiniBtn')
   if (expandMiniBtn) {
