@@ -356,6 +356,16 @@
     }
   })
 
+  // 图钉置顶按钮
+  let isPinned = false
+  if (DOM.btnPin) {
+    DOM.btnPin.addEventListener('click', () => {
+      isPinned = !isPinned
+      DOM.btnPin.classList.toggle('active', isPinned)
+      window.electronAPI.setAlwaysOnTop(isPinned)
+    })
+  }
+
   // ============ 迷你模式功能 ============
   let isMiniMode = false
 

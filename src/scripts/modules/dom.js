@@ -86,7 +86,8 @@
     // 按钮
     btnClose: document.querySelector('.btn-close'),
     btnMinimize: document.querySelector('.btn-minimize'),
-    btnReset: document.querySelector('.btn-reset')
+    btnReset: document.querySelector('.btn-reset'),
+    btnPin: document.getElementById('btnPin')
   }
 
   // 导出到全局

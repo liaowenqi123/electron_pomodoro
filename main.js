@@ -444,6 +444,7 @@ ipcMain.on('set-always-on-top', (event, onTop) => {
   const win = BrowserWindow.fromWebContents(event.sender)
   if (win) {
     win.setAlwaysOnTop(onTop)
+    win.setMinimizable(!onTop)  // 置顶时禁用最小化
   }
 })
 
