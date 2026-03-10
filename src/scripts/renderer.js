@@ -496,6 +496,33 @@
     })
   }
 
+  // ============ 滚轮调整时间功能 ============
+  // 仅在单次模式下、未开始计时时，滚动时间数字可调整分钟数
+  const timeDisplay = document.getElementById('timeDisplay')
+  if (timeDisplay) {
+    timeDisplay.addEventListener('wheel', (e) => {
+      // 判断条件：单次模式 + 未开始计时
+      if (AppState.appMode !== 'single') return
+      if (Timer.getIsRunning()) return
+      
+      e.preventDefault()
+      e.stopPropagation()
+      
+      // 获取当前时间（分钟）
+      const currentMinutes = Math.floor(Timer.getTotalTime() / 60)
+      
+      // 根据滚动方向调整（向上滚动增加，向下滚动减少）
+      const delta = e.deltaY < 0 ? 1 : -1
+      let newMinutes = currentMinutes + delta
+      
+      // 限制范围 1-120 分钟
+      newMinutes = Math.max(1, Math.min(120, newMinutes))
+      
+      // 设置新时间
+      Timer.setTime(newMinutes)
+    }, { passive: false })
+  }
+
   // ============ 自定义确认弹窗 ============
   // 显示自定义确认弹窗
   window.showConfirmModal = function(message) {
