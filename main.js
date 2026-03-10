@@ -493,10 +493,11 @@ ipcMain.on('enter-mini-mode', (event) => {
     // 保存当前正常模式位置
     normalModePosition = win.getPosition()
     
-    // 设置迷你模式尺寸并置顶，禁止最小化
+    // 设置迷你模式尺寸并置顶，禁止最小化，隐藏任务栏图标
     win.setSize(MINI_SIZE, MINI_SIZE)
     win.setAlwaysOnTop(true)
     win.setMinimizable(false)
+    win.setSkipTaskbar(true)
     
     // 如果有保存的迷你模式位置，恢复它
     if (miniModePosition) {
@@ -512,10 +513,11 @@ ipcMain.on('exit-mini-mode', (event) => {
     miniModePosition = win.getPosition()
     saveMiniModePosition()
     
-    // 恢复正常模式尺寸，恢复可最小化
+    // 恢复正常模式尺寸，恢复可最小化，显示任务栏图标
     win.setSize(NORMAL_WIDTH, NORMAL_HEIGHT)
     win.setAlwaysOnTop(false)
     win.setMinimizable(true)
+    win.setSkipTaskbar(false)
     
     // 恢复正常模式位置
     if (normalModePosition) {
