@@ -18,6 +18,7 @@
           <span class="coin-icon">💰</span>
           <span id="coinCount">0</span>
         </div>
+        <button class="garden-shop-btn" id="shopBtn" title="商店">🏪</button>
       </div>
       <button class="garden-btn-close" id="gardenCloseBtn">×</button>
     </div>
@@ -48,6 +49,37 @@
     <!-- 提示信息 -->
     <div class="garden-tip" id="gardenTip">
       点击种子，然后点击空格子种植
+    </div>
+  </div>
+
+  <!-- 商店弹窗 -->
+  <div class="shop-modal" id="shopModal">
+    <div class="shop-content">
+      <div class="shop-header">
+        <span class="shop-title">🏪 商店</span>
+        <button class="shop-close" id="shopCloseBtn">×</button>
+      </div>
+      
+      <!-- 标签页切换 -->
+      <div class="shop-tabs">
+        <button class="shop-tab active" data-tab="buy">🌱 购买种子</button>
+        <button class="shop-tab" data-tab="sell">🧺 出售作物</button>
+      </div>
+      
+      <!-- 购买种子区域 -->
+      <div class="shop-panel active" id="buyPanel">
+        <div class="shop-grid" id="shopBuyGrid">
+          <!-- 种子由 JS 动态生成 -->
+        </div>
+      </div>
+      
+      <!-- 出售作物区域 -->
+      <div class="shop-panel" id="sellPanel">
+        <div class="shop-grid" id="shopSellGrid">
+          <!-- 作物由 JS 动态生成 -->
+        </div>
+        <button class="shop-sell-all" id="sellAllBtn">💰 一键出售全部</button>
+      </div>
     </div>
   </div>
 

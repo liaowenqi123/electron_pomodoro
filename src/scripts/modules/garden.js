@@ -26,7 +26,14 @@
       seedList: document.getElementById('seedList'),
       cropList: document.getElementById('cropList'),
       gardenTip: document.getElementById('gardenTip'),
-      gardenCloseBtn: document.getElementById('gardenCloseBtn')
+      gardenCloseBtn: document.getElementById('gardenCloseBtn'),
+      // 商店相关
+      shopBtn: document.getElementById('shopBtn'),
+      shopModal: document.getElementById('shopModal'),
+      shopCloseBtn: document.getElementById('shopCloseBtn'),
+      shopBuyGrid: document.getElementById('shopBuyGrid'),
+      shopSellGrid: document.getElementById('shopSellGrid'),
+      sellAllBtn: document.getElementById('sellAllBtn')
     }
 
     // 绑定关闭按钮事件
@@ -59,6 +66,9 @@
     
     // 渲染界面
     render()
+    
+    // 绑定商店事件
+    initShopEvents()
   }
 
   /**
@@ -453,6 +463,234 @@
    */
   function updateTip(message) {
     elements.gardenTip.textContent = message
+  }
+
+  // ============ 商店功能 ============
+
+  /**
+   * 初始化商店事件
+   */
+  function initShopEvents() {
+    // 打开商店
+    if (elements.shopBtn) {
+      elements.shopBtn.addEventListener('click', openShop)
+    }
+    
+    // 关闭商店
+    if (elements.shopCloseBtn) {
+      elements.shopCloseBtn.addEventListener('click', closeShop)
+    }
+    
+    // 点击遮罩关闭
+    if (elements.shopModal) {
+      elements.shopModal.addEventListener('click', (e) => {
+        if (e.target === elements.shopModal) {
+          closeShop()
+        }
+      })
+    }
+    
+    // 标签页切换
+    const tabs = document.querySelectorAll('.shop-tab')
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // 更新标签页状态
+        tabs.forEach(t => t.classList.remove('active'))
+        tab.classList.add('active')
+        
+        // 切换面板
+        const tabName = tab.dataset.tab
+        document.querySelectorAll('.shop-panel').forEach(panel => {
+          panel.classList.remove('active')
+        })
+        document.getElementById(tabName === 'buy' ? 'buyPanel' : 'sellPanel').classList.add('active')
+      })
+    })
+    
+    // 一键出售
+    if (elements.sellAllBtn) {
+      elements.sellAllBtn.addEventListener('click', sellAllCrops)
+    }
+  }
+
+  /**
+   * 打开商店
+   */
+  function openShop() {
+    if (elements.shopModal) {
+      elements.shopModal.classList.add('show')
+      renderShopBuy()
+      renderShopSell()
+    }
+  }
+
+  /**
+   * 关闭商店
+   */
+  function closeShop() {
+    if (elements.shopModal) {
+      elements.shopModal.classList.remove('show')
+    }
+  }
+
+  /**
+   * 渲染购买种子列表
+   */
+  function renderShopBuy() {
+    if (!elements.shopBuyGrid) return
+    
+    elements.shopBuyGrid.innerHTML = ''
+    const coins = gardenData.coins || 0
+    
+    Object.keys(CROP_CONFIG).forEach(cropKey => {
+      const crop = CROP_CONFIG[cropKey]
+      const canBuy = coins >= crop.seedPrice
+      
+      const itemEl = document.createElement('div')
+      itemEl.className = 'shop-item'
+      itemEl.innerHTML = `
+        <div class="shop-item-icon"><span class="seed-icon seed-${crop.seedType}"></span></div>
+        <div class="shop-item-name">${crop.name}种子</div>
+        <div class="shop-item-price">💰 ${crop.seedPrice}</div>
+        <button class="shop-item-btn" ${canBuy ? '' : 'disabled'}>${canBuy ? '购买' : '金币不足'}</button>
+      `
+      
+      if (canBuy) {
+        const btn = itemEl.querySelector('.shop-item-btn')
+        btn.addEventListener('click', () => buySeed(cropKey))
+      }
+      
+      elements.shopBuyGrid.appendChild(itemEl)
+    })
+  }
+
+  /**
+   * 渲染出售作物列表
+   */
+  function renderShopSell() {
+    if (!elements.shopSellGrid) return
+    
+    elements.shopSellGrid.innerHTML = ''
+    const crops = gardenData.crops || {}
+    
+    // 检查是否有作物
+    const hasCrops = Object.values(crops).some(count => count > 0)
+    
+    if (!hasCrops) {
+      elements.shopSellGrid.innerHTML = '<div class="shop-empty">暂无可出售的作物</div>'
+      if (elements.sellAllBtn) {
+        elements.sellAllBtn.disabled = true
+      }
+      return
+    }
+    
+    if (elements.sellAllBtn) {
+      elements.sellAllBtn.disabled = false
+    }
+    
+    Object.keys(CROP_CONFIG).forEach(cropKey => {
+      const crop = CROP_CONFIG[cropKey]
+      const count = crops[cropKey] || 0
+      
+      if (count > 0) {
+        const itemEl = document.createElement('div')
+        itemEl.className = 'shop-item'
+        itemEl.innerHTML = `
+          <div class="shop-item-icon">${crop.icon}</div>
+          <div class="shop-item-name">${crop.name}</div>
+          <div class="shop-item-count">拥有: x${count}</div>
+          <div class="shop-item-price">💰 ${crop.sellPrice}</div>
+          <button class="shop-item-btn sell">出售</button>
+        `
+        
+        const btn = itemEl.querySelector('.shop-item-btn')
+        btn.addEventListener('click', () => sellCrop(cropKey))
+        
+        elements.shopSellGrid.appendChild(itemEl)
+      }
+    })
+  }
+
+  /**
+   * 购买种子
+   */
+  async function buySeed(cropKey) {
+    const crop = CROP_CONFIG[cropKey]
+    const coins = gardenData.coins || 0
+    
+    if (coins < crop.seedPrice) {
+      updateTip('金币不足')
+      return
+    }
+    
+    // 扣除金币
+    gardenData.coins = coins - crop.seedPrice
+    
+    // 增加种子
+    gardenData.seeds = gardenData.seeds || {}
+    gardenData.seeds[cropKey] = (gardenData.seeds[cropKey] || 0) + 1
+    
+    // 保存并渲染
+    await saveGardenData()
+    updateTip(`购买成功！获得 ${crop.name}种子 x1`)
+    render()
+    renderShopBuy()
+  }
+
+  /**
+   * 出售作物
+   */
+  async function sellCrop(cropKey) {
+    const crop = CROP_CONFIG[cropKey]
+    const crops = gardenData.crops || {}
+    
+    if (!crops[cropKey] || crops[cropKey] <= 0) {
+      return
+    }
+    
+    // 减少作物
+    crops[cropKey]--
+    
+    // 增加金币
+    gardenData.coins = (gardenData.coins || 0) + crop.sellPrice
+    
+    // 保存并渲染
+    await saveGardenData()
+    updateTip(`出售成功！获得 💰${crop.sellPrice}`)
+    render()
+    renderShopSell()
+  }
+
+  /**
+   * 一键出售全部作物
+   */
+  async function sellAllCrops() {
+    const crops = gardenData.crops || {}
+    let totalCoins = 0
+    let totalItems = 0
+    
+    Object.keys(crops).forEach(cropKey => {
+      const count = crops[cropKey]
+      if (count > 0) {
+        const crop = CROP_CONFIG[cropKey]
+        totalCoins += crop.sellPrice * count
+        totalItems += count
+        crops[cropKey] = 0
+      }
+    })
+    
+    if (totalItems === 0) {
+      return
+    }
+    
+    // 增加金币
+    gardenData.coins = (gardenData.coins || 0) + totalCoins
+    
+    // 保存并渲染
+    await saveGardenData()
+    updateTip(`出售成功！共出售 ${totalItems} 个作物，获得 💰${totalCoins}`)
+    render()
+    renderShopSell()
   }
 
   // 导出到全局
