@@ -2,7 +2,7 @@
  * 番茄钟 - 主进程
  */
 
-const { app, BrowserWindow, ipcMain, Notification, Tray, nativeImage, Menu } = require('electron')
+const { app, BrowserWindow, ipcMain, Notification, Tray, nativeImage } = require('electron')
 const path = require('path')
 const musicProcess = require('./src/modules/musicProcess')
 const aiAssistant = require('./src/modules/aiAssistant')
@@ -515,25 +515,11 @@ ipcMain.on('enter-mini-mode', (event) => {
       tray = new Tray(icon)
       tray.setToolTip('番茄钟 - 迷你模式')
       
-      // 右键菜单
-      const contextMenu = Menu.buildFromTemplate([
-        {
-          label: '展开窗口',
-          click: () => {
-            // 发送事件到渲染进程退出迷你模式
-            win.webContents.send('exit-mini-mode-from-tray')
-          }
-        },
-        { type: 'separator' },
-        {
-          label: '退出应用',
-          click: () => {
-            // 发送事件到渲染进程，让渲染进程处理确认弹窗和退出
-            win.webContents.send('quit-app-from-tray')
-          }
-        }
-      ])
-      tray.setContextMenu(contextMenu)
+      // 右键显示自定义菜单窗口
+      tray.on('right-click', (event, bounds) => {
+        // 发送事件让渲染进程显示自定义菜单
+        win.webContents.send('show-tray-menu', { x: bounds.x, y: bounds.y })
+      })
       
       tray.on('click', () => {
         // 点击托盘图标显示窗口

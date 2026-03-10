@@ -676,3 +676,48 @@
   opacity: 1;
   transform: scale(1.1);
 }
+
+/* ============ 托盘右键菜单 ============ */
+.tray-menu {
+  position: fixed;
+  display: none;
+  flex-direction: column;
+  background: rgba(40, 40, 40, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 4px;
+  padding: 4px 0;
+  min-width: 100px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
+}
+
+.tray-menu.show {
+  display: flex;
+}
+
+.tray-menu-item {
+  padding: 6px 16px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 0.15s;
+  user-select: none;
+}
+
+.tray-menu-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tray-menu-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 4px 8px;
+}
+
+.tray-menu-exit {
+  color: #ef5350;
+}
+
+.tray-menu-exit:hover {
+  background: rgba(239, 83, 80, 0.15);
+}
