@@ -506,7 +506,6 @@
       if (Timer.getIsRunning()) return
       
       e.preventDefault()
-      e.stopPropagation()
       
       // 获取当前时间（分钟）
       const currentMinutes = Math.floor(Timer.getTotalTime() / 60)
