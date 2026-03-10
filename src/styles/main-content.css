@@ -700,21 +700,21 @@
 /* ============ 计时器上方备注输入 ============ */
 .timer-note-input {
   position: absolute;
-  top: 35px;
+  top: 50px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 8px;
+  padding: 4px 8px;
   background: rgba(255, 255, 255, 0.12);
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.25);
   -webkit-app-region: no-drag;
   animation: fadeInDown 0.3s ease;
-  max-width: 130px;
+  max-width: 120px;
   z-index: 10;
-  height: 22px;
+  height: 26px;
 }
 
 @keyframes fadeInDown {
@@ -736,7 +736,7 @@
   font-size: 11px;
   outline: none;
   padding: 1px 3px;
-  min-width: 70px;
+  min-width: 50px;
   -webkit-app-region: no-drag;
   line-height: 1;
 }
@@ -778,22 +778,22 @@
 /* ============ 计时器上方备注显示区域 ============ */
 .timer-note-display {
   position: absolute;
-  top: 35px;
+  top: 50px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 8px;
+  padding: 4px 8px;
   background: rgba(255, 255, 255, 0.12);
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.25);
   -webkit-app-region: no-drag;
   animation: fadeInDown 0.3s ease;
-  max-width: 130px;
+  max-width: 140px;
   z-index: 10;
-  height: 22px;
-  min-width: 22px;
+  height: 28px;
+  min-width: 28px;
 }
 
 .timer-note-text {
@@ -804,7 +804,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  line-height: 1;
+  line-height: 1.4;
   min-width: 0;
 }
 

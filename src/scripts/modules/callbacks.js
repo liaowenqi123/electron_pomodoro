@@ -21,6 +21,38 @@
         if (AppState.focusModeEnabled && window.ForegroundDetection) {
           window.ForegroundDetection.startDetection()
         }
+        
+        // 单次模式下，自动确认备注输入
+        if (AppState.appMode === 'single') {
+          const timerNoteInput = document.getElementById('timerNoteInput')
+          const timerNoteDisplay = document.getElementById('timerNoteDisplay')
+          const timerNoteTitleInput = document.getElementById('timerNoteTitleInput')
+          const timerNoteText = document.getElementById('timerNoteText')
+          
+          if (timerNoteInput && timerNoteInput.style.display !== 'none' && timerNoteTitleInput) {
+            const title = timerNoteTitleInput.value.trim()
+            
+            // 保存到独立的单次模式备注字段
+            const data = DataStore.getData()
+            data.singleModeNote = title
+            DataStore.saveImmediate()
+            
+            // 切换到显示模式
+            timerNoteInput.style.display = 'none'
+            timerNoteDisplay.style.display = 'flex'
+            timerNoteText.textContent = title
+            
+            // 根据字数调整位置
+            const len = title.length
+            if (len <= 2) {
+              timerNoteDisplay.style.top = '40px'
+            } else if (len <= 4) {
+              timerNoteDisplay.style.top = '45px'
+            } else {
+              timerNoteDisplay.style.top = '50px'
+            }
+          }
+        }
       },
       
       onStatusChange: (status) => {
