@@ -127,6 +127,7 @@
   position: relative;
   transition: width 0.15s cubic-bezier(0.5, 0, 0.5, 1) 0s,
               height 0.15s cubic-bezier(0.5, 0, 0.5, 1) 0s;
+  -webkit-app-region: no-drag;
 }
 
 .progress-ring {
@@ -540,5 +541,138 @@
 
 .btn-expand-mini:hover {
   background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.1);
+}
+
+/* ============ 计时器上方备注输入 ============ */
+.timer-note-input {
+  position: absolute;
+  top: 35px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  -webkit-app-region: no-drag;
+  animation: fadeInDown 0.3s ease;
+  max-width: 130px;
+  z-index: 10;
+  height: 22px;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.timer-note-title {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 11px;
+  outline: none;
+  padding: 1px 3px;
+  min-width: 70px;
+  -webkit-app-region: no-drag;
+  line-height: 1;
+}
+
+.timer-note-title::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 10px;
+}
+
+.timer-note-title:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.timer-note-confirm {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  -webkit-app-region: no-drag;
+  padding: 0;
+  line-height: 1;
+}
+
+.timer-note-confirm:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+/* ============ 计时器上方备注编辑按钮 ============ */
+.timer-note-edit {
+  position: absolute;
+  top: 35px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  -webkit-app-region: no-drag;
+  animation: fadeInDown 0.3s ease;
+  max-width: 130px;
+  z-index: 10;
+  height: 22px;
+}
+
+.timer-note-text {
+  flex: 1;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.timer-note-edit-btn {
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  -webkit-app-region: no-drag;
+  padding: 0;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+.timer-note-edit-btn:hover {
+  opacity: 1;
   transform: scale(1.1);
 }

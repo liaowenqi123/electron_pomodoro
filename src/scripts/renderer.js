@@ -238,15 +238,9 @@
   DOM.addPresetBtn.addEventListener('click', async () => {
     if (AppState.appMode === 'single') {
       const minutes = WheelPicker.getValue()
-      const note = NoteManager.getNote()
       
-      // 备注改为可选，标题和详细内容都为空时，note为null
-      const finalNote = (note.title || note.detail) ? note : null
-      
-      await Presets.addPreset(minutes, finalNote)
-      
-      // 添加成功后清空备注输入框
-      NoteManager.clearNote()
+      // 不再需要从NoteManager获取备注，备注将在选择预设后输入
+      await Presets.addPreset(minutes, null)
     }
   })
 

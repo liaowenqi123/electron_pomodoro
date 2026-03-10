@@ -38,16 +38,8 @@
         item.classList.add('active')
       }
       
-      // 构建左侧内容（时间 + 备注图标）
+      // 构建左侧内容（只显示时间，不显示备注图标）
       let leftContent = `<span class="preset-time">${minutes}分钟</span>`
-      if (note && (note.title || note.detail)) {
-        const tooltipText = note.title || '查看备注'
-        leftContent += `
-          <span class="preset-note-icon" data-index="${index}" title="${tooltipText}">
-            📒
-          </span>
-        `
-      }
       
       item.innerHTML = `
         <div class="preset-item-left">
@@ -59,16 +51,9 @@
       // 点击选择预设
       item.addEventListener('click', (e) => {
         if (e.target.classList.contains('preset-delete')) return
-        if (e.target.classList.contains('preset-note-icon')) {
-          // 点击备注图标，显示编辑备注弹窗
-          e.stopPropagation()
-          const idx = parseInt(e.target.dataset.index)
-          editNoteForPreset(idx, note)
-          return
-        }
         if (!isEnabled) return
         
-        selectPreset(minutes, note)
+        selectPreset(minutes, note, index)
       })
       
       // 删除按钮
@@ -226,7 +211,7 @@
   }
 
   // 选择预设
-  function selectPreset(minutes, note) {
+  function selectPreset(minutes, note, index) {
     activePreset = minutes
     
     // 更新 UI
@@ -234,17 +219,107 @@
       item.classList.toggle('active', parseInt(item.dataset.minutes) === minutes)
     })
     
-    // 如果预设有备注，填充到备注输入框（可选）
-    if (note && window.NoteManager) {
-      window.NoteManager.setNote(note)
+    // 只在单次模式时显示计时器上方的备注输入/编辑区域
+    if (AppState.appMode === 'single') {
+      showTimerNoteInput(minutes, note, index)
     } else {
-      // 如果没有备注，清空输入框
-      window.NoteManager.clearNote()
+      // 计划模式时隐藏备注区域
+      const timerNoteInput = document.getElementById('timerNoteInput')
+      const timerNoteEdit = document.getElementById('timerNoteEdit')
+      if (timerNoteInput) timerNoteInput.style.display = 'none'
+      if (timerNoteEdit) timerNoteEdit.style.display = 'none'
     }
     
     // 触发回调
     if (callbacks.onSelect) {
       callbacks.onSelect(minutes)
+    }
+  }
+  
+  // 显示计时器上方的备注输入/编辑区域
+  function showTimerNoteInput(minutes, note, index) {
+    const timerNoteInput = document.getElementById('timerNoteInput')
+    const timerNoteEdit = document.getElementById('timerNoteEdit')
+    const timerNoteTitleInput = document.getElementById('timerNoteTitleInput')
+    const timerNoteText = document.getElementById('timerNoteText')
+    
+    if (!timerNoteInput || !timerNoteEdit) {
+      console.warn('Timer note elements not found')
+      return
+    }
+    
+    // 如果已有备注，显示编辑按钮
+    if (note && note.title) {
+      timerNoteInput.style.display = 'none'
+      timerNoteEdit.style.display = 'flex'
+      timerNoteText.textContent = note.title
+      
+      // 绑定编辑按钮事件
+      const editBtn = document.getElementById('timerNoteEditBtn')
+      if (editBtn) {
+        editBtn.onclick = (e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          timerNoteEdit.style.display = 'none'
+          timerNoteInput.style.display = 'flex'
+          timerNoteTitleInput.value = note.title
+          timerNoteTitleInput.focus()
+        }
+      }
+    } else {
+      // 没有备注，显示输入框
+      timerNoteInput.style.display = 'flex'
+      timerNoteEdit.style.display = 'none'
+      timerNoteTitleInput.value = ''
+      timerNoteTitleInput.focus()
+    }
+    
+    // 绑定确认按钮事件
+    const confirmBtn = document.getElementById('timerNoteConfirm')
+    if (confirmBtn) {
+      confirmBtn.onclick = async (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        const title = timerNoteTitleInput.value.trim()
+        const newNote = title ? { title, detail: '' } : null
+        
+        // 更新预设的备注
+        await updatePresetNote(index, newNote)
+        
+        // 切换到编辑模式
+        if (title) {
+          timerNoteInput.style.display = 'none'
+          timerNoteEdit.style.display = 'flex'
+          timerNoteText.textContent = title
+          
+          // 重新绑定编辑按钮
+          const editBtn2 = document.getElementById('timerNoteEditBtn')
+          if (editBtn2) {
+            editBtn2.onclick = (e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              timerNoteEdit.style.display = 'none'
+              timerNoteInput.style.display = 'flex'
+              timerNoteTitleInput.value = title
+              timerNoteTitleInput.focus()
+            }
+          }
+        } else {
+          timerNoteInput.style.display = 'none'
+          timerNoteEdit.style.display = 'none'
+        }
+      }
+    }
+    
+    // 回车键确认
+    timerNoteTitleInput.onkeypress = (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        const confirmBtn = document.getElementById('timerNoteConfirm')
+        if (confirmBtn && confirmBtn.onclick) {
+          confirmBtn.onclick(e)
+        }
+      }
     }
   }
 
@@ -256,8 +331,18 @@
       return false
     }
     
-    // 允许添加相同时间的预设，不再检查是否已存在
-    // 直接添加新预设
+    // 单次模式下不允许添加相同时间的预设
+    const exists = currentPresets[currentMode].some(preset => {
+      const presetMinutes = typeof preset === 'number' ? preset : preset.minutes
+      return presetMinutes === minutes
+    })
+    
+    if (exists) {
+      alert('该时间预设已存在')
+      return false
+    }
+    
+    // 添加新预设
     currentPresets[currentMode].push({ minutes, note })
     
     // 排序
@@ -274,7 +359,11 @@
     render()
     
     // 自动选中新预设
-    selectPreset(minutes, note)
+    const index = currentPresets[currentMode].findIndex(preset => {
+      const presetMinutes = typeof preset === 'number' ? preset : preset.minutes
+      return presetMinutes === minutes
+    })
+    selectPreset(minutes, note, index)
     
     return true
   }
@@ -291,6 +380,12 @@
     
     // 取消选中
     activePreset = null
+    
+    // 隐藏备注输入/编辑区域
+    const timerNoteInput = document.getElementById('timerNoteInput')
+    const timerNoteEdit = document.getElementById('timerNoteEdit')
+    if (timerNoteInput) timerNoteInput.style.display = 'none'
+    if (timerNoteEdit) timerNoteEdit.style.display = 'none'
     
     // 重新渲染
     render()

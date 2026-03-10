@@ -153,6 +153,12 @@
   }
 
   function switchToPlanMode() {
+    // 隐藏单次模式的备注显示
+    const timerNoteInput = document.getElementById('timerNoteInput')
+    const timerNoteEdit = document.getElementById('timerNoteEdit')
+    if (timerNoteInput) timerNoteInput.style.display = 'none'
+    if (timerNoteEdit) timerNoteEdit.style.display = 'none'
+    
     // 更新 UI
     updateModeSliderUI(true)
     updateContentVisibility('plan')
