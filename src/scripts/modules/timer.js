@@ -13,6 +13,11 @@
   let isPaused = false  // 跟踪暂停状态
   let minuteCounter = 0  // 用于跟踪分钟数
 
+  // 时间戳相关变量 - 用于修复后台计时器节流问题
+  let timerStartTime = 0  // 计时开始时的时间戳
+  let pausedElapsedTime = 0  // 暂停时已经过的时间（秒）
+  let gardenSecondCounter = 0  // 菜园子秒数累积器
+
   const radius = 116
   const circumference = 2 * Math.PI * radius
 
@@ -29,8 +34,13 @@
     if (timeLeft === 0) timeLeft = totalTime
     isRunning = true
     isPaused = false
-    minuteCounter = 0  // 重置分钟计数器
     elements.startBtn.textContent = '暂停'
+    
+    // 设置计时开始时间戳
+    // 如果是从暂停恢复，需要考虑之前已经过的时间
+    timerStartTime = Date.now() - pausedElapsedTime * 1000
+    gardenSecondCounter = pausedElapsedTime  // 恢复已累积的秒数
+    pausedElapsedTime = 0
     
     if (callbacks.onStart) {
       callbacks.onStart()
@@ -44,28 +54,41 @@
       callbacks.onEnabledChange(false)
     }
     
+    // 使用时间戳计算真实剩余时间，避免后台节流问题
     timerId = setInterval(() => {
-      timeLeft--
-      minuteCounter++
+      // 计算从开始到现在经过的真实秒数
+      const elapsedSeconds = Math.floor((Date.now() - timerStartTime) / 1000)
+      const newTimeLeft = totalTime - elapsedSeconds
+      
+      // 更新剩余时间
+      timeLeft = Math.max(0, newTimeLeft)
       updateDisplay()
       
-      // 每过1分钟，通知菜园子更新作物进度
+      // 计算本次间隔的秒数（用于菜园子更新）
+      const intervalSeconds = elapsedSeconds - gardenSecondCounter
+      gardenSecondCounter = elapsedSeconds
+      
+      // 每60秒更新一次菜园子
+      minuteCounter += intervalSeconds
       if (minuteCounter >= 60 && window.Garden) {
-        window.Garden.updateProgress()
-        minuteCounter = 0  // 重置计数器
+        const minutesToUpdate = Math.floor(minuteCounter / 60)
+        for (let i = 0; i < minutesToUpdate; i++) {
+          window.Garden.updateProgress()
+        }
+        minuteCounter = minuteCounter % 60
       }
       
       if (timeLeft === 0) {
         clearInterval(timerId)
         isRunning = false
-        minuteCounter = 0  // 重置分钟计数器
+        minuteCounter = 0
         elements.startBtn.textContent = '开始'
         
         if (callbacks.onComplete) {
           callbacks.onComplete()
         }
       }
-    }, 1000)
+    }, 200)  // 更频繁地检查（200ms），确保显示更流畅
   }
 
   function pause() {
@@ -73,6 +96,9 @@
     isPaused = true
     clearInterval(timerId)
     elements.startBtn.textContent = '继续'
+    
+    // 保存暂停时已经过的时间和秒数累积器
+    pausedElapsedTime = Math.floor((Date.now() - timerStartTime) / 1000)
     
     if (callbacks.onStatusChange) {
       callbacks.onStatusChange('paused')
@@ -84,6 +110,10 @@
     isRunning = false
     isPaused = false
     timeLeft = totalTime
+    pausedElapsedTime = 0
+    timerStartTime = 0
+    gardenSecondCounter = 0
+    minuteCounter = 0
     updateDisplay()
     elements.startBtn.textContent = '开始'
     elements.progressCircle.style.strokeDashoffset = 0
