@@ -384,6 +384,13 @@
     exit: exitMiniMode
   }
 
+  // 监听托盘右键菜单退出迷你模式事件
+  if (window.electronAPI && window.electronAPI.onExitMiniModeFromTray) {
+    window.electronAPI.onExitMiniModeFromTray(() => {
+      exitMiniMode()
+    })
+  }
+
   // 迷你模式展开按钮事件
   const expandMiniBtn = document.getElementById('expandMiniBtn')
   if (expandMiniBtn) {

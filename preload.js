@@ -202,5 +202,10 @@ const { contextBridge, ipcRenderer } = require('electron')
   exitMiniMode: () => ipcRenderer.send('exit-mini-mode'),
   
   // 更新迷你模式位置（用于持久化）
-  updateMiniPosition: () => ipcRenderer.send('update-mini-position')
+  updateMiniPosition: () => ipcRenderer.send('update-mini-position'),
+  
+  // 监听托盘退出迷你模式事件
+  onExitMiniModeFromTray: (callback) => {
+    ipcRenderer.on('exit-mini-mode-from-tray', () => callback())
+  }
 })
