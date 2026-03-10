@@ -358,15 +358,13 @@
   }
 
   function exitMiniMode() {
-    if (!isMiniMode) return Promise.resolve()
+    if (!isMiniMode) return
     isMiniMode = false
     // 显示主容器，隐藏迷你模式
     document.querySelector('.container').style.display = 'flex'
     document.getElementById('miniMode').style.display = 'none'
     // 恢复窗口大小
     window.electronAPI.exitMiniMode()
-    // 返回 Promise，延迟50ms确保窗口调整完成
-    return new Promise(resolve => setTimeout(resolve, 50))
   }
 
   // 暴露到全局
@@ -424,13 +422,9 @@
 
   // ============ 自定义确认弹窗 ============
   // 显示自定义确认弹窗
-  window.showConfirmModal = async function(message) {
-    // 如果处于迷你模式，先退出（就像按了一下退出按钮）
-    if (window.MiniMode && window.MiniMode.isActive()) {
-      await window.MiniMode.exit()
-    }
-    
+  window.showConfirmModal = function(message) {
     return new Promise((resolve) => {
+      const modal = document.getElementById('confirmModal')
       const messageEl = modal.querySelector('.confirm-message')
       const cancelBtn = document.getElementById('confirmCancelBtn')
       const okBtn = document.getElementById('confirmOkBtn')
