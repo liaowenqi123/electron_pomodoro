@@ -2,7 +2,7 @@
  * 番茄钟 - 主进程
  */
 
-const { app, BrowserWindow, ipcMain, Notification } = require('electron')
+const { app, BrowserWindow, ipcMain, Notification, Tray, nativeImage } = require('electron')
 const path = require('path')
 const musicProcess = require('./src/modules/musicProcess')
 const aiAssistant = require('./src/modules/aiAssistant')
@@ -17,6 +17,9 @@ let timerPaused = false
 
 // 前台检测就绪状态（供渲染进程查询）
 let foregroundInspectionReady = false
+
+// 系统托盘
+let tray = null
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -499,6 +502,22 @@ ipcMain.on('enter-mini-mode', (event) => {
     win.setMinimizable(false)
     win.setSkipTaskbar(true)
     
+    // 创建系统托盘图标（红色圆形代表番茄）
+    if (!tray) {
+      // 使用 data URL 创建 16x16 红色圆形图标
+      const iconDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA3klEQVR4nK2SwQ3CMAxF3wqdgIjABdgK7QJ6gBLsAmQEKzABnUCxRoWJCBbcx5cUWzBhYOL/A/9YSNM0GQD5iCLLch9wkkUYhmGYpuu6rnP4XkQsFkVRdJN+v9/vuq5pmqZpW5ZlSYJvB/D6xXHcNE1Zluu6dF2XJEmSpGmapmkawzAMwzBd15VSco4Dq4Y45/i+b9u2fd/HcRxZlue6oiiiKIqmaRiG4f8MZIyh67rP81RVTdMUhcL3fdM0PQ6B53l+35VSGoZh+L5vW5aVUjIMQ9u2fd/HcRznMcYqgIj4U0r/tQD/AHzUYzd8H3zVAAAAAElFTkSuQmCC'
+      const icon = nativeImage.createFromDataURL(iconDataUrl)
+      tray = new Tray(icon)
+      tray.setToolTip('番茄钟 - 迷你模式')
+      tray.on('click', () => {
+        // 点击托盘图标显示窗口
+        if (win.isMinimized()) {
+          win.restore()
+        }
+        win.focus()
+      })
+    }
+    
     // 如果有保存的迷你模式位置，恢复它
     if (miniModePosition) {
       win.setPosition(miniModePosition[0], miniModePosition[1])
@@ -518,6 +537,12 @@ ipcMain.on('exit-mini-mode', (event) => {
     win.setAlwaysOnTop(false)
     win.setMinimizable(true)
     win.setSkipTaskbar(false)
+    
+    // 销毁系统托盘图标
+    if (tray) {
+      tray.destroy()
+      tray = null
+    }
     
     // 恢复正常模式位置
     if (normalModePosition) {
