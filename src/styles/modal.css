@@ -147,23 +147,26 @@
   color: rgba(255, 255, 255, 0.95);
   font-size: 12px;
   line-height: 1.6;
+  height: 280px;
+  overflow-y: auto;
 }
 
 /* 教程分页标签 */
 .tutorial-tabs {
   display: flex;
-  gap: 6px;
-  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 12px;
   justify-content: center;
 }
 
 .tutorial-tab {
-  padding: 6px 14px;
+  padding: 5px 10px;
   border: none;
-  border-radius: 20px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.15);
   color: rgba(255, 255, 255, 0.7);
-  font-size: 12px;
+  font-size: 11px;
   cursor: pointer;
   transition: all 0.2s ease;
 }

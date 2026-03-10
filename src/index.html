@@ -247,70 +247,109 @@
           <button class="tutorial-tab active" data-tab="basics">基础</button>
           <button class="tutorial-tab" data-tab="focus">专注</button>
           <button class="tutorial-tab" data-tab="music">音乐</button>
-          <button class="tutorial-tab" data-tab="cloud">云端</button>
+          <button class="tutorial-tab" data-tab="stats">统计</button>
+          <button class="tutorial-tab" data-tab="ai">AI</button>
+          <button class="tutorial-tab" data-tab="login">登录</button>
         </div>
         
         <div class="tutorial-body">
           <!-- 基础篇 -->
           <div class="tutorial-page active" id="tutorial-basics">
-            <h3>🔄 模式切换</h3>
-            <p>顶部滑块切换 <b>单次模式</b> 和 <b>计划模式</b></p>
-            
             <h3>⏱️ 单次模式</h3>
             <p>• 点击左侧预设设置时间，或用滚轮自定义（1-120分钟）</p>
-            <p>• 可选：在备注区域填写标题和详细内容</p>
             <p>• 点击 "+" 添加新预设，点击 "×" 删除预设</p>
             <p>• 预设旁的 📒 图标可编辑备注</p>
-            <p>• "工作"/"休息" 按钮切换类型</p>
             
             <h3>📝 计划模式</h3>
             <p>• 滚轮选时间，点击 "+ 工作"/"+ 休息" 添加任务</p>
-            <p>• 拖拽调整顺序，点击 "×" 删除任务</p>
-            <p>• 点击"开始"自动依次执行计划</p>
+            <p>• 拖拽调整顺序，点击"开始"依次执行</p>
+            
+            <h3>🎯 迷你模式</h3>
+            <p>• 计时运行时点击最小化进入迷你模式</p>
+            <p>• 窗口缩小为桌面小组件，始终置顶</p>
+            <p>• 可拖动到任意位置，位置会被记住</p>
+            
+            <h3>🌙 深色模式</h3>
+            <p>• 点击顶部按钮切换深色/浅色主题</p>
           </div>
           
           <!-- 专注篇 -->
           <div class="tutorial-page" id="tutorial-focus">
-            <h3>🌱 专注模式与菜园子</h3>
+            <h3>🌱 专注模式</h3>
             <p>• 开启专注模式后参与奖惩机制</p>
             <p>• 计时运行时作物会成长</p>
-            <p>• 切换娱乐应用会收到警告，3次警告作物枯萎</p>
             <p>• 点击 🌱 按钮打开菜园子管理作物</p>
             
-            <h3>🎯 迷你模式</h3>
-            <p>• 计时运行时点击最小化进入迷你模式</p>
-            <p>• 窗口会缩小为桌面小组件，始终置顶</p>
-            <p>• 可拖动到任意位置，位置会被记住</p>
-            <p>• 点击托盘图标或展开按钮恢复</p>
+            <h3>🔍 前台检测</h3>
+            <p>• 专注模式下会检测当前前台窗口</p>
+            <p>• 切换到娱乐应用会收到警告</p>
+            <p>• 3次警告作物枯萎</p>
+            <p>• 可标记"不是娱乐"避免误判</p>
+            
+            <h3>🌻 菜园子</h3>
+            <p>• 用专注时长兑换种子和肥料</p>
+            <p>• 种植作物，收获后可出售</p>
           </div>
           
           <!-- 音乐篇 -->
           <div class="tutorial-page" id="tutorial-music">
             <h3>🎵 音乐播放器</h3>
             <p>• 播放控制：播放/暂停、上下首</p>
-            <p>• 点击歌名展开播放器</p>
-            <p>• 拖动进度条跳转</p>
+            <p>• 点击歌名展开播放器详情</p>
+            <p>• 拖动进度条跳转播放位置</p>
             <p>• 点击设备按钮切换输出设备</p>
+            <p>• 点击音量图标调节音量</p>
             
             <h3>⌨️ 快捷键</h3>
-            <p>• Ctrl + ↑/↓：调整音量</p>
+            <p>• Ctrl + ↑：增大音量</p>
+            <p>• Ctrl + ↓：减小音量</p>
           </div>
           
-          <!-- 云端篇 -->
-          <div class="tutorial-page" id="tutorial-cloud">
-            <h3>☁️ 云端登录</h3>
-            <p>• 注册账号或登录已有账号</p>
-            <p>• Admin 用户可自动获取 DeepSeek API Key</p>
-            <p>• 普通用户可使用基础功能</p>
-            
-            <h3>🤖 AI规划助手</h3>
-            <p>• 需要 Admin 用户登录</p>
-            <p>• 点击 🤖 按钮，用自然语言描述需求</p>
-            <p>• 点击"应用计划"自动添加到计划模式</p>
-            
+          <!-- 统计篇 -->
+          <div class="tutorial-page" id="tutorial-stats">
             <h3>📊 数据统计</h3>
             <p>• 点击 📊 按钮查看专注统计</p>
-            <p>• 支持每日、每周、每月查看</p>
+            <p>• 显示专注次数、总时长、平均时长</p>
+            
+            <h3>📅 时间范围</h3>
+            <p>• 每日：查看当天数据</p>
+            <p>• 每周：查看本周数据</p>
+            <p>• 每月：查看本月数据</p>
+            
+            <h3>📈 详细记录</h3>
+            <p>• 查看每次专注的备注和时长</p>
+            <p>• 图表直观展示专注趋势</p>
+          </div>
+          
+          <!-- AI篇 -->
+          <div class="tutorial-page" id="tutorial-ai">
+            <h3>🤖 AI规划助手</h3>
+            <p>• 需要 Admin 用户登录后使用</p>
+            <p>• 点击 🤖 按钮打开AI助手</p>
+            <p>• 用自然语言描述您的需求</p>
+            <p>• 示例："我要学习3小时，每45分钟休息10分钟"</p>
+            
+            <h3>✨ 生成计划</h3>
+            <p>• AI会根据您的描述生成计划</p>
+            <p>• 点击"应用计划"自动添加到计划模式</p>
+            <p>• 可在应用前手动调整</p>
+          </div>
+          
+          <!-- 登录篇 -->
+          <div class="tutorial-page" id="tutorial-login">
+            <h3>☁️ 云端登录</h3>
+            <p>• 注册账号或登录已有账号</p>
+            <p>• 数据可云端同步</p>
+            
+            <h3>🔐 Admin 账户</h3>
+            <p>• Admin 用户自动获取 DeepSeek API Key</p>
+            <p>• 可使用 AI 规划助手功能</p>
+            <p>• API Key 仅在内存中，安全可靠</p>
+            
+            <h3>👤 普通用户</h3>
+            <p>• 可使用基础番茄钟功能</p>
+            <p>• 可使用音乐播放器</p>
+            <p>• 可使用统计功能</p>
           </div>
         </div>
       </div>
