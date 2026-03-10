@@ -497,10 +497,10 @@
   }
 
   // ============ 滚轮调整时间功能 ============
-  // 仅在单次模式下、未开始计时时，滚动时间数字可调整分钟数
-  const timeDisplay = document.getElementById('timeDisplay')
-  if (timeDisplay) {
-    timeDisplay.addEventListener('wheel', (e) => {
+  // 仅在单次模式下、未开始计时时，滚动时间区域可调整分钟数
+  const timerContainer = document.querySelector('.timer-section .timer-container')
+  if (timerContainer) {
+    timerContainer.addEventListener('wheel', (e) => {
       // 判断条件：单次模式 + 未开始计时
       if (AppState.appMode !== 'single') return
       if (Timer.getIsRunning()) return
