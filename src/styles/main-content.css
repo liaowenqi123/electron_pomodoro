@@ -494,7 +494,7 @@
 .mini-progress-ring .progress {
   stroke: rgba(255, 255, 255, 0.95);
   stroke-width: 6;
-  stroke-dasharray: 352;
+  stroke-dasharray: 389.56;
   stroke-dashoffset: 0;
   transition: stroke-dashoffset 1s linear;
   filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
