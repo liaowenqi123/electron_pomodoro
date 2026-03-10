@@ -323,7 +323,18 @@
   })
 
   // 关闭窗口按钮
-  DOM.btnClose.addEventListener('click', () => {
+  DOM.btnClose.addEventListener('click', async () => {
+    // 专注模式下，如果计时器正在运行，弹出确认框
+    if (AppState.focusModeEnabled && Timer.getIsRunning()) {
+      const confirmed = await window.showConfirmModal('确定要关闭吗？所有正在生长的作物将会枯萎！')
+      if (!confirmed) {
+        return // 用户取消，不关闭
+      }
+      // 触发惩罚：所有正在生长的作物枯萎
+      if (window.Garden) {
+        await window.Garden.handleResetPunishment()
+      }
+    }
     window.electronAPI.closeWindow()
   })
 
