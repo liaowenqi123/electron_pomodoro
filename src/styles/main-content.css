@@ -696,6 +696,7 @@
   transform: scale(1.1);
 }
 
+
 /* ============ 计时器上方备注输入 ============ */
 .timer-note-input {
   position: absolute;
@@ -774,8 +775,8 @@
   transform: scale(1.05);
 }
 
-/* ============ 计时器上方备注编辑按钮 ============ */
-.timer-note-edit {
+/* ============ 计时器上方备注显示区域 ============ */
+.timer-note-display {
   position: absolute;
   top: 35px;
   left: 50%;
@@ -792,6 +793,7 @@
   max-width: 130px;
   z-index: 10;
   height: 22px;
+  min-width: 22px;
 }
 
 .timer-note-text {
@@ -803,6 +805,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   line-height: 1;
+  min-width: 0;
 }
 
 .timer-note-edit-btn {
@@ -811,7 +814,7 @@
   border-radius: 0;
   background: transparent;
   border: none;
-  font-size: 14px;
+  font-size: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;

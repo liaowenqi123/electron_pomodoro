@@ -426,6 +426,34 @@
   // ============ 初始化显示 ============
   Timer.setTime(AppState.defaultWorkTime)
   WheelPicker.setValue(AppState.defaultWorkTime)
+  
+  // 自动选择默认预设（25分钟）并显示其备注
+  const currentMode = Mode.getMode()
+  const presets = DataStore.getPresets()
+  const defaultIndex = presets[currentMode].findIndex(preset => {
+    const presetMinutes = typeof preset === 'number' ? preset : preset.minutes
+    return presetMinutes === 25
+  })
+  
+  if (defaultIndex >= 0) {
+    const defaultPreset = presets[currentMode][defaultIndex]
+    const defaultNote = typeof defaultPreset === 'object' ? defaultPreset.note : null
+    Presets.selectPreset(25, defaultNote, defaultIndex)
+  } else if (presets[currentMode].length > 0) {
+    // 如果没有25分钟预设，选择第一个预设
+    const firstPreset = presets[currentMode][0]
+    const firstMinutes = typeof firstPreset === 'number' ? firstPreset : firstPreset.minutes
+    const firstNote = typeof firstPreset === 'object' ? firstPreset.note : null
+    Presets.selectPreset(firstMinutes, firstNote, 0)
+  } else {
+    // 如果没有任何预设，显示00:00
+    Timer.setTime(0)
+  }
+  
+  // 初始化笔emoji的点击事件
+  if (window.Presets && window.Presets.initializeNoteEditButton) {
+    window.Presets.initializeNoteEditButton()
+  }
 
   // ============ 顶部按钮展开/收起功能 ============
   const expandBtn = document.getElementById('expandBtn')

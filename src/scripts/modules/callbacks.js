@@ -157,6 +157,33 @@
         // 切换预设列表
         Presets.setMode(mode)
         WheelPicker.setValue(defaultTime)
+        
+        // 在单次模式下，切换工作/休息模式时自动选择该模式的第一个预设
+        if (AppState.appMode === 'single' && window.Presets) {
+          const presets = DataStore.getPresets()
+          if (presets[mode] && presets[mode].length > 0) {
+            // 优先选择25分钟预设
+            let selectedIndex = presets[mode].findIndex(preset => {
+              const presetMinutes = typeof preset === 'number' ? preset : preset.minutes
+              return presetMinutes === 25
+            })
+            
+            // 如果没有25分钟预设，选择第一个
+            if (selectedIndex < 0) {
+              selectedIndex = 0
+            }
+            
+            const selectedPreset = presets[mode][selectedIndex]
+            const selectedMinutes = typeof selectedPreset === 'number' ? selectedPreset : selectedPreset.minutes
+            const selectedNote = typeof selectedPreset === 'object' ? selectedPreset.note : null
+            
+            window.Presets.selectPreset(selectedMinutes, selectedNote, selectedIndex)
+            // 绑定备注编辑按钮的点击事件
+            if (window.Presets.initializeNoteEditButton) {
+              window.Presets.initializeNoteEditButton()
+            }
+          }
+        }
       }
     }
   }

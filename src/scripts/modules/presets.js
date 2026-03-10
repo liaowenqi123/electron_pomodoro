@@ -17,7 +17,6 @@
   // 渲染预设列表
   function render() {
     const presets = currentPresets[currentMode] || []
-    const isLastItem = presets.length === 1  // 是否只剩一个项目
     
     elements.presetList.innerHTML = ''
     
@@ -42,8 +41,8 @@
       // 构建左侧内容（只显示时间，不显示备注图标）
       let leftContent = `<span class="preset-time">${minutes}分钟</span>`
       
-      // 只剩一个项目时不显示删除按钮
-      const deleteBtnHtml = isLastItem ? '' : `<button class="preset-delete" data-index="${index}">×</button>`
+      // 总是显示删除按钮
+      const deleteBtnHtml = `<button class="preset-delete" data-index="${index}">×</button>`
       
       item.innerHTML = `
         <div class="preset-item-left">
@@ -225,15 +224,32 @@
       item.classList.toggle('active', parseInt(item.dataset.minutes) === minutes)
     })
     
-    // 只在单次模式时显示计时器上方的备注输入/编辑区域
+    // 只在单次模式时显示计时器上方的备注
     if (AppState.appMode === 'single') {
-      showTimerNoteInput(minutes, note, index)
-    } else {
-      // 计划模式时隐藏备注区域
       const timerNoteInput = document.getElementById('timerNoteInput')
-      const timerNoteEdit = document.getElementById('timerNoteEdit')
+      const timerNoteDisplay = document.getElementById('timerNoteDisplay')
+      const timerNoteTitleInput = document.getElementById('timerNoteTitleInput')
+      const timerNoteText = document.getElementById('timerNoteText')
+      
+      if (timerNoteInput && timerNoteDisplay) {
+        // 如果已有备注，显示备注文本
+        if (note && note.title) {
+          timerNoteInput.style.display = 'none'
+          timerNoteDisplay.style.display = 'flex'
+          timerNoteText.textContent = note.title
+        } else {
+          // 没有备注，显示空的笔emoji
+          timerNoteInput.style.display = 'none'
+          timerNoteDisplay.style.display = 'flex'
+          timerNoteText.textContent = ''
+        }
+      }
+    } else {
+      // 计划模式时隐藏备注
+      const timerNoteInput = document.getElementById('timerNoteInput')
+      const timerNoteDisplay = document.getElementById('timerNoteDisplay')
       if (timerNoteInput) timerNoteInput.style.display = 'none'
-      if (timerNoteEdit) timerNoteEdit.style.display = 'none'
+      if (timerNoteDisplay) timerNoteDisplay.style.display = 'none'
     }
     
     // 触发回调
@@ -242,98 +258,80 @@
     }
   }
   
-  // 显示计时器上方的备注输入/编辑区域
-  function showTimerNoteInput(minutes, note, index) {
+  // 绑定确认按钮事件
+  function bindConfirmButton(index) {
+    const confirmBtn = document.getElementById('timerNoteConfirm')
     const timerNoteInput = document.getElementById('timerNoteInput')
-    const timerNoteEdit = document.getElementById('timerNoteEdit')
+    const timerNoteDisplay = document.getElementById('timerNoteDisplay')
     const timerNoteTitleInput = document.getElementById('timerNoteTitleInput')
     const timerNoteText = document.getElementById('timerNoteText')
-    const timerNoteConfirm = document.getElementById('timerNoteConfirm')
-    const timerNoteEditBtn = document.getElementById('timerNoteEditBtn')
     
-    if (!timerNoteInput || !timerNoteEdit) {
-      console.warn('Timer note elements not found')
-      return
-    }
+    if (!confirmBtn) return
     
-    // 清除之前的事件监听器
-    const newConfirmBtn = timerNoteConfirm.cloneNode(true)
-    timerNoteConfirm.parentNode.replaceChild(newConfirmBtn, timerNoteConfirm)
+    // 清除旧的事件监听器
+    const newConfirmBtn = confirmBtn.cloneNode(true)
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn)
     
-    const newEditBtn = timerNoteEditBtn.cloneNode(true)
-    timerNoteEditBtn.parentNode.replaceChild(newEditBtn, timerNoteEditBtn)
+    const updatedConfirmBtn = document.getElementById('timerNoteConfirm')
     
-    const newTitleInput = timerNoteTitleInput.cloneNode(true)
-    timerNoteTitleInput.parentNode.replaceChild(newTitleInput, timerNoteTitleInput)
-    
-    // 重新获取元素引用
-    const confirmBtn = document.getElementById('timerNoteConfirm')
-    const editBtn = document.getElementById('timerNoteEditBtn')
-    const titleInput = document.getElementById('timerNoteTitleInput')
-    
-    // 如果已有备注，显示编辑按钮
-    if (note && note.title) {
-      timerNoteInput.style.display = 'none'
-      timerNoteEdit.style.display = 'flex'
-      timerNoteText.textContent = note.title
-      
-      // 绑定编辑按钮事件
-      editBtn.addEventListener('click', (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        timerNoteEdit.style.display = 'none'
-        timerNoteInput.style.display = 'flex'
-        titleInput.value = note.title
-        titleInput.focus()
-      })
-    } else {
-      // 没有备注，显示输入框
-      timerNoteInput.style.display = 'flex'
-      timerNoteEdit.style.display = 'none'
-      titleInput.value = ''
-      titleInput.focus()
-    }
-    
-    // 绑定确认按钮事件
-    confirmBtn.addEventListener('click', async (e) => {
+    const handleConfirm = async (e) => {
       e.preventDefault()
       e.stopPropagation()
-      const title = titleInput.value.trim()
+      const title = timerNoteTitleInput.value.trim()
       const newNote = title ? { title, detail: '' } : null
       
       // 更新预设的备注
       await updatePresetNote(index, newNote)
       
-      // 切换到编辑模式
-      if (title) {
-        timerNoteInput.style.display = 'none'
-        timerNoteEdit.style.display = 'flex'
-        timerNoteText.textContent = title
-        
-        // 重新绑定编辑按钮
-        editBtn.addEventListener('click', (e) => {
-          e.preventDefault()
-          e.stopPropagation()
-          timerNoteEdit.style.display = 'none'
-          timerNoteInput.style.display = 'flex'
-          titleInput.value = title
-          titleInput.focus()
-        })
-      } else {
-        timerNoteInput.style.display = 'none'
-        timerNoteEdit.style.display = 'none'
-      }
-    })
+      // 切换到显示模式
+      timerNoteInput.style.display = 'none'
+      timerNoteDisplay.style.display = 'flex'
+      timerNoteText.textContent = title
+    }
     
-    // 回车键确认
-    titleInput.addEventListener('keydown', (e) => {
+    updatedConfirmBtn.addEventListener('click', handleConfirm)
+    
+    // 绑定回车键
+    timerNoteTitleInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault()
-        confirmBtn.click()
+        updatedConfirmBtn.click()
       }
     })
   }
 
+  // 重新初始化当前模式的备注显示
+  function reinitializeNoteDisplay() {
+    const currentMode = Mode.getMode()
+    const timerNoteInput = document.getElementById('timerNoteInput')
+    const timerNoteDisplay = document.getElementById('timerNoteDisplay')
+    const timerNoteText = document.getElementById('timerNoteText')
+    
+    if (!timerNoteInput || !timerNoteDisplay) return
+    
+    // 如果有选中的预设，显示其备注
+    if (activePreset !== null) {
+      const index = currentPresets[currentMode].findIndex(preset => {
+        const presetMinutes = typeof preset === 'number' ? preset : preset.minutes
+        return presetMinutes === activePreset
+      })
+      
+      if (index >= 0) {
+        const preset = currentPresets[currentMode][index]
+        const note = typeof preset === 'object' ? preset.note : null
+        
+        timerNoteInput.style.display = 'none'
+        timerNoteDisplay.style.display = 'flex'
+        timerNoteText.textContent = note && note.title ? note.title : ''
+        return
+      }
+    }
+    
+    // 没有选中的预设，隐藏备注
+    timerNoteInput.style.display = 'none'
+    timerNoteDisplay.style.display = 'none'
+  }
+  
   // 添加预设
   async function addPreset(minutes, note) {
     // 验证
@@ -406,11 +404,16 @@
     // 取消选中
     activePreset = null
     
-    // 隐藏备注输入/编辑区域
+    // 隐藏备注输入框和显示区域
     const timerNoteInput = document.getElementById('timerNoteInput')
-    const timerNoteEdit = document.getElementById('timerNoteEdit')
+    const timerNoteDisplay = document.getElementById('timerNoteDisplay')
     if (timerNoteInput) timerNoteInput.style.display = 'none'
-    if (timerNoteEdit) timerNoteEdit.style.display = 'none'
+    if (timerNoteDisplay) timerNoteDisplay.style.display = 'none'
+    
+    // 如果没有预设了，显示00:00
+    if (currentPresets[currentMode].length === 0) {
+      Timer.setTime(0)
+    }
     
     // 重新渲染
     render()
@@ -465,6 +468,52 @@
     // 初始渲染
     render()
   }
+  
+  // 初始化笔emoji的点击事件
+  function initializeNoteEditButton() {
+    const editBtn = document.getElementById('timerNoteEditBtn')
+    if (!editBtn) return
+    
+    // 清除旧的事件监听器
+    const newEditBtn = editBtn.cloneNode(true)
+    editBtn.parentNode.replaceChild(newEditBtn, editBtn)
+    
+    const updatedEditBtn = document.getElementById('timerNoteEditBtn')
+    updatedEditBtn.addEventListener('click', (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      
+      const timerNoteInput = document.getElementById('timerNoteInput')
+      const timerNoteDisplay = document.getElementById('timerNoteDisplay')
+      const timerNoteTitleInput = document.getElementById('timerNoteTitleInput')
+      
+      // 获取当前选中的预设
+      const activeMinutes = activePreset
+      
+      // 如果没有选择预设，不做任何操作
+      if (activeMinutes === null) {
+        return
+      }
+      
+      // 获取当前预设的索引
+      const currentMode = Mode.getMode()
+      const index = currentPresets[currentMode].findIndex(preset => {
+        const presetMinutes = typeof preset === 'number' ? preset : preset.minutes
+        return presetMinutes === activeMinutes
+      })
+      
+      if (index < 0) return
+      
+      const preset = currentPresets[currentMode][index]
+      const note = typeof preset === 'object' ? preset.note : null
+      
+      timerNoteDisplay.style.display = 'none'
+      timerNoteInput.style.display = 'flex'
+      timerNoteTitleInput.value = note && note.title ? note.title : ''
+      timerNoteTitleInput.focus()
+      bindConfirmButton(index)
+    })
+  }
 
   // 导出到全局
   window.Presets = {
@@ -475,6 +524,8 @@
     deletePreset: deletePreset,
     setMode: setMode,
     setEnabled: setEnabled,
-    getActivePreset: getActivePreset
+    getActivePreset: getActivePreset,
+    initializeNoteEditButton: initializeNoteEditButton,
+    reinitializeNoteDisplay: reinitializeNoteDisplay
   }
 })()

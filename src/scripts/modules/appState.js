@@ -91,10 +91,6 @@
   function updateNoteInputsDisabled() {
     const disabled = state.focusModeEnabled
     
-    // 单次模式的备注输入框
-    const noteTitleInput = document.getElementById('noteTitleInput')
-    const noteDetailInput = document.getElementById('noteDetailInput')
-    
     // 计划模式的备注输入框
     const planNoteTitleInput = document.getElementById('planNoteTitleInput')
     const planNoteDetailInput = document.getElementById('planNoteDetailInput')
@@ -102,18 +98,8 @@
     // 计时器上方的备注输入框
     const timerNoteTitleInput = document.getElementById('timerNoteTitleInput')
     const timerNoteInput = document.getElementById('timerNoteInput')
-    const timerNoteEdit = document.getElementById('timerNoteEdit')
+    const timerNoteDisplay = document.getElementById('timerNoteDisplay')
     
-    if (noteTitleInput) {
-      noteTitleInput.disabled = disabled
-      noteTitleInput.style.opacity = disabled ? '0.5' : '1'
-      noteTitleInput.style.cursor = disabled ? 'not-allowed' : 'text'
-    }
-    if (noteDetailInput) {
-      noteDetailInput.disabled = disabled
-      noteDetailInput.style.opacity = disabled ? '0.5' : '1'
-      noteDetailInput.style.cursor = disabled ? 'not-allowed' : 'text'
-    }
     if (planNoteTitleInput) {
       planNoteTitleInput.disabled = disabled
       planNoteTitleInput.style.opacity = disabled ? '0.5' : '1'
@@ -133,9 +119,9 @@
       timerNoteInput.style.opacity = disabled ? '0.5' : '1'
       timerNoteInput.style.pointerEvents = disabled ? 'none' : 'auto'
     }
-    if (timerNoteEdit) {
-      timerNoteEdit.style.opacity = disabled ? '0.5' : '1'
-      timerNoteEdit.style.pointerEvents = disabled ? 'none' : 'auto'
+    if (timerNoteDisplay) {
+      timerNoteDisplay.style.opacity = disabled ? '0.5' : '1'
+      timerNoteDisplay.style.pointerEvents = disabled ? 'none' : 'auto'
     }
   }
 
@@ -168,14 +154,19 @@
     
     // 恢复状态文字
     DOM.statusEl.textContent = currentMode === 'work' ? '准备开始专注工作' : '准备休息一下'
+    
+    // 重新初始化备注显示（确保显示当前模式的备注）
+    if (window.Presets && window.Presets.reinitializeNoteDisplay) {
+      window.Presets.reinitializeNoteDisplay()
+    }
   }
 
   function switchToPlanMode() {
-    // 隐藏单次模式的备注显示
+    // 隐藏单次模式的备注
     const timerNoteInput = document.getElementById('timerNoteInput')
-    const timerNoteEdit = document.getElementById('timerNoteEdit')
+    const timerNoteDisplay = document.getElementById('timerNoteDisplay')
     if (timerNoteInput) timerNoteInput.style.display = 'none'
-    if (timerNoteEdit) timerNoteEdit.style.display = 'none'
+    if (timerNoteDisplay) timerNoteDisplay.style.display = 'none'
     
     // 更新 UI
     updateModeSliderUI(true)
