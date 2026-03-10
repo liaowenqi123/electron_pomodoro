@@ -207,5 +207,10 @@ const { contextBridge, ipcRenderer } = require('electron')
   // 监听托盘退出迷你模式事件
   onExitMiniModeFromTray: (callback) => {
     ipcRenderer.on('exit-mini-mode-from-tray', () => callback())
+  },
+  
+  // 监听托盘退出应用事件
+  onQuitAppFromTray: (callback) => {
+    ipcRenderer.on('quit-app-from-tray', () => callback())
   }
 })

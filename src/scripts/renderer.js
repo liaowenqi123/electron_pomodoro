@@ -391,6 +391,18 @@
     })
   }
 
+  // 监听托盘右键菜单退出应用事件
+  if (window.electronAPI && window.electronAPI.onQuitAppFromTray) {
+    window.electronAPI.onQuitAppFromTray(async () => {
+      // 先退出迷你模式
+      if (isMiniMode) {
+        exitMiniMode()
+      }
+      // 然后触发关闭逻辑（包括确认弹窗）
+      DOM.btnClose.click()
+    })
+  }
+
   // 迷你模式展开按钮事件
   const expandMiniBtn = document.getElementById('expandMiniBtn')
   if (expandMiniBtn) {

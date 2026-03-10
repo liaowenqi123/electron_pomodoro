@@ -528,8 +528,8 @@ ipcMain.on('enter-mini-mode', (event) => {
         {
           label: '退出应用',
           click: () => {
-            musicProcess.stop()
-            app.quit()
+            // 发送事件到渲染进程，让渲染进程处理确认弹窗和退出
+            win.webContents.send('quit-app-from-tray')
           }
         }
       ])
