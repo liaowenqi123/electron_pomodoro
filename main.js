@@ -22,12 +22,15 @@ let foregroundInspectionReady = false
 let tray = null
 
 function createWindow() {
+  const iconPath = path.join(__dirname, 'src/tomato-page-1.ico')
+  
   const win = new BrowserWindow({
     width: 520,
     height: 560,
     frame: false,
     transparent: true,
     resizable: false,
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -194,12 +197,15 @@ function createGardenWindow() {
     return
   }
 
+  const iconPath = path.join(__dirname, 'src/tomato-page-1.ico')
+
   gardenWindow = new BrowserWindow({
     width: 400,
     height: 520,
     frame: false,
     transparent: true,
     resizable: false,
+    icon: iconPath,
     parent: BrowserWindow.getFocusedWindow(),
     webPreferences: {
       nodeIntegration: false,
