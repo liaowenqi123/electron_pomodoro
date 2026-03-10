@@ -497,6 +497,30 @@ body.dark-theme .container.plan-mode .plan-item.break:hover {
 .sidebar-stats .stat-unit {
   color: rgba(255, 255, 255, 0.6);
 }
+
+/* ============ 提示信息 ============ */
+.toast-notification {
+  position: relative;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  max-width: 120px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  margin-top: 8px;
+  display: none;
+}
+
+.toast-notification.show {
+  opacity: 1;
+  display: block;
+}
 .plan-list .plan-item {
 border: 2px solid rgba(255, 255, 255, 0.5);
 }

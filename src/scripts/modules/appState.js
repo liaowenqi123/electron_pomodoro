@@ -99,6 +99,11 @@
     const planNoteTitleInput = document.getElementById('planNoteTitleInput')
     const planNoteDetailInput = document.getElementById('planNoteDetailInput')
     
+    // 计时器上方的备注输入框
+    const timerNoteTitleInput = document.getElementById('timerNoteTitleInput')
+    const timerNoteInput = document.getElementById('timerNoteInput')
+    const timerNoteEdit = document.getElementById('timerNoteEdit')
+    
     if (noteTitleInput) {
       noteTitleInput.disabled = disabled
       noteTitleInput.style.opacity = disabled ? '0.5' : '1'
@@ -118,6 +123,19 @@
       planNoteDetailInput.disabled = disabled
       planNoteDetailInput.style.opacity = disabled ? '0.5' : '1'
       planNoteDetailInput.style.cursor = disabled ? 'not-allowed' : 'text'
+    }
+    if (timerNoteTitleInput) {
+      timerNoteTitleInput.disabled = disabled
+      timerNoteTitleInput.style.opacity = disabled ? '0.5' : '1'
+      timerNoteTitleInput.style.cursor = disabled ? 'not-allowed' : 'text'
+    }
+    if (timerNoteInput) {
+      timerNoteInput.style.opacity = disabled ? '0.5' : '1'
+      timerNoteInput.style.pointerEvents = disabled ? 'none' : 'auto'
+    }
+    if (timerNoteEdit) {
+      timerNoteEdit.style.opacity = disabled ? '0.5' : '1'
+      timerNoteEdit.style.pointerEvents = disabled ? 'none' : 'auto'
     }
   }
 
