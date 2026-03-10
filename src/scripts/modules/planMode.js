@@ -18,6 +18,8 @@
 
   // 渲染计划列表
   function render() {
+    const isLastItem = planList.length === 1  // 是否只剩一个项目
+    
     elements.planList.innerHTML = ''
     
     planList.forEach((item, index) => {
@@ -51,11 +53,14 @@
         `
       }
       
+      // 只剩一个项目时不显示删除按钮
+      const deleteBtnHtml = isLastItem ? '' : '<button class="plan-item-delete">×</button>'
+      
       div.innerHTML = `
         <div class="plan-item-left">
           ${leftContent}
         </div>
-        <button class="plan-item-delete">×</button>
+        ${deleteBtnHtml}
       `
       
       // 点击备注图标
@@ -72,12 +77,14 @@
       
       // 删除按钮
       const deleteBtn = div.querySelector('.plan-item-delete')
-      deleteBtn.addEventListener('click', (e) => {
-        e.stopPropagation()
-        if (!isRunning) {
-          deleteItem(index)
-        }
-      })
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', (e) => {
+          e.stopPropagation()
+          if (!isRunning) {
+            deleteItem(index)
+          }
+        })
+      }
       
       // 拖拽事件
       div.addEventListener('dragstart', handleDragStart)

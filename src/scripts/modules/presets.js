@@ -17,6 +17,7 @@
   // 渲染预设列表
   function render() {
     const presets = currentPresets[currentMode] || []
+    const isLastItem = presets.length === 1  // 是否只剩一个项目
     
     elements.presetList.innerHTML = ''
     
@@ -41,11 +42,14 @@
       // 构建左侧内容（只显示时间，不显示备注图标）
       let leftContent = `<span class="preset-time">${minutes}分钟</span>`
       
+      // 只剩一个项目时不显示删除按钮
+      const deleteBtnHtml = isLastItem ? '' : `<button class="preset-delete" data-index="${index}">×</button>`
+      
       item.innerHTML = `
         <div class="preset-item-left">
           ${leftContent}
         </div>
-        <button class="preset-delete" data-index="${index}">×</button>
+        ${deleteBtnHtml}
       `
       
       // 点击选择预设
@@ -58,11 +62,13 @@
       
       // 删除按钮
       const deleteBtn = item.querySelector('.preset-delete')
-      deleteBtn.addEventListener('click', (e) => {
-        e.stopPropagation()
-        const idx = parseInt(e.target.dataset.index)
-        deletePreset(idx)
-      })
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', (e) => {
+          e.stopPropagation()
+          const idx = parseInt(e.target.dataset.index)
+          deletePreset(idx)
+        })
+      }
       
       elements.presetList.appendChild(item)
     })
