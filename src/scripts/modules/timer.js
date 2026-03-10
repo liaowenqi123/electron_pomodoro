@@ -178,6 +178,13 @@
     elements.progressCircle.style.strokeDasharray = circumference
     elements.progressCircle.style.strokeDashoffset = 0
     
+    // 初始化迷你模式的进度圆
+    const miniProgressCircle = document.getElementById('miniProgressCircle')
+    if (miniProgressCircle) {
+      miniProgressCircle.style.strokeDasharray = miniCircumference
+      miniProgressCircle.style.strokeDashoffset = 0
+    }
+    
     elements.startBtn.addEventListener('click', toggle)
     
     updateDisplay()
