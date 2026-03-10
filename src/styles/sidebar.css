@@ -524,3 +524,58 @@ body.dark-theme .container.plan-mode .plan-item.break:hover {
 .plan-list .plan-item {
 border: 2px solid rgba(255, 255, 255, 0.5);
 }
+
+/* ============ 侧边栏收起按钮 ============ */
+.sidebar-collapse-btn {
+  position: absolute;
+  left: 160px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-left: none;
+  border-radius: 0 6px 6px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-app-region: no-drag;
+  z-index: 10;
+}
+
+.sidebar-collapse-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  width: 10px;
+  height: 60px;
+  border-radius: 0 9px 9px 0;
+}
+
+.sidebar-collapse-icon {
+  font-size: 6px;
+  color: rgba(255, 255, 255, 0.6);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 收起状态：图标向右 */
+.container.sidebar-collapsed .sidebar-collapse-icon {
+  transform: rotate(180deg);
+}
+
+/* 容器滑动动画 */
+.container {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 收起状态：整个容器向左移动 160px */
+.container.sidebar-collapsed {
+  transform: translateX(-160px);
+}
+
+/* 收起状态：按钮移到窗口最左边 */
+.container.sidebar-collapsed .sidebar-collapse-btn {
+  left: 160px;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+}

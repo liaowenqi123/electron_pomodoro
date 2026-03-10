@@ -478,6 +478,24 @@
     })
   }
 
+  // ============ 侧边栏收起/展开功能 ============
+  const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn')
+  let isSidebarCollapsed = false
+
+  if (sidebarCollapseBtn && DOM.container) {
+    sidebarCollapseBtn.addEventListener('click', () => {
+      isSidebarCollapsed = !isSidebarCollapsed
+      
+      if (isSidebarCollapsed) {
+        DOM.container.classList.add('sidebar-collapsed')
+        sidebarCollapseBtn.title = '展开侧边栏'
+      } else {
+        DOM.container.classList.remove('sidebar-collapsed')
+        sidebarCollapseBtn.title = '收起侧边栏'
+      }
+    })
+  }
+
   // ============ 自定义确认弹窗 ============
   // 显示自定义确认弹窗
   window.showConfirmModal = function(message) {
