@@ -21,6 +21,28 @@
         closeTutorial()
       }
     })
+
+    // 分页标签切换
+    const tabs = document.querySelectorAll('.tutorial-tab')
+    const pages = document.querySelectorAll('.tutorial-page')
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetTab = tab.dataset.tab
+        
+        // 更新标签状态
+        tabs.forEach(t => t.classList.remove('active'))
+        tab.classList.add('active')
+        
+        // 更新页面显示
+        pages.forEach(page => {
+          page.classList.remove('active')
+          if (page.id === `tutorial-${targetTab}`) {
+            page.classList.add('active')
+          }
+        })
+      })
+    })
   }
 
   function closeTutorial() {
