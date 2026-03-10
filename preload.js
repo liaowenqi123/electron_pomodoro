@@ -191,5 +191,16 @@ const { contextBridge, ipcRenderer } = require('electron')
   bringToFront: () => ipcRenderer.send('bring-to-front'),
   
   // 取消置顶
-  cancelAlwaysOnTop: () => ipcRenderer.send('cancel-always-on-top')
+  cancelAlwaysOnTop: () => ipcRenderer.send('cancel-always-on-top'),
+  
+  // ============ 迷你模式 API ============
+  
+  // 进入迷你模式
+  enterMiniMode: () => ipcRenderer.send('enter-mini-mode'),
+  
+  // 退出迷你模式
+  exitMiniMode: () => ipcRenderer.send('exit-mini-mode'),
+  
+  // 更新迷你模式位置（用于持久化）
+  updateMiniPosition: () => ipcRenderer.send('update-mini-position')
 })

@@ -461,11 +461,83 @@ ipcMain.on('cancel-always-on-top', (event) => {
   }
 })
 
+// ============ 迷你模式 IPC 处理 ============
+
+// 存储两种模式的窗口位置
+let normalModePosition = null  // 正常模式位置（临时）
+let miniModePosition = null    // 迷你模式位置（持久化）
+
+// 正常模式窗口尺寸
+const NORMAL_WIDTH = 520
+const NORMAL_HEIGHT = 560
+const MINI_SIZE = 160
+
+// 加载迷你模式位置
+function loadMiniModePosition() {
+  const data = dataManager.readData()
+  if (data.miniModePosition) {
+    miniModePosition = data.miniModePosition
+  }
+}
+
+// 保存迷你模式位置
+function saveMiniModePosition() {
+  const data = dataManager.readData()
+  data.miniModePosition = miniModePosition
+  dataManager.writeData(data)
+}
+
+ipcMain.on('enter-mini-mode', () => {
+  const win = BrowserWindow.getFocusedWindow()
+  if (win) {
+    // 保存当前正常模式位置
+    normalModePosition = win.getPosition()
+    
+    // 设置迷你模式尺寸并置顶
+    win.setSize(MINI_SIZE, MINI_SIZE)
+    win.setAlwaysOnTop(true)
+    
+    // 如果有保存的迷你模式位置，恢复它
+    if (miniModePosition) {
+      win.setPosition(miniModePosition[0], miniModePosition[1])
+    }
+  }
+})
+
+ipcMain.on('exit-mini-mode', () => {
+  const win = BrowserWindow.getFocusedWindow()
+  if (win) {
+    // 保存迷你模式位置（持久化）
+    miniModePosition = win.getPosition()
+    saveMiniModePosition()
+    
+    // 恢复正常模式尺寸
+    win.setSize(NORMAL_WIDTH, NORMAL_HEIGHT)
+    win.setAlwaysOnTop(false)
+    
+    // 恢复正常模式位置
+    if (normalModePosition) {
+      win.setPosition(normalModePosition[0], normalModePosition[1])
+    }
+  }
+})
+
+// 监听窗口移动，实时更新迷你模式位置
+ipcMain.on('update-mini-position', () => {
+  const win = BrowserWindow.getFocusedWindow()
+  if (win) {
+    miniModePosition = win.getPosition()
+    saveMiniModePosition()
+  }
+})
+
 // ============ 应用生命周期 ============
 
 app.whenReady().then(() => {
   // 初始化云端认证
   cloudAuth.init()
+  // 加载迷你模式位置
+  loadMiniModePosition()
   createWindow()
 
   app.on('activate', () => {

@@ -342,8 +342,55 @@
 
   // 最小化窗口按钮
   DOM.btnMinimize.addEventListener('click', () => {
-    window.electronAPI.minimizeWindow()
+    // 如果计时器正在运行，进入迷你模式
+    if (Timer.getIsRunning()) {
+      enterMiniMode()
+    } else {
+      // 否则正常最小化
+      window.electronAPI.minimizeWindow()
+    }
   })
+
+  // ============ 迷你模式功能 ============
+  let isMiniMode = false
+
+  function enterMiniMode() {
+    isMiniMode = true
+    // 隐藏主容器，显示迷你模式
+    document.querySelector('.container').style.display = 'none'
+    document.getElementById('miniMode').style.display = 'flex'
+    // 调整窗口大小并置顶
+    window.electronAPI.enterMiniMode()
+  }
+
+  function exitMiniMode() {
+    isMiniMode = false
+    // 显示主容器，隐藏迷你模式
+    document.querySelector('.container').style.display = 'flex'
+    document.getElementById('miniMode').style.display = 'none'
+    // 恢复窗口大小
+    window.electronAPI.exitMiniMode()
+  }
+
+  // 迷你模式展开按钮事件
+  const expandMiniBtn = document.getElementById('expandMiniBtn')
+  if (expandMiniBtn) {
+    expandMiniBtn.addEventListener('click', () => {
+      if (isMiniMode) {
+        exitMiniMode()
+      }
+    })
+  }
+
+  // 监听迷你模式的拖动结束事件，保存位置
+  const miniDraggable = document.querySelector('.mini-draggable')
+  if (miniDraggable) {
+    miniDraggable.addEventListener('mouseleave', () => {
+      if (isMiniMode) {
+        window.electronAPI.updateMiniPosition()
+      }
+    })
+  }
 
   // ============ 初始化显示 ============
   Timer.setTime(AppState.defaultWorkTime)

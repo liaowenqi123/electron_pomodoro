@@ -21,6 +21,10 @@
   const radius = 116
   const circumference = 2 * Math.PI * radius
 
+  // 迷你模式的圆形半径和周长（viewBox="0 0 130 130", circle r=62）
+  const miniRadius = 62
+  const miniCircumference = 2 * Math.PI * miniRadius
+
   // 使用统一的格式化函数
   const formatTime = Utils.formatTime
 
@@ -28,6 +32,14 @@
     elements.timeDisplay.textContent = formatTime(timeLeft)
     const progress = (totalTime - timeLeft) / totalTime
     elements.progressCircle.style.strokeDashoffset = circumference * (1 - progress)
+    
+    // 同步更新迷你模式显示
+    const miniTimeDisplay = document.getElementById('miniTimeDisplay')
+    const miniProgressCircle = document.getElementById('miniProgressCircle')
+    if (miniTimeDisplay && miniProgressCircle) {
+      miniTimeDisplay.textContent = formatTime(timeLeft)
+      miniProgressCircle.style.strokeDashoffset = miniCircumference * (1 - progress)
+    }
   }
 
   function start() {
