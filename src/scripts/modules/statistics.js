@@ -89,38 +89,8 @@ const Statistics = (function() {
    * 同步当前统计数据到历史记录
    */
   function syncCurrentDataToHistory() {
-    const stats = DataStore.getStats()
-    const data = DataStore.getData()
-    const today = new Date().toISOString().split('T')[0]
-    
-    // 如果今天有统计数据
-    if (stats.todayCount > 0) {
-      if (!data.statisticsHistory) {
-        data.statisticsHistory = []
-      }
-      
-      // 查找今天的历史记录
-      let todayRecord = data.statisticsHistory.find(item => item.date === today)
-      
-      if (!todayRecord) {
-        // 如果历史记录中没有今天的数据，添加进去
-        data.statisticsHistory.push({
-          date: today,
-          count: stats.todayCount,
-          minutes: stats.totalMinutes
-        })
-        
-        // 保存
-        window.electronAPI.writeData(data)
-        console.log('已同步今日数据到历史记录:', stats.todayCount, '次,', stats.totalMinutes, '分钟')
-      } else if (todayRecord.count !== stats.todayCount || todayRecord.minutes !== stats.totalMinutes) {
-        // 如果数据不一致，更新历史记录
-        todayRecord.count = stats.todayCount
-        todayRecord.minutes = stats.totalMinutes
-        window.electronAPI.writeData(data)
-        console.log('已更新今日历史记录')
-      }
-    }
+    // 不再需要同步，因为现在每次完成番茄钟都会直接记录到历史
+    console.log('使用新的历史记录结构，无需同步')
   }
 
   /**
@@ -199,8 +169,16 @@ const Statistics = (function() {
     const labels = data.map(item => item.label)
     const minutes = data.map(item => item.minutes)
 
-    // 莫兰迪亮色配色
-    const morandiColors = [
+    // 获取所有备注类型并分配颜色
+    const allNotes = new Set()
+    data.forEach(item => {
+      if (item.noteGroups) {
+        Object.keys(item.noteGroups).forEach(note => allNotes.add(note))
+      }
+    })
+    
+    const noteColors = {}
+    const colorPalette = [
       'rgba(200, 213, 224, 0.8)',  // 莫兰迪蓝
       'rgba(232, 213, 196, 0.8)',  // 莫兰迪米
       'rgba(212, 228, 215, 0.8)',  // 莫兰迪绿
@@ -209,6 +187,10 @@ const Statistics = (function() {
       'rgba(230, 224, 206, 0.8)',  // 莫兰迪黄
       'rgba(220, 210, 210, 0.8)'   // 莫兰迪灰粉
     ]
+    
+    Array.from(allNotes).forEach((note, index) => {
+      noteColors[note] = colorPalette[index % colorPalette.length]
+    })
 
     const isDarkMode = document.body.classList.contains('dark-mode')
     const textColor = isDarkMode ? '#e0e0e0' : '#666'
@@ -218,14 +200,28 @@ const Statistics = (function() {
     let chartConfig = {}
 
     if (currentChartType === 'pie') {
+      // 饼图：显示所有备注的总时长
+      const pieData = {}
+      data.forEach(item => {
+        if (item.noteGroups) {
+          Object.entries(item.noteGroups).forEach(([note, minutes]) => {
+            pieData[note] = (pieData[note] || 0) + minutes
+          })
+        }
+      })
+      
+      const pieLabels = Object.keys(pieData)
+      const pieValues = Object.values(pieData)
+      const pieColors = pieLabels.map(note => noteColors[note])
+      
       chartConfig = {
         type: 'pie',
         data: {
-          labels: labels,
+          labels: pieLabels,
           datasets: [{
             label: '专注时长（分钟）',
-            data: minutes,
-            backgroundColor: morandiColors,
+            data: pieValues,
+            backgroundColor: pieColors,
             borderWidth: 2,
             borderColor: isDarkMode ? '#2d2d2d' : '#fff'
           }]
@@ -318,36 +314,36 @@ const Statistics = (function() {
           }
         }
       }
-    } else { // bar
+    } else { // bar - 堆叠柱状图显示不同备注
+      // 创建堆叠数据集
+      const datasets = []
+      Array.from(allNotes).forEach(note => {
+        const noteData = data.map(item => {
+          return item.noteGroups && item.noteGroups[note] ? item.noteGroups[note] : 0
+        })
+        
+        datasets.push({
+          label: note,
+          data: noteData,
+          backgroundColor: noteColors[note],
+          borderColor: noteColors[note].replace('0.8', '1'),
+          borderWidth: 1,
+          borderRadius: 6
+        })
+      })
+      
       chartConfig = {
         type: 'bar',
         data: {
           labels: labels,
-          datasets: [
-            {
-              label: '专注时长（分钟）',
-              data: minutes,
-              backgroundColor: 'rgba(200, 213, 224, 0.8)',
-              borderColor: 'rgba(200, 213, 224, 1)',
-              borderWidth: 1,
-              borderRadius: 6
-            }
-          ]
+          datasets: datasets
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              labels: {
-                color: textColor,
-                padding: 10,
-                font: { size: 12 }
-              }
-            }
-          },
           scales: {
             x: {
+              stacked: true,
               ticks: {
                 color: textColor
               },
@@ -356,6 +352,7 @@ const Statistics = (function() {
               }
             },
             y: {
+              stacked: true,
               ticks: {
                 color: textColor
               },
@@ -366,6 +363,15 @@ const Statistics = (function() {
                 display: true,
                 text: '分钟',
                 color: textColor
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: {
+                color: textColor,
+                padding: 10,
+                font: { size: 12 }
               }
             }
           }
@@ -395,6 +401,17 @@ const Statistics = (function() {
     // 倒序显示（最新的在前）
     data.reverse().forEach(item => {
       const row = document.createElement('tr')
+      
+      // 根据时间范围显示不同的表头内容
+      let periodLabel = ''
+      if (currentPeriod === 'daily') {
+        periodLabel = '当日'
+      } else if (currentPeriod === 'weekly') {
+        periodLabel = '当周'
+      } else {
+        periodLabel = '当月'
+      }
+      
       row.innerHTML = `
         <td>${item.label}</td>
         <td>${item.minutes}</td>
@@ -402,6 +419,20 @@ const Statistics = (function() {
       `
       tbody.appendChild(row)
     })
+    
+    // 更新表头
+    const tableHeaders = document.querySelectorAll('.stats-table th')
+    if (tableHeaders.length >= 3) {
+      let periodLabel = ''
+      if (currentPeriod === 'daily') {
+        periodLabel = '每日专注时长'
+      } else if (currentPeriod === 'weekly') {
+        periodLabel = '每周专注时长'
+      } else {
+        periodLabel = '每月专注时长'
+      }
+      tableHeaders[1].textContent = periodLabel
+    }
   }
 
   /**
@@ -433,7 +464,67 @@ const Statistics = (function() {
    */
   function getStatisticsHistory() {
     const data = DataStore.getData()
-    const history = data.statisticsHistory || []
+    let history = data.statisticsHistory || []
+    
+    // 如果历史数据为空，但今日有统计数据，尝试恢复
+    if (history.length === 0) {
+      const stats = DataStore.getStats()
+      if (stats.todayCount > 0 && stats.totalMinutes > 0) {
+        console.log('检测到今日有统计数据但历史为空，尝试恢复数据')
+        const today = new Date().toISOString().split('T')[0]
+        const avgMinutes = Math.round(stats.totalMinutes / stats.todayCount)
+        
+        // 根据今日统计恢复历史记录
+        for (let i = 0; i < stats.todayCount; i++) {
+          history.push({
+            date: today,
+            timestamp: new Date().toISOString(),
+            minutes: i === stats.todayCount - 1 ? stats.totalMinutes - (avgMinutes * (stats.todayCount - 1)) : avgMinutes,
+            note: '恢复的数据'
+          })
+        }
+        
+        // 保存恢复的数据
+        data.statisticsHistory = history
+        if (window.electronAPI) {
+          window.electronAPI.writeData(data)
+        }
+        
+        console.log('已恢复', history.length, '条历史记录')
+      }
+    }
+    
+    // 数据迁移：检查是否是旧格式的数据
+    if (history.length > 0 && history[0].count !== undefined) {
+      console.log('检测到旧格式数据，进行数据迁移')
+      const migratedHistory = []
+      
+      // 将旧格式数据转换为新格式
+      history.forEach(oldRecord => {
+        if (oldRecord.count && oldRecord.minutes) {
+          // 将一天的数据拆分成多个番茄钟记录
+          const avgMinutes = Math.round(oldRecord.minutes / oldRecord.count)
+          for (let i = 0; i < oldRecord.count; i++) {
+            migratedHistory.push({
+              date: oldRecord.date,
+              timestamp: oldRecord.date + 'T' + String(9 + i).padStart(2, '0') + ':00:00.000Z', // 模拟时间戳
+              minutes: i === oldRecord.count - 1 ? oldRecord.minutes - (avgMinutes * (oldRecord.count - 1)) : avgMinutes, // 最后一个记录包含余数
+              note: '历史数据'
+            })
+          }
+        }
+      })
+      
+      // 保存迁移后的数据
+      data.statisticsHistory = migratedHistory
+      if (window.electronAPI) {
+        window.electronAPI.writeData(data)
+      }
+      
+      console.log('数据迁移完成，从', history.length, '条旧记录迁移到', migratedHistory.length, '条新记录')
+      history = migratedHistory
+    }
+    
     console.log('历史数据:', history)
     return history
   }
@@ -469,15 +560,27 @@ const Statistics = (function() {
       date.setDate(date.getDate() - i)
       const dateStr = date.toISOString().split('T')[0]
       
-      const dayData = history.filter(item => item.date === dateStr)
-      const count = dayData.reduce((sum, item) => sum + (item.count || 0), 0)
-      const minutes = dayData.reduce((sum, item) => sum + (item.minutes || 0), 0)
+      // 获取这一天的所有记录
+      const dayRecords = history.filter(item => item.date === dateStr)
+      const count = dayRecords.length
+      const minutes = dayRecords.reduce((sum, item) => sum + (item.minutes || 0), 0)
+      
+      // 按备注分组统计（用于图表颜色）
+      const noteGroups = {}
+      dayRecords.forEach(record => {
+        const note = record.note || '无备注'
+        if (!noteGroups[note]) {
+          noteGroups[note] = 0
+        }
+        noteGroups[note] += record.minutes || 0
+      })
       
       result.push({
         label: `${date.getMonth() + 1}/${date.getDate()}`,
         date: dateStr,
         count: count,
-        minutes: minutes
+        minutes: minutes,
+        noteGroups: noteGroups
       })
     }
     
@@ -496,18 +599,30 @@ const Statistics = (function() {
       const startDate = new Date(endDate)
       startDate.setDate(startDate.getDate() - 6)
       
-      const weekData = history.filter(item => {
+      // 获取这一周的所有记录
+      const weekRecords = history.filter(item => {
         const itemDate = new Date(item.date)
         return itemDate >= startDate && itemDate <= endDate
       })
       
-      const count = weekData.reduce((sum, item) => sum + (item.count || 0), 0)
-      const minutes = weekData.reduce((sum, item) => sum + (item.minutes || 0), 0)
+      const count = weekRecords.length
+      const minutes = weekRecords.reduce((sum, item) => sum + (item.minutes || 0), 0)
+      
+      // 按备注分组统计
+      const noteGroups = {}
+      weekRecords.forEach(record => {
+        const note = record.note || '无备注'
+        if (!noteGroups[note]) {
+          noteGroups[note] = 0
+        }
+        noteGroups[note] += record.minutes || 0
+      })
       
       result.push({
         label: `${startDate.getMonth() + 1}/${startDate.getDate()}-${endDate.getMonth() + 1}/${endDate.getDate()}`,
         count: count,
-        minutes: minutes
+        minutes: minutes,
+        noteGroups: noteGroups
       })
     }
     
@@ -525,18 +640,30 @@ const Statistics = (function() {
       const year = date.getFullYear()
       const month = date.getMonth() + 1
       
-      const monthData = history.filter(item => {
+      // 获取这个月的所有记录
+      const monthRecords = history.filter(item => {
         const itemDate = new Date(item.date)
         return itemDate.getFullYear() === year && itemDate.getMonth() + 1 === month
       })
       
-      const count = monthData.reduce((sum, item) => sum + (item.count || 0), 0)
-      const minutes = monthData.reduce((sum, item) => sum + (item.minutes || 0), 0)
+      const count = monthRecords.length
+      const minutes = monthRecords.reduce((sum, item) => sum + (item.minutes || 0), 0)
+      
+      // 按备注分组统计
+      const noteGroups = {}
+      monthRecords.forEach(record => {
+        const note = record.note || '无备注'
+        if (!noteGroups[note]) {
+          noteGroups[note] = 0
+        }
+        noteGroups[note] += record.minutes || 0
+      })
       
       result.push({
         label: `${year}/${month}`,
         count: count,
-        minutes: minutes
+        minutes: minutes,
+        noteGroups: noteGroups
       })
     }
     

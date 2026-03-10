@@ -89,7 +89,12 @@
           if (mode === 'work') {
             DOM.statusEl.textContent = '🎉 完成！休息一下吧'
             window.electronAPI.showNotification('🍅 番茄钟完成', '恭喜！你完成了一个番茄时间，休息一下吧~')
-            Stats.increment(Math.round(Timer.getTotalTime() / 60))
+            
+            // 获取当前备注
+            const timerNoteText = document.getElementById('timerNoteText')
+            const currentNote = timerNoteText && timerNoteText.textContent ? timerNoteText.textContent.trim() : ''
+            
+            Stats.increment(Math.round(Timer.getTotalTime() / 60), currentNote)
           } else {
             DOM.statusEl.textContent = '⏰ 休息结束！继续加油'
             window.electronAPI.showNotification('☕ 休息结束', '休息时间到，准备好继续工作了吗？')
@@ -98,7 +103,11 @@
           // 计划模式：完成当前项，进入下一项
           const currentItem = PlanMode.getCurrentItem()
           if (currentItem && currentItem.type === 'work') {
-            Stats.increment(currentItem.minutes)
+            // 获取计划模式的备注
+            const planNote = window.NoteManager ? window.NoteManager.getNote() : { title: '', detail: '' }
+            const noteText = planNote.title || planNote.detail || ''
+            
+            Stats.increment(currentItem.minutes, noteText)
           }
           
           const nextItem = PlanMode.nextItem()
