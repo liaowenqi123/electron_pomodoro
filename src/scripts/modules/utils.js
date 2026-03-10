@@ -31,11 +31,11 @@
    * 作物配置
    */
   const CROP_CONFIG = {
-    carrot: { name: '胡萝卜', growTime: 25, icon: '🥕', seedType: 'carrot', rarity: 'common', value: 10, seedPrice: 10, sellPrice: 8 },
-    tomato: { name: '番茄', growTime: 50, icon: '🍅', seedType: 'tomato', rarity: 'common', value: 20, seedPrice: 20, sellPrice: 16 },
-    sunflower: { name: '向日葵', growTime: 90, icon: '🌻', seedType: 'sunflower', rarity: 'rare', value: 50, seedPrice: 50, sellPrice: 40 },
-    rose: { name: '玫瑰', growTime: 120, icon: '🌹', seedType: 'rose', rarity: 'rare', value: 80, seedPrice: 80, sellPrice: 64 },
-    osmanthus: { name: '金桂树', growTime: 180, icon: '🌳', seedType: 'osmanthus', rarity: 'legend', value: 150, seedPrice: 150, sellPrice: 120 }
+    carrot: { name: '胡萝卜', growTime: 25, icon: '🥕', seedType: 'carrot', rarity: 'common', value: 10, seedPrice: 8, sellPrice: 10 },
+    tomato: { name: '番茄', growTime: 50, icon: '🍅', seedType: 'tomato', rarity: 'common', value: 20, seedPrice: 16, sellPrice: 20 },
+    sunflower: { name: '向日葵', growTime: 90, icon: '🌻', seedType: 'sunflower', rarity: 'rare', value: 50, seedPrice: 40, sellPrice: 50 },
+    rose: { name: '玫瑰', growTime: 120, icon: '🌹', seedType: 'rose', rarity: 'rare', value: 80, seedPrice: 64, sellPrice: 80 },
+    osmanthus: { name: '金桂树', growTime: 180, icon: '🌳', seedType: 'osmanthus', rarity: 'legend', value: 150, seedPrice: 120, sellPrice: 150 }
   }
 
   /**
