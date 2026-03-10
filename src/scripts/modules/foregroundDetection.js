@@ -219,10 +219,10 @@
   /**
    * 显示警告弹窗
    */
-  function showWarningModal() {
+  async function showWarningModal() {
     // 如果处于迷你模式，先退出（就像按了一下退出按钮）
     if (window.MiniMode && window.MiniMode.isActive()) {
-      window.MiniMode.exit()
+      await window.MiniMode.exit()
     }
     
     if (elements.warningModal) {
@@ -252,10 +252,10 @@
   /**
    * 显示 API Key 错误弹窗
    */
-  function showApiKeyErrorModal(data) {
+  async function showApiKeyErrorModal(data) {
     // 如果处于迷你模式，先退出（就像按了一下退出按钮）
     if (window.MiniMode && window.MiniMode.isActive()) {
-      window.MiniMode.exit()
+      await window.MiniMode.exit()
     }
     
     if (elements.apiKeyErrorModal) {
