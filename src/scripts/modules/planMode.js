@@ -150,11 +150,9 @@
     }
     
     const deleteNoteHandler = async () => {
-      if (confirm('确定要删除这条备注吗？')) {
-        await updatePlanNote(index, null)
-        modal.classList.remove('show')
-        cleanup()
-      }
+      await updatePlanNote(index, null)
+      modal.classList.remove('show')
+      cleanup()
     }
     
     const closeHandler = () => {
