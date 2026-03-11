@@ -489,6 +489,30 @@
   }
 
   // ============ 侧边栏收起/展开功能 ============
+  
+  // ============ 计划模式备注区域展开/收起功能 ============
+  const planNoteCollapseBtn = document.getElementById('planNoteCollapseBtn')
+  const planNoteSection = document.getElementById('planNoteSection')
+  const planModeContent = document.getElementById('planModeContent')
+  let isPlanNoteCollapsed = false
+
+  if (planNoteCollapseBtn && planNoteSection) {
+    planNoteCollapseBtn.addEventListener('click', () => {
+      isPlanNoteCollapsed = !isPlanNoteCollapsed
+      
+      if (isPlanNoteCollapsed) {
+        planNoteSection.classList.add('collapsed')
+        planModeContent.classList.add('note-collapsed')
+        planNoteCollapseBtn.title = '展开'
+      } else {
+        planNoteSection.classList.remove('collapsed')
+        planModeContent.classList.remove('note-collapsed')
+        planNoteCollapseBtn.title = '收起'
+      }
+    })
+  }
+  
+  // ============ 侧边栏收起/展开功能 ============
   const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn')
   let isSidebarCollapsed = false
 

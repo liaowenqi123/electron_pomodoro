@@ -99,13 +99,6 @@
           <div class="plan-list scrollable" id="planList">
             <!-- 由 JS 动态生成 -->
           </div>
-          
-          <!-- 备注输入区域 -->
-          <div class="note-input-section" id="planNoteInputSection">
-            <div class="note-input-header">📝 备注（可选）</div>
-            <input type="text" class="note-title-input" id="planNoteTitleInput" placeholder="标题" maxlength="50">
-            <textarea class="note-detail-input" id="planNoteDetailInput" placeholder="详细内容" rows="2"></textarea>
-          </div>
         </div>
         
         <!-- 添加预设/计划 -->
@@ -122,6 +115,20 @@
           <div class="plan-add-buttons" id="planAddButtons" style="display: none;">
             <button class="btn-add-plan btn-add-work" id="addWorkBtn" title="添加工作时间">+ 工作</button>
             <button class="btn-add-plan btn-add-break" id="addBreakBtn" title="添加休息时间">+ 休息</button>
+          </div>
+          
+          <!-- 计划模式备注输入区域 -->
+          <div class="plan-note-section" id="planNoteSection" style="display: none;">
+            <div class="plan-note-collapse-btn" id="planNoteCollapseBtn" title="收起">
+              <span class="plan-note-collapse-icon">▲</span>
+            </div>
+            <div class="plan-note-wrapper" id="planNoteWrapper">
+              <div class="plan-note-content">
+                <div class="note-input-header">📝 备注（可选）</div>
+                <input type="text" class="note-title-input" id="planNoteTitleInput" placeholder="标题" maxlength="50">
+                <textarea class="note-detail-input" id="planNoteDetailInput" placeholder="详细内容" rows="2"></textarea>
+              </div>
+            </div>
           </div>
           
           <!-- 提示信息 -->

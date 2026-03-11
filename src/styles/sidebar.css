@@ -185,6 +185,12 @@
   margin-bottom: 10px;
   overflow-y: auto;
   -webkit-app-region: no-drag;
+  transition: max-height 0.3s cubic-bezier(0.5, 0, 0.5, 1);
+}
+
+/* 备注区域收起时，计划列表扩展 */
+.plan-mode-content.note-collapsed .plan-list {
+  max-height: 280px;
 }
 
 /* 计划列表滚动条样式（略带蓝色调） */
@@ -523,6 +529,87 @@ body.dark-theme .container.plan-mode .plan-item.break:hover {
 }
 .plan-list .plan-item {
 border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+/* ============ 计划模式备注区域（带展开/收起） ============ */
+.plan-note-section {
+  position: relative;
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  overflow: visible;
+}
+
+/* 展开收起按钮 - 在顶部 */
+.plan-note-collapse-btn {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.plan-note-collapse-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  width: 60px;
+  height: 10px;
+  border-radius: 0 0 11px 11px;
+}
+
+.plan-note-collapse-icon {
+  font-size: 6px;
+  color: rgba(255, 255, 255, 0.6);
+  transition: transform 0.2s ease;
+}
+
+/* 收起状态：图标向上 */
+.plan-note-section.collapsed .plan-note-collapse-icon {
+  transform: rotate(180deg);
+}
+
+.plan-note-section.collapsed .plan-note-collapse-btn {
+  top: 0;
+  border-radius: 0 0 8px 8px;
+  border-top: none;
+}
+
+.plan-note-section.collapsed .plan-note-collapse-btn:hover {
+  width: 60px;
+  height: 10px;
+  border-radius: 0 0 11px 11px;
+}
+
+/* 内容包装器 */
+.plan-note-wrapper {
+  overflow: hidden;
+  max-height: 200px;
+  transition: max-height 0.3s cubic-bezier(0.5, 0, 0.5, 1);
+}
+
+.plan-note-section.collapsed .plan-note-wrapper {
+  max-height: 0;
+}
+
+.plan-note-content {
+  padding: 14px 10px 10px 10px;
+  opacity: 1;
+  transition: opacity 0.3s cubic-bezier(0.5, 0, 0.5, 1);
+}
+
+.plan-note-section.collapsed .plan-note-content {
+  opacity: 0;
 }
 
 /* ============ 侧边栏收起按钮 ============ */

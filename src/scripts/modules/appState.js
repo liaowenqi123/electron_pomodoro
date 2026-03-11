@@ -208,16 +208,20 @@
   }
 
   function updateContentVisibility(mode) {
+    const planNoteSection = document.getElementById('planNoteSection')
+    
     if (mode === 'single') {
       DOM.singleModeContent.style.display = 'block'
       DOM.planModeContent.style.display = 'none'
       DOM.addPresetBtn.style.display = 'flex'
       DOM.planAddButtons.style.display = 'none'
+      if (planNoteSection) planNoteSection.style.display = 'none'
     } else {
       DOM.singleModeContent.style.display = 'none'
       DOM.planModeContent.style.display = 'block'
       DOM.addPresetBtn.style.display = 'none'
       DOM.planAddButtons.style.display = 'flex'
+      if (planNoteSection) planNoteSection.style.display = 'block'
     }
   }
 
