@@ -511,9 +511,9 @@
   const timerContainer = document.querySelector('.timer-section .timer-container')
   if (timerContainer) {
     timerContainer.addEventListener('wheel', (e) => {
-      // 判断条件：单次模式 + 未开始计时
+      // 判断条件：单次模式 + 未开始计时 + 未暂停
       if (AppState.appMode !== 'single') return
-      if (Timer.getIsRunning()) return
+      if (Timer.getIsRunning() || Timer.getIsPaused()) return
       
       e.preventDefault()
       

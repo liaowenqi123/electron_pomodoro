@@ -63,6 +63,15 @@
           window.electronAPI.updateTimerStatus(isRunning, isPaused)
         }
 
+        // 暂停时禁用滚轮选择器和预设按钮，恢复时重新启用
+        if (status === 'paused') {
+          Presets.setEnabled(false)
+          WheelPicker.setEnabled(false)
+        } else if (status === 'ready') {
+          Presets.setEnabled(true)
+          WheelPicker.setEnabled(true)
+        }
+
         if (AppState.appMode === 'single') {
           const mode = Mode.getMode()
           if (status === 'running') {
