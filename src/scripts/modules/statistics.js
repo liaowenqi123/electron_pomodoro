@@ -287,6 +287,23 @@ const Statistics = (function() {
                 padding: 10,
                 font: { size: 12 }
               }
+            },
+            tooltip: {
+              callbacks: {
+                afterLabel: function(context) {
+                  // 显示这一天不同备注的详细分布
+                  const dataIndex = context.dataIndex
+                  const item = data[dataIndex]
+                  if (item.noteGroups) {
+                    const details = []
+                    Object.entries(item.noteGroups).forEach(([note, minutes]) => {
+                      details.push(`  ${note}: ${minutes}分钟`)
+                    })
+                    return details.join('\n')
+                  }
+                  return ''
+                }
+              }
             }
           },
           scales: {
