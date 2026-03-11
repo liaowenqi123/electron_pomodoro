@@ -185,12 +185,13 @@
   margin-bottom: 10px;
   overflow-y: auto;
   -webkit-app-region: no-drag;
-  transition: max-height 0.3s cubic-bezier(0.5, 0, 0.5, 1);
+  transition: max-height 0.35s cubic-bezier(0.5, 0, 0.5, 1);
 }
 
 /* 备注区域收起时，计划列表扩展 */
 .plan-mode-content.note-collapsed .plan-list {
-  max-height: 280px;
+  max-height: 310px;
+  transition-delay: 0.2s;
 }
 
 /* 计划列表滚动条样式（略带蓝色调） */
@@ -595,7 +596,7 @@ border: 2px solid rgba(255, 255, 255, 0.5);
 .plan-note-wrapper {
   overflow: hidden;
   max-height: 200px;
-  transition: max-height 0.3s cubic-bezier(0.5, 0, 0.5, 1);
+  transition: max-height 0.5s cubic-bezier(0.5, 0, 0.5, 1);
 }
 
 .plan-note-section.collapsed .plan-note-wrapper {
@@ -605,7 +606,7 @@ border: 2px solid rgba(255, 255, 255, 0.5);
 .plan-note-content {
   padding: 14px 10px 10px 10px;
   opacity: 1;
-  transition: opacity 0.3s cubic-bezier(0.5, 0, 0.5, 1);
+  transition: opacity 0.5s cubic-bezier(0.5, 0, 0.5, 1);
 }
 
 .plan-note-section.collapsed .plan-note-content {
